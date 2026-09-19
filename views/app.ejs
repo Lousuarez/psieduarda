@@ -467,7 +467,8 @@ function toggleTheme(){
   .unidade-name{ flex:1; font-size:13.5px; font-weight:600; color:var(--ink); }
   .unidade-count{ font-size:11.5px; color:var(--ink-dim); }
   .unidade-add-row{ display:flex; gap:8px; margin-top:14px; }
-  .unidade-add-row input{ flex:1; }
+  .unidade-add-row input{ flex:1; font-family:var(--font); font-size:13.5px; color:var(--ink); background:var(--bg); border:1px solid var(--line); border-radius:7px; padding:9px 11px; outline:none; }
+  .unidade-add-row input:focus{ border-color:var(--verde-ink); }
 
   .empty-state{ padding:56px 20px; text-align:center; color:var(--ink-dim); font-size:13.5px; }
 
@@ -622,16 +623,10 @@ function toggleTheme(){
             <button class="nav-item nav-subitem" id="navm-unidades" onclick="navTo('manage','unidades')">Unidades</button>
           </div></div>
         </div>
-        <div class="nav-submenu" id="navsub-manage-admin">
-          <button class="nav-submenu-toggle" onclick="toggleNavSubmenu('manage-admin')" aria-expanded="false" aria-controls="navsub-manage-admin-list">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>
-            <span class="nav-submenu-label">Administrativo</span>
-            <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
-          </button>
-          <div class="nav-submenu-list" id="navsub-manage-admin-list"><div>
-            <button class="nav-item nav-subitem" id="navm-usuarios" onclick="navTo('manage','usuarios')">Usuários</button>
-          </div></div>
-        </div>
+        <button class="nav-item" id="navm-usuarios" onclick="navTo('manage','usuarios')" style="display:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>
+          Usuários
+        </button>
       </div>
     </nav>
 
@@ -842,6 +837,7 @@ function toggleTheme(){
               <input type="password" id="usuario-new-senha" placeholder="Senha" aria-label="Senha do novo usuário" onkeydown="if(event.key==='Enter') addUsuario();">
               <button class="reg-new-btn" onclick="addUsuario()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Adicionar</button>
             </div>
+            <label class="field-check" style="margin:10px 0 0;"><input type="checkbox" id="usuario-new-admin"> Usuário administrador (acessa o menu Administrativo)</label>
           </div>
         </div>
       </div>
@@ -1033,6 +1029,10 @@ let confirmActionFn = null;
 let unidadeEditingId = null;
 let usuarioEditingId = null;
 let currentUserId = null;
+let currentUserIsAdmin = false;
+function applyAdminVisibility(){
+  document.getElementById('navm-usuarios').style.display = currentUserIsAdmin ? '' : 'none';
+}
 let trilhaExtraSelected = null;
 let txSelectedModulo = null;
 const loadedCols = new Set();
@@ -2089,16 +2089,18 @@ function renderUsuarios(){
   if(!usuarios.length){ el.innerHTML = '<p style="font-size:12.5px;color:var(--ink-dim);">Nenhum usuário cadastrado ainda.</p>'; return; }
   el.innerHTML = usuarios.map(u => {
     const isSelf = u.id === currentUserId;
+    const badge = u.isAdmin ? ' <span class="unidade-count">admin</span>' : '';
     if(usuarioEditingId===u.id){
-      return `<div class="unidade-row">
-        <input type="text" id="usuario-edit-nome" value="${esc(u.username)}" style="flex:1;font-family:var(--font);font-size:13.5px;padding:6px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);">
-        <input type="password" id="usuario-edit-senha" placeholder="Nova senha (opcional)" style="flex:1;font-family:var(--font);font-size:13.5px;padding:6px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);">
+      return `<div class="unidade-row" style="flex-wrap:wrap;">
+        <input type="text" id="usuario-edit-nome" value="${esc(u.username)}" style="flex:1;min-width:140px;font-family:var(--font);font-size:13.5px;padding:6px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);">
+        <input type="password" id="usuario-edit-senha" placeholder="Nova senha (opcional)" style="flex:1;min-width:140px;font-family:var(--font);font-size:13.5px;padding:6px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);">
         <button class="btn-ghost-sm" onclick="saveUsuarioEdit('${u.id}')" title="Salvar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg></button>
         <button class="btn-ghost-sm" onclick="usuarioEditingId=null; renderUsuarios();" title="Cancelar">×</button>
+        <label class="field-check" style="margin:0; width:100%;"><input type="checkbox" id="usuario-edit-admin" ${u.isAdmin?'checked':''}> Usuário administrador</label>
       </div>`;
     }
     return `<div class="unidade-row">
-      <span class="unidade-name">${esc(u.username)}${isSelf ? ' <span class="unidade-count">(você)</span>' : ''}</span>
+      <span class="unidade-name">${esc(u.username)}${isSelf ? ' <span class="unidade-count">(você)</span>' : ''}${badge}</span>
       <button class="btn-ghost-sm" onclick="usuarioEditingId='${u.id}'; renderUsuarios();" title="Editar">${editSvg()}</button>
       ${isSelf ? '' : `<button class="btn-ghost-sm" onclick="deleteUsuario('${u.id}', ${usuarios.length})" title="Excluir">${trashSvg()}</button>`}
     </div>`;
@@ -2107,31 +2109,35 @@ function renderUsuarios(){
 async function addUsuario(){
   const nomeInput = document.getElementById('usuario-new-nome');
   const senhaInput = document.getElementById('usuario-new-senha');
+  const adminInput = document.getElementById('usuario-new-admin');
   const username = nomeInput.value.trim();
   const password = senhaInput.value;
   if(!username || !password){ toast('Informe usuário e senha'); return; }
   if(!db){ toast('Banco indisponível'); return; }
   try{
-    await db.collection('usuarios').add({username, password});
-    nomeInput.value = ''; senhaInput.value = ''; toast('Usuário adicionado');
+    await db.collection('usuarios').add({username, password, isAdmin: adminInput.checked});
+    nomeInput.value = ''; senhaInput.value = ''; adminInput.checked = false; toast('Usuário adicionado');
   }catch(e){ toast('Não foi possível criar o usuário (nome já existe?)'); }
 }
 async function saveUsuarioEdit(id){
   const username = document.getElementById('usuario-edit-nome').value.trim();
   const password = document.getElementById('usuario-edit-senha').value;
+  const isAdmin = document.getElementById('usuario-edit-admin').checked;
   if(!username) return;
-  const data = {username};
+  const data = {username, isAdmin};
   if(password) data.password = password;
   try{
     await db.doc('usuarios/'+id).update(data);
     usuarioEditingId = null; toast('Usuário atualizado');
-  }catch(e){ toast('Não foi possível atualizar (nome já existe?)'); }
+  }catch(e){ toast('Não foi possível atualizar (nome já existe, ou é o último administrador?)'); }
 }
 function deleteUsuario(id, total){
   if(total<=1){ toast('Não é possível excluir o último usuário'); return; }
   const u = usuarios.find(x=>x.id===id);
   openConfirm(`Excluir ${u?.username||'usuário'}?`, 'Esta ação não pode ser desfeita.', async () => {
-    await db.doc('usuarios/'+id).delete(); toast('Usuário excluído');
+    try{
+      await db.doc('usuarios/'+id).delete(); toast('Usuário excluído');
+    }catch(e){ toast('Não foi possível excluir (é o último administrador?)'); }
   });
 }
 
@@ -2178,6 +2184,8 @@ async function handleLogin(ev){
     const data = await res.json();
     setToken(data.token);
     currentUserId = data.id;
+    currentUserIsAdmin = !!data.isAdmin;
+    applyAdminVisibility();
     showApp();
     boot();
   }catch(e){ errEl.style.display = 'block'; }
@@ -2188,6 +2196,7 @@ async function doLogout(){
   const headers = authHeaders();
   clearToken();
   currentUserId = null;
+  currentUserIsAdmin = false;
   showLogin();
   try{ await fetch('api/logout', { method:'POST', headers }); }catch(e){}
 }
@@ -2200,6 +2209,8 @@ async function initAuth(){
     if(!res.ok){ clearToken(); showLogin(); return; }
     const data = await res.json();
     currentUserId = data.id;
+    currentUserIsAdmin = !!data.isAdmin;
+    applyAdminVisibility();
     showApp();
     boot();
   }catch(e){ clearToken(); showLogin(); }

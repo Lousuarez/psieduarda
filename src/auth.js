@@ -9,7 +9,8 @@ async function attemptLogin(username, pass) {
   const user = rows[0];
   if (!user) return null;
   const ok = await bcrypt.compare(pass, user.password_hash);
-  return ok ? user : null;
+  if (!ok) return null;
+  return { id: user.id, username: user.username, isAdmin: !!user.is_admin };
 }
 
 async function issueToken(userId) {
@@ -22,12 +23,14 @@ async function issueToken(userId) {
 async function verifyToken(token) {
   if (!token) return null;
   const [rows] = await pool.query(
-    `SELECT u.id, u.username FROM auth_tokens t
+    `SELECT u.id, u.username, u.is_admin FROM auth_tokens t
      JOIN users u ON u.id = t.user_id
      WHERE t.token = ? AND t.expires_at > NOW()`,
     [token]
   );
-  return rows[0] || null;
+  if (!rows.length) return null;
+  const row = rows[0];
+  return { id: row.id, username: row.username, isAdmin: !!row.is_admin };
 }
 
 async function revokeToken(token) {
@@ -49,4 +52,9 @@ async function requireAuth(req, res, next) {
   next();
 }
 
-module.exports = { attemptLogin, issueToken, verifyToken, revokeToken, getBearerToken, requireAuth };
+function requireAdmin(req, res, next) {
+  if (!req.user || !req.user.isAdmin) return res.status(403).json({ error: 'forbidden' });
+  next();
+}
+
+module.exports = { attemptLogin, issueToken, verifyToken, revokeToken, getBearerToken, requireAuth, requireAdmin };
