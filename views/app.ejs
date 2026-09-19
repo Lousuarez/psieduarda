@@ -1110,7 +1110,12 @@ async function boot(){
   db.collection('modulos').onSnapshot(s => { modulos = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('modulos'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
   db.collection('colaboradores').onSnapshot(s => { colaboradores = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('colaboradores'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
   db.collection('progresso').onSnapshot(s => { progresso = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('progresso'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
-  db.collection('usuarios').onSnapshot(s => { usuarios = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('usuarios'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
+  // Só usuários administradores têm permissão pra ler /api/usuarios (403 pros
+  // demais) — buscar essa coleção pra todo mundo derrubaria dbUnavailable
+  // (compartilhado) e quebraria o app inteiro pra quem não é admin.
+  if(currentUserIsAdmin){
+    db.collection('usuarios').onSnapshot(s => { usuarios = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('usuarios'); renderAll(); }, ()=>{ renderAll(); });
+  }
 }
 
 /* ---------- Derived helpers ---------- */
