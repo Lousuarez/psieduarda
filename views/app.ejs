@@ -357,6 +357,11 @@ function toggleTheme(){
   .colab-head-row{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:6px; }
   .colab-detail h2{ font-weight:700; font-size:21px; margin:0 0 6px; color:var(--ink); }
   .colab-meta-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
+  .colab-head-stat{ flex-shrink:0; text-align:right; }
+  .colab-head-stat-num{ display:block; font-size:24px; font-weight:800; color:var(--verde-ink); line-height:1; }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .colab-head-stat-num{ color:var(--verde); } }
+  :root[data-theme="dark"] .colab-head-stat-num{ color:var(--verde); }
+  .colab-head-stat-label{ display:block; font-size:10.5px; font-weight:600; color:var(--ink-dim); margin-top:3px; white-space:nowrap; }
   .badge{ font-size:10.5px; font-weight:800; letter-spacing:.03em; text-transform:uppercase; padding:4px 10px; border-radius:20px; background:var(--bg-sunken); color:var(--ink-dim); }
   .badge.lideranca{ background:var(--status-done-bg); color:var(--status-done-ink); }
   .badge.ativo{ background:var(--status-done-bg); color:var(--status-done-ink); }
@@ -395,8 +400,11 @@ function toggleTheme(){
   .chip button{ appearance:none; background:none; border:none; cursor:pointer; color:var(--ink-faint); font-size:14px; line-height:1; padding:2px; }
   .chip button:hover{ color:var(--danger); }
   .add-chip-select{ font-family:var(--font); font-size:12px; color:var(--ink-dim); border:1.5px dashed var(--line); border-radius:16px; padding:6px 12px; background:none; cursor:pointer; }
-  .progress-group{ margin-bottom:16px; }
-  .progress-group-title{ font-size:13px; font-weight:800; color:var(--ink); margin-bottom:8px; }
+  .progress-group{ margin-bottom:22px; }
+  .progress-group-head{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:2px; }
+  .progress-group-title{ font-size:13px; font-weight:800; color:var(--ink); }
+  .progress-group-stat{ font-size:11px; font-weight:700; color:var(--ink-dim); white-space:nowrap; flex-shrink:0; }
+  .progress-group .progress-cycle-card:first-of-type{ margin-top:14px; }
   .progress-cycle-title{ font-size:11px; font-weight:700; color:var(--verde-ink); text-transform:uppercase; letter-spacing:.04em; margin:10px 0 4px; }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .progress-cycle-title{ color:var(--verde); } }
   :root[data-theme="dark"] .progress-cycle-title{ color:var(--verde); }
@@ -1298,6 +1306,11 @@ function renderViewColabDetail(){
   const c = colaboradores.find(x=>x.id===colabSelected);
   if(!c){ el.innerHTML = '<div class="empty-state">Selecione um colaborador na lista.</div>'; return; }
   const unidadeNome = unidadeById(c.unidadeId)?.nome || '—';
+  const enrolled = colabEnrolledTrilhas(c);
+  const allMods = enrolled.flatMap(({ciclosComMods})=>ciclosComMods.flatMap(x=>x.mods));
+  const done = allMods.filter(m=>progressoDoc(c.id,m.id)?.status==='Concluído').length;
+  const pct = allMods.length ? Math.round(done/allMods.length*100) : 0;
+
   let html = `
     <div class="colab-head-row">
       <div>
@@ -1309,28 +1322,30 @@ function renderViewColabDetail(){
           ${c.cargo ? `<span class="badge">${esc(c.cargo)}</span>` : ''}
         </div>
       </div>
+      ${enrolled.length ? `<div class="colab-head-stat">
+        <span class="colab-head-stat-num">${pct}%</span>
+        <span class="colab-head-stat-label">${done}/${allMods.length} módulos</span>
+      </div>` : ''}
     </div>`;
   if(c.nota){ html += `<div class="warn-box">${warnSvg()}<span>${esc(c.nota)}</span></div>`; }
   if(c.email || c.gestor || c.dataAdmissao){
     html += `<p style="font-size:12.5px;color:var(--ink-dim);margin:0 0 6px;">${[c.email, c.gestor?('gestor: '+c.gestor):'', c.dataAdmissao?('desde '+c.dataAdmissao):''].filter(Boolean).map(esc).join(' · ')}</p>`;
   }
 
-  const enrolled = colabEnrolledTrilhas(c);
   html += `<div class="section-h">Trilhas</div>`;
-  if(enrolled.length){
-    html += `<div class="chip-row">` + enrolled.map(({t})=>`<span class="chip" style="padding:6px 13px;">${esc(t.nome)}</span>`).join('') + `</div>`;
-  } else {
+  if(!enrolled.length){
     html += `<p style="font-size:12.5px;color:var(--ink-dim);">Ainda não está inserido em nenhuma trilha.</p>`;
-  }
-
-  if(enrolled.length){
-    const allMods = enrolled.flatMap(({ciclosComMods})=>ciclosComMods.flatMap(x=>x.mods));
-    const done = allMods.filter(m=>progressoDoc(c.id,m.id)?.status==='Concluído').length;
-    const pct = allMods.length ? Math.round(done/allMods.length*100) : 0;
-    html += `<div class="section-h">Progresso <span style="text-transform:none;font-weight:600;color:var(--ink-dim);">${done}/${allMods.length} módulos · ${pct}%</span></div>`;
-    html += `<div class="progress-bar-outer"><div class="progress-bar-inner" style="width:${pct}%"></div></div>`;
+  } else {
     enrolled.forEach(({t, ciclosComMods}) => {
-      html += `<div class="progress-group"><div class="progress-group-title">${esc(t.nome)}</div>`;
+      const modsT = ciclosComMods.flatMap(x=>x.mods);
+      const doneT = modsT.filter(m=>progressoDoc(c.id,m.id)?.status==='Concluído').length;
+      const pctT = modsT.length ? Math.round(doneT/modsT.length*100) : 0;
+      html += `<div class="progress-group">
+        <div class="progress-group-head">
+          <span class="progress-group-title">${esc(t.nome)}</span>
+          <span class="progress-group-stat">${doneT}/${modsT.length} · ${pctT}%</span>
+        </div>
+        <div class="progress-bar-outer progress-bar-outer-sm"><div class="progress-bar-inner" style="width:${pctT}%"></div></div>`;
       ciclosComMods.forEach(({ci, mods}) => {
         const withStatus = mods.map(m => ({m, st: progressoDoc(c.id, m.id)?.status || 'Não iniciado'}));
         const emAndamento = withStatus.filter(x=>x.st==='Em andamento');
