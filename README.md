@@ -9,55 +9,64 @@ hospedada na Hostinger via o pacote Node.js do plano, no domínio
 
 ## Acesso
 
-Usuário e senha ficam nas variáveis de ambiente `ADMIN_USER` /
-`ADMIN_PASS_HASH` (veja `.env.example`). Para gerar um hash de senha novo,
-rode no terminal (com Node instalado):
+Usuário e senha ficam na tabela `users` do banco de dados (criada e já
+populada com um usuário padrão pelo `schema.sql` — veja o próprio arquivo
+pro usuário/senha padrão). Login é feito por **token** (não por cookie de
+sessão): o navegador guarda o token no `localStorage` depois do login e
+manda ele em cada requisição via header `Authorization`. Isso evita
+depender de `Set-Cookie`, que alguma infraestrutura de proxy/CDN pode
+remover das respostas antes de chegar ao navegador.
+
+Para trocar a senha de um usuário, gere um novo hash e atualize a linha
+direto no banco (via phpMyAdmin):
 
 ```
 node -e "console.log(require('bcryptjs').hashSync('sua_nova_senha', 10))"
 ```
 
-e substitua o valor de `ADMIN_PASS_HASH` nas variáveis de ambiente do
-servidor.
+```sql
+UPDATE users SET password_hash = 'HASH_GERADO_ACIMA' WHERE username = 'Admin';
+```
+
+Pra criar outro usuário:
+
+```sql
+INSERT INTO users (id, username, password_hash)
+VALUES (HEX(RANDOM_BYTES(9)), 'novo_usuario', 'HASH_GERADO_ACIMA');
+```
 
 ## Como implantar na Hostinger (passo a passo)
 
 1. **Criar a aplicação Node.js**
-   Em hPanel → seu site → **Node.js** → Criar aplicação:
-   - Versão do Node: a LTS mais recente disponível (18 ou superior)
-   - Application root: raiz do repositório
-   - Application startup file: `server.js`
-   - Application URL: `psieduarda.com.br`
+   No painel de deploy, importe o repositório `Lousuarez/psieduarda`,
+   branch `main`, diretório raiz `./`, versão do Node 18 ou superior.
 
-2. **Implantar via Git**
-   Na mesma tela (ou em Avançado → Git), aponte pro repositório
-   `Lousuarez/psieduarda`, branch `main`, apontando pra raiz configurada no
-   passo 1.
-
-3. **Criar o banco de dados MySQL**
+2. **Criar o banco de dados MySQL**
    Em hPanel → Bancos de dados → Bancos de dados MySQL, crie um novo banco
    e um novo usuário com acesso a ele. Anote: nome do banco, usuário, senha
-   (o host quase sempre é `localhost`).
+   (o host quase sempre é `localhost`, ou o host remoto informado em
+   "MySQL Remoto" se a aplicação não rodar na mesma rede do banco).
 
-4. **Rodar o schema**
+3. **Rodar o schema**
    Em hPanel → Bancos de dados → phpMyAdmin, abra o banco criado e rode o
    conteúdo de `schema.sql`. Isso cria as tabelas usadas pela aplicação
-   (diferente da versão anterior, aqui o schema precisa ser rodado antes do
-   primeiro acesso — a aplicação não cria as tabelas sozinha).
+   **e** já insere o usuário administrador padrão — o schema precisa ser
+   rodado antes do primeiro acesso, a aplicação não cria as tabelas
+   sozinha.
 
-5. **Definir as variáveis de ambiente**
-   No painel Node.js da Hostinger, defina: `DB_HOST`, `DB_PORT`, `DB_USER`,
-   `DB_PASS`, `DB_NAME`, `SESSION_SECRET`, `ADMIN_USER`, `ADMIN_PASS_HASH`
-   (veja `.env.example` para o formato de cada uma). Essas variáveis nunca
-   são commitadas no repositório.
+4. **Definir as variáveis de ambiente**
+   No painel de deploy, defina: `NODE_ENV=production`, `DB_HOST`,
+   `DB_PORT`, `DB_USER`, `DB_PASS`, `DB_NAME` (veja `.env.example` para o
+   formato de cada uma). Essas variáveis nunca são commitadas no
+   repositório.
 
-6. **Instalar as dependências**
-   No painel Node.js, use o botão "Run NPM Install" (ou rode `npm install`
-   via terminal SSH, se disponível).
+5. **Instalar as dependências e implantar**
+   O próprio painel roda `npm install` e `npm start` (que executa
+   `server.js`) automaticamente ao importar do GitHub.
 
-7. **Testar**
-   Acesse `https://psieduarda.com.br`. Deve aparecer a tela de login. Entre
-   com as credenciais configuradas e confirme que consegue cadastrar uma
+6. **Testar**
+   Acesse o domínio configurado. Deve aparecer a tela de login. Entre com
+   as credenciais configuradas e confirme que consegue cadastrar uma
    unidade e um colaborador de teste.
 
 ## Rodando localmente
@@ -73,30 +82,32 @@ Acesse `http://localhost:3000`.
 ## Estrutura do projeto
 
 ```
-server.js               Entry point (Startup File da Hostinger)
+server.js               Entry point (Startup File)
 src/db.js                Pool de conexão MySQL + gerador de IDs
-src/auth.js               Login (bcrypt) e middleware de sessão
-src/routes/auth.js        POST /login, GET /logout
+src/auth.js               Login (bcrypt) e emissão/validação de tokens
+src/routes/auth.js        POST /api/login, POST /api/logout, GET /api/me
 src/routes/*.js           Uma rota REST por entidade (unidades, trilhas,
                           ciclos, modulos, colaboradores, progresso)
-views/app.ejs             Página única da aplicação (login + app, conforme
-                          sessão) — HTML/CSS/JS do front-end
+views/app.ejs             Página única da aplicação (login + app, alternados
+                          via JS conforme o token) — HTML/CSS/JS do front-end
 public/assets/            Logos e outros arquivos estáticos
-schema.sql                Script de criação das tabelas (rodar manualmente
-                          antes do primeiro acesso)
+schema.sql                Script de criação das tabelas + usuário admin
+                          padrão (rodar manualmente antes do primeiro acesso)
 ```
 
 O modelo de dados usa **tabelas normalizadas por entidade** (colaboradores,
-trilhas, ciclos, módulos, progresso, unidades), com chaves estrangeiras
-reais e exclusão em cascata onde faz sentido (ex.: excluir um colaborador
-remove automaticamente o progresso e as matrículas em trilhas dele).
+trilhas, ciclos, módulos, progresso, unidades, usuários), com chaves
+estrangeiras reais e exclusão em cascata onde faz sentido (ex.: excluir um
+colaborador remove automaticamente o progresso e as matrículas em trilhas
+dele).
 
 ## Segurança
 
-- A senha do admin fica com hash (bcrypt) em variável de ambiente, nunca em
-  texto puro, e nunca é enviada ao GitHub.
-- A sessão de login é persistida no próprio MySQL (`express-mysql-session`)
-  com cookie `HttpOnly`; em produção (`NODE_ENV=production`, atrás de
-  HTTPS) o cookie também é marcado como seguro.
-- Todas as rotas de dados (`/api/*`) exigem sessão autenticada — sem login
-  válido, a API responde 401 e nenhum dado é retornado.
+- As senhas ficam com hash (bcrypt) na tabela `users`, nunca em texto puro,
+  e nunca são enviadas ao GitHub.
+- Login é por token opaco (tabela `auth_tokens`, expira em 30 dias),
+  enviado pelo cliente via header `Authorization: Bearer <token>` — não
+  depende de cookies, então funciona mesmo atrás de proxies/CDNs que
+  removem `Set-Cookie`.
+- Todas as rotas de dados (`/api/*`) exigem um token válido — sem login,
+  a API responde 401 e nenhum dado é retornado.

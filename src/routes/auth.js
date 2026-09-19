@@ -1,29 +1,27 @@
 const express = require('express');
-const { attemptLogin } = require('../auth');
+const { attemptLogin, issueToken, revokeToken, verifyToken, getBearerToken } = require('../auth');
 const asyncHandler = require('../asyncHandler');
 
 const router = express.Router();
 
 router.post('/login', asyncHandler(async (req, res) => {
-  const user = String(req.body.user || '').trim();
+  const username = String(req.body.user || '').trim();
   const pass = String(req.body.pass || '');
-  const ok = await attemptLogin(user, pass);
-  if (ok) {
-    req.session.regenerate((err) => {
-      if (err) return res.redirect('/');
-      req.session.authed = true;
-      res.redirect('/');
-    });
-    return;
-  }
-  req.session.loginError = true;
-  res.redirect('/');
+  const user = await attemptLogin(username, pass);
+  if (!user) return res.status(401).json({ error: 'invalid_credentials' });
+  const token = await issueToken(user.id);
+  res.json({ ok: true, token, username: user.username });
 }));
 
-router.get('/logout', (req, res) => {
-  req.session.destroy(() => {
-    res.redirect('/');
-  });
-});
+router.post('/logout', asyncHandler(async (req, res) => {
+  await revokeToken(getBearerToken(req));
+  res.json({ ok: true });
+}));
+
+router.get('/me', asyncHandler(async (req, res) => {
+  const user = await verifyToken(getBearerToken(req));
+  if (!user) return res.status(401).json({ error: 'not_authenticated' });
+  res.json({ ok: true, username: user.username });
+}));
 
 module.exports = router;
