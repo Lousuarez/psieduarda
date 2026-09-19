@@ -10,7 +10,7 @@ router.post('/login', asyncHandler(async (req, res) => {
   const user = await attemptLogin(username, pass);
   if (!user) return res.status(401).json({ error: 'invalid_credentials' });
   const token = await issueToken(user.id);
-  res.json({ ok: true, token, username: user.username });
+  res.json({ ok: true, token, id: user.id, username: user.username });
 }));
 
 router.post('/logout', asyncHandler(async (req, res) => {
@@ -21,7 +21,7 @@ router.post('/logout', asyncHandler(async (req, res) => {
 router.get('/me', asyncHandler(async (req, res) => {
   const user = await verifyToken(getBearerToken(req));
   if (!user) return res.status(401).json({ error: 'not_authenticated' });
-  res.json({ ok: true, username: user.username });
+  res.json({ ok: true, id: user.id, username: user.username });
 }));
 
 module.exports = router;
