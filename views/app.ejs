@@ -401,10 +401,13 @@ function toggleTheme(){
   .chip button:hover{ color:var(--danger); }
   .add-chip-select{ font-family:var(--font); font-size:12px; color:var(--ink-dim); border:1.5px dashed var(--line); border-radius:16px; padding:6px 12px; background:none; cursor:pointer; }
   .progress-group{ margin-bottom:22px; }
-  .progress-group-head{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:2px; }
-  .progress-group-title{ font-size:13px; font-weight:800; color:var(--ink); }
-  .progress-group-stat{ font-size:11px; font-weight:700; color:var(--ink-dim); white-space:nowrap; flex-shrink:0; }
-  .progress-group .progress-cycle-card:first-of-type{ margin-top:14px; }
+  .progress-group-title{ font-size:13px; font-weight:800; color:var(--ink); margin-bottom:8px; }
+  .progress-group-stat-row{ display:flex; align-items:baseline; gap:8px; margin-bottom:8px; }
+  .progress-group-stat-num{ font-size:22px; font-weight:800; color:var(--verde-ink); line-height:1; }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .progress-group-stat-num{ color:var(--verde); } }
+  :root[data-theme="dark"] .progress-group-stat-num{ color:var(--verde); }
+  .progress-group-stat-label{ font-size:11.5px; font-weight:600; color:var(--ink-dim); }
+  .progress-group .progress-cycle-card:first-of-type{ margin-top:22px; }
   .progress-cycle-title{ font-size:11px; font-weight:700; color:var(--verde-ink); text-transform:uppercase; letter-spacing:.04em; margin:10px 0 4px; }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .progress-cycle-title{ color:var(--verde); } }
   :root[data-theme="dark"] .progress-cycle-title{ color:var(--verde); }
@@ -1322,9 +1325,9 @@ function renderViewColabDetail(){
           ${c.cargo ? `<span class="badge">${esc(c.cargo)}</span>` : ''}
         </div>
       </div>
-      ${enrolled.length ? `<div class="colab-head-stat">
+      ${enrolled.length > 1 ? `<div class="colab-head-stat">
         <span class="colab-head-stat-num">${pct}%</span>
-        <span class="colab-head-stat-label">${done}/${allMods.length} módulos</span>
+        <span class="colab-head-stat-label">${done}/${allMods.length} módulos no total</span>
       </div>` : ''}
     </div>`;
   if(c.nota){ html += `<div class="warn-box">${warnSvg()}<span>${esc(c.nota)}</span></div>`; }
@@ -1341,11 +1344,12 @@ function renderViewColabDetail(){
       const doneT = modsT.filter(m=>progressoDoc(c.id,m.id)?.status==='Concluído').length;
       const pctT = modsT.length ? Math.round(doneT/modsT.length*100) : 0;
       html += `<div class="progress-group">
-        <div class="progress-group-head">
-          <span class="progress-group-title">${esc(t.nome)}</span>
-          <span class="progress-group-stat">${doneT}/${modsT.length} · ${pctT}%</span>
+        <div class="progress-group-title">${esc(t.nome)}</div>
+        <div class="progress-group-stat-row">
+          <span class="progress-group-stat-num">${pctT}%</span>
+          <span class="progress-group-stat-label">${doneT}/${modsT.length} módulos concluídos</span>
         </div>
-        <div class="progress-bar-outer progress-bar-outer-sm"><div class="progress-bar-inner" style="width:${pctT}%"></div></div>`;
+        <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:${pctT}%"></div></div>`;
       ciclosComMods.forEach(({ci, mods}) => {
         const withStatus = mods.map(m => ({m, st: progressoDoc(c.id, m.id)?.status || 'Não iniciado'}));
         const emAndamento = withStatus.filter(x=>x.st==='Em andamento');
