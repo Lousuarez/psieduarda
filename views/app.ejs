@@ -408,6 +408,23 @@ function toggleTheme(){
   .progress-bar-outer{ height:5px; border-radius:4px; background:var(--status-todo-bg); overflow:hidden; margin-top:4px; }
   .progress-bar-inner{ height:100%; background:var(--verde); border-radius:4px; }
 
+  .progress-cycle-card{ border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:10px; background:var(--bg-sunken); }
+  .progress-cycle-card .progress-cycle-title{ margin:0; }
+  .progress-cycle-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .progress-cycle-count{ font-size:11px; font-weight:700; color:var(--ink-dim); white-space:nowrap; }
+  .progress-bar-outer-sm{ height:4px; margin-top:6px; }
+  .prog-list{ margin-top:10px; }
+  .prog-row-sm{ padding:6px 0; gap:8px; }
+  .prog-row-sm .prog-name{ flex:1; min-width:0; font-size:12.5px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .status-dot{ width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+  .status-dot.done{ background:var(--status-done-ink); }
+  .status-dot.on{ background:var(--status-prog-ink); }
+  .status-dot.off{ background:var(--status-todo-ink); }
+  .status-pill-sm{ font-size:8.5px; padding:3px 8px; cursor:default; }
+  .prog-toggle-more{ appearance:none; background:none; border:none; cursor:pointer; font-family:var(--font); font-size:11.5px; font-weight:700; color:var(--ink-faint); padding:8px 0 0; width:100%; text-align:left; }
+  .prog-toggle-more:hover{ color:var(--verde-ink); }
+  .prog-more-list .prog-row-sm:first-child{ border-top:1px solid var(--line); padding-top:8px; margin-top:2px; }
+
   @media (max-width:760px){ .colab-layout{ grid-template-columns:1fr; } .colab-list{ max-height:220px; } }
 
   /* Trilhas / board */
@@ -1307,17 +1324,44 @@ function renderViewColabDetail(){
     enrolled.forEach(({t, ciclosComMods}) => {
       html += `<div class="progress-group"><div class="progress-group-title">${esc(t.nome)}</div>`;
       ciclosComMods.forEach(({ci, mods}) => {
-        html += `<div class="progress-cycle-title">${esc(ci.nome)}</div>`;
-        mods.forEach(m => {
-          const st = progressoDoc(c.id, m.id)?.status || 'Não iniciado';
-          html += `<div class="prog-row"><span class="prog-name">${esc(m.nome)}</span>
-            <span class="status-pill ${statusPillClass(st)}" style="pointer-events:none;">${esc(st)}</span></div>`;
-        });
+        const withStatus = mods.map(m => ({m, st: progressoDoc(c.id, m.id)?.status || 'Não iniciado'}));
+        const emAndamento = withStatus.filter(x=>x.st==='Em andamento');
+        const concluidos = withStatus.filter(x=>x.st==='Concluído');
+        const naoIniciados = withStatus.filter(x=>x.st==='Não iniciado');
+        const doneCi = concluidos.length;
+        const pctCi = mods.length ? Math.round(doneCi/mods.length*100) : 0;
+        const groupId = `pmore-${c.id}-${ci.id}`;
+        html += `<div class="progress-cycle-card">
+          <div class="progress-cycle-head">
+            <span class="progress-cycle-title">${esc(ci.nome)}</span>
+            <span class="progress-cycle-count">${doneCi}/${mods.length}</span>
+          </div>
+          <div class="progress-bar-outer progress-bar-outer-sm"><div class="progress-bar-inner" style="width:${pctCi}%"></div></div>
+          <div class="prog-list">`;
+        [...emAndamento, ...concluidos].forEach(({m, st}) => { html += vcolabProgRow(m, st); });
+        if(naoIniciados.length){
+          html += `<button type="button" class="prog-toggle-more" onclick="toggleProgMore('${groupId}')" id="${groupId}-btn">+ mostrar ${naoIniciados.length} não iniciado${naoIniciados.length>1?'s':''}</button>
+          <div class="prog-more-list" id="${groupId}" style="display:none">`;
+          naoIniciados.forEach(({m, st}) => { html += vcolabProgRow(m, st); });
+          html += `</div>`;
+        }
+        html += `</div></div>`;
       });
       html += `</div>`;
     });
   }
   el.innerHTML = html;
+}
+function vcolabProgRow(m, st){
+  return `<div class="prog-row prog-row-sm"><span class="status-dot ${statusPillClass(st)}"></span><span class="prog-name">${esc(m.nome)}</span>
+    <span class="status-pill status-pill-sm ${statusPillClass(st)}" style="pointer-events:none;">${esc(st)}</span></div>`;
+}
+function toggleProgMore(id){
+  const el = document.getElementById(id);
+  const btn = document.getElementById(id+'-btn');
+  const open = el.style.display !== 'none';
+  el.style.display = open ? 'none' : '';
+  if(btn) btn.textContent = btn.textContent.replace(open ? '− ocultar' : '+ mostrar', open ? '+ mostrar' : '− ocultar');
 }
 
 let viewSelectedModulo = null;
