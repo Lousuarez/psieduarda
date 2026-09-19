@@ -82,3 +82,31 @@ CREATE TABLE IF NOT EXISTS progresso (
     FOREIGN KEY (colaborador_id) REFERENCES colaboradores(id) ON DELETE CASCADE,
     FOREIGN KEY (modulo_id) REFERENCES modulos(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Login por usuário/senha (substitui as variáveis ADMIN_USER/ADMIN_PASS_HASH).
+CREATE TABLE IF NOT EXISTS users (
+    id CHAR(18) PRIMARY KEY,
+    username VARCHAR(191) NOT NULL UNIQUE,
+    password_hash VARCHAR(191) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Tokens de acesso emitidos no login. Usados em vez de cookie de sessão porque
+-- a infraestrutura da Hostinger na frente da aplicação remove o header
+-- Set-Cookie das respostas, impedindo o navegador de guardar a sessão.
+CREATE TABLE IF NOT EXISTS auth_tokens (
+    token CHAR(64) PRIMARY KEY,
+    user_id CHAR(18) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Usuário administrador padrão (senha: Prestes@admin2026 — troque depois
+-- gerando um novo hash com:
+-- node -e "console.log(require('bcryptjs').hashSync('nova_senha', 10))"
+-- e rodando: UPDATE users SET password_hash='...' WHERE username='Admin';)
+INSERT INTO users (id, username, password_hash)
+VALUES ('3f59b64087d9d61b89', 'Admin', '$2a$10$rNYeFW2gepBBnRoPQ7WVY.O.14pf4ubBS38C.vWe0e.2iVHqWw2iq')
+ON DUPLICATE KEY UPDATE username = username;
