@@ -84,13 +84,20 @@ CREATE TABLE IF NOT EXISTS progresso (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Login por usuário/senha (substitui as variáveis ADMIN_USER/ADMIN_PASS_HASH).
+-- Só usuários com is_admin=TRUE enxergam e usam o menu Administrativo
+-- (cadastro de outros usuários).
 CREATE TABLE IF NOT EXISTS users (
     id CHAR(18) PRIMARY KEY,
     username VARCHAR(191) NOT NULL UNIQUE,
     password_hash VARCHAR(191) NOT NULL,
+    is_admin BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Rodar de novo é seguro (idempotente) — cobre bancos que já tinham a
+-- tabela "users" criada antes da coluna is_admin existir.
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN NOT NULL DEFAULT FALSE;
 
 -- Tokens de acesso emitidos no login. Usados em vez de cookie de sessão porque
 -- a infraestrutura da Hostinger na frente da aplicação remove o header
@@ -107,6 +114,6 @@ CREATE TABLE IF NOT EXISTS auth_tokens (
 -- gerando um novo hash com:
 -- node -e "console.log(require('bcryptjs').hashSync('nova_senha', 10))"
 -- e rodando: UPDATE users SET password_hash='...' WHERE username='Admin';)
-INSERT INTO users (id, username, password_hash)
-VALUES ('3f59b64087d9d61b89', 'Admin', '$2a$10$rNYeFW2gepBBnRoPQ7WVY.O.14pf4ubBS38C.vWe0e.2iVHqWw2iq')
-ON DUPLICATE KEY UPDATE username = username;
+INSERT INTO users (id, username, password_hash, is_admin)
+VALUES ('3f59b64087d9d61b89', 'Admin', '$2a$10$rNYeFW2gepBBnRoPQ7WVY.O.14pf4ubBS38C.vWe0e.2iVHqWw2iq', TRUE)
+ON DUPLICATE KEY UPDATE is_admin = TRUE;

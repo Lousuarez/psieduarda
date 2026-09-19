@@ -3,7 +3,7 @@ require('dotenv').config();
 const path = require('path');
 const express = require('express');
 
-const { requireAuth } = require('./src/auth');
+const { requireAuth, requireAdmin } = require('./src/auth');
 const asyncHandler = require('./src/asyncHandler');
 const authRoutes = require('./src/routes/auth');
 const unidadesRoutes = require('./src/routes/unidades');
@@ -12,6 +12,7 @@ const ciclosRoutes = require('./src/routes/ciclos');
 const modulosRoutes = require('./src/routes/modulos');
 const colaboradoresRoutes = require('./src/routes/colaboradores');
 const progressoRoutes = require('./src/routes/progresso');
+const usuariosRoutes = require('./src/routes/usuarios');
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use('/api/ciclos', asyncHandler(requireAuth), ciclosRoutes);
 app.use('/api/modulos', asyncHandler(requireAuth), modulosRoutes);
 app.use('/api/colaboradores', asyncHandler(requireAuth), colaboradoresRoutes);
 app.use('/api/progresso', asyncHandler(requireAuth), progressoRoutes);
+app.use('/api/usuarios', asyncHandler(requireAuth), requireAdmin, usuariosRoutes);
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
