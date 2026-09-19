@@ -479,7 +479,7 @@ unset($_SESSION['jad_login_error']);
   .panel-close:hover{ color:var(--ink); }
   .field{ margin-bottom:14px; }
   .field label{ display:block; font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-dim); margin-bottom:6px; }
-  .field input[type=text], .field input[type=email], .field input[type=number], .field select, .field textarea{
+  .field input[type=text], .field input[type=email], .field input[type=number], .field input[type=password], .field select, .field textarea{
     width:100%; font-family:var(--font); font-size:13.5px; color:var(--ink); background:var(--bg); border:1px solid var(--line); border-radius:7px; padding:9px 11px; outline:none;
   }
   .field textarea{ resize:vertical; min-height:64px; }
