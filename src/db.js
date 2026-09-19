@@ -16,4 +16,8 @@ function genId() {
   return crypto.randomBytes(9).toString('hex');
 }
 
-module.exports = { pool, genId };
+function genToken() {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+module.exports = { pool, genId, genToken };

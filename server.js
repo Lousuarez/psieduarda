@@ -13,6 +13,8 @@ const modulosRoutes = require('./src/routes/modulos');
 const colaboradoresRoutes = require('./src/routes/colaboradores');
 const progressoRoutes = require('./src/routes/progresso');
 const usuariosRoutes = require('./src/routes/usuarios');
+const minhaTrilhaRoutes = require('./src/routes/minhaTrilha');
+const exportRoutes = require('./src/routes/export');
 
 const app = express();
 
@@ -27,7 +29,15 @@ app.get('/', (req, res) => {
   res.render('app');
 });
 
+app.get('/minha-trilha/:token', (req, res) => {
+  res.render('minha-trilha');
+});
+
 app.use('/api', authRoutes);
+
+// Público (sem requireAuth) — protegido pelo próprio token do link, que só o
+// dono do link conhece.
+app.use('/api/minha-trilha', minhaTrilhaRoutes);
 
 app.use('/api/unidades', asyncHandler(requireAuth), unidadesRoutes);
 app.use('/api/trilhas', asyncHandler(requireAuth), trilhasRoutes);
@@ -36,6 +46,7 @@ app.use('/api/modulos', asyncHandler(requireAuth), modulosRoutes);
 app.use('/api/colaboradores', asyncHandler(requireAuth), colaboradoresRoutes);
 app.use('/api/progresso', asyncHandler(requireAuth), progressoRoutes);
 app.use('/api/usuarios', asyncHandler(requireAuth), requireAdmin, usuariosRoutes);
+app.use('/api/export', asyncHandler(requireAuth), exportRoutes);
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {

@@ -60,10 +60,15 @@ CREATE TABLE IF NOT EXISTS colaboradores (
     lideranca BOOLEAN NOT NULL DEFAULT FALSE,
     ativo BOOLEAN NOT NULL DEFAULT TRUE,
     nota TEXT,
+    access_token CHAR(64) UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (unidade_id) REFERENCES unidades(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Rodar de novo é seguro (idempotente) — cobre bancos que já tinham a
+-- tabela "colaboradores" criada antes da coluna access_token existir.
+ALTER TABLE colaboradores ADD COLUMN IF NOT EXISTS access_token CHAR(64) UNIQUE;
 
 CREATE TABLE IF NOT EXISTS colaborador_trilhas (
     colaborador_id CHAR(18) NOT NULL,
@@ -81,6 +86,21 @@ CREATE TABLE IF NOT EXISTS progresso (
     PRIMARY KEY (colaborador_id, modulo_id),
     FOREIGN KEY (colaborador_id) REFERENCES colaboradores(id) ON DELETE CASCADE,
     FOREIGN KEY (modulo_id) REFERENCES modulos(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Histórico de mudanças de status em progresso — cada PUT /api/progresso
+-- grava uma linha aqui além de atualizar (ou apagar) a linha em "progresso".
+-- 'Não iniciado' é registrado aqui (diferente da tabela "progresso", onde
+-- esse status nunca é uma linha) porque isso é log de evento, não estado.
+CREATE TABLE IF NOT EXISTS progresso_historico (
+    id CHAR(18) PRIMARY KEY,
+    colaborador_id CHAR(18) NOT NULL,
+    modulo_id CHAR(18) NOT NULL,
+    status ENUM('Não iniciado','Em andamento','Concluído') NOT NULL,
+    changed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (colaborador_id) REFERENCES colaboradores(id) ON DELETE CASCADE,
+    FOREIGN KEY (modulo_id) REFERENCES modulos(id) ON DELETE CASCADE,
+    KEY idx_progresso_historico_colab_mod (colaborador_id, modulo_id, changed_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Login por usuário/senha (substitui as variáveis ADMIN_USER/ADMIN_PASS_HASH).

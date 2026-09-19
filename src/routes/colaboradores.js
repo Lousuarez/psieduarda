@@ -1,5 +1,5 @@
 const express = require('express');
-const { pool, genId } = require('../db');
+const { pool, genId, genToken } = require('../db');
 const asyncHandler = require('../asyncHandler');
 
 const router = express.Router();
@@ -17,6 +17,7 @@ function toApi(row, trilhaIds) {
     ativo: !!row.ativo,
     nota: row.nota || '',
     trilhaIds: trilhaIds || [],
+    hasAccessToken: !!row.access_token,
   };
 }
 
@@ -101,6 +102,39 @@ router.delete('/:id/trilhas/:trilhaId', asyncHandler(async (req, res) => {
     [id, trilhaId]
   );
   res.json({ ok: true });
+}));
+
+// (Re)gera o link de acesso pessoal do colaborador (mata o link anterior,
+// se existir, já que access_token é único por linha).
+router.post('/:id/link', asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const [rows] = await pool.query('SELECT id FROM colaboradores WHERE id = ?', [id]);
+  if (!rows.length) return res.status(404).json({ error: 'not_found' });
+  const token = genToken();
+  await pool.query('UPDATE colaboradores SET access_token = ? WHERE id = ?', [token, id]);
+  res.json({ token });
+}));
+
+router.delete('/:id/link', asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  await pool.query('UPDATE colaboradores SET access_token = NULL WHERE id = ?', [id]);
+  res.json({ ok: true });
+}));
+
+router.get('/:id/historico', asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const [rows] = await pool.query(
+    `SELECT h.status, h.changed_at, m.nome AS modulo_nome
+     FROM progresso_historico h
+     JOIN modulos m ON m.id = h.modulo_id
+     WHERE h.colaborador_id = ?
+     ORDER BY h.changed_at DESC
+     LIMIT 50`,
+    [id]
+  );
+  res.json({
+    docs: rows.map((r) => ({ status: r.status, changedAt: r.changed_at, moduloNome: r.modulo_nome })),
+  });
 }));
 
 module.exports = router;
