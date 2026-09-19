@@ -252,7 +252,7 @@ function toggleTheme(){
   .tx-select-wrap select:focus{ border-color:var(--verde-ink); }
   .tx-roadmap-stat{ font-size:12px; color:var(--ink-dim); margin:0 0 20px; }
 
-  .tx-row{ position:relative; display:flex; flex-wrap:wrap; align-items:flex-start; row-gap:56px; column-gap:34px; }
+  .tx-row{ position:relative; display:flex; flex-wrap:wrap; align-items:stretch; row-gap:56px; column-gap:34px; }
   .tx-connector-svg{ position:absolute; top:0; left:0; pointer-events:none; overflow:visible; z-index:0; }
   .tx-conn-path{ fill:none; stroke:var(--verde-ink); stroke-width:2.6; stroke-linecap:round; stroke-dasharray:0.1 10; opacity:.85; }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-conn-path{ stroke:var(--verde); } }
@@ -268,7 +268,7 @@ function toggleTheme(){
   :root[data-theme="dark"] .tx-ciclo-eyebrow{ color:var(--verde); }
   .tx-ciclo-name{ font-size:13.5px; font-weight:800; color:var(--ink); margin:1px 0 0; line-height:1.25; }
 
-  .tx-nodes{ display:flex; flex-wrap:wrap; row-gap:18px; column-gap:0; flex:1; align-items:flex-start; }
+  .tx-nodes{ display:flex; flex-wrap:wrap; row-gap:18px; column-gap:0; flex:1; align-items:flex-start; align-content:center; }
   .tx-node{ flex:1 1 88px; min-width:76px; max-width:118px; display:flex; flex-direction:column; align-items:center; text-align:center; position:relative; padding:6px 4px; border-radius:10px; cursor:pointer; }
   .tx-node:hover{ background:var(--bg-elevated); }
   .tx-node:focus-visible{ outline:2px solid var(--verde-ink); outline-offset:2px; }
@@ -1627,15 +1627,16 @@ function layoutTxConnectors(){
   const w = row.scrollWidth, h = row.scrollHeight;
   const pts = cards.map(card => {
     const r = card.getBoundingClientRect();
-    const head = card.querySelector('.tx-ciclo-head');
-    const hr = head ? head.getBoundingClientRect() : r;
     return {
       left: r.left - rowRect.left, right: r.right - rowRect.left,
       top: r.top - rowRect.top, bottom: r.bottom - rowRect.top,
-      midY: hr.top - rowRect.top + hr.height/2
+      midY: r.top - rowRect.top + r.height/2
     };
   });
 
+  // As âncoras usam sempre o centro vertical real do card (não a cabeça),
+  // então a linha atravessa o meio de cada caixa mesmo quando ciclos com
+  // números diferentes de módulos deixam os cards com alturas distintas.
   let paths = '';
   for(let i=0; i<pts.length-1; i++){
     const a = pts[i], b = pts[i+1];
@@ -1645,10 +1646,9 @@ function layoutTxConnectors(){
       if(x2 > x1){ paths += `<path class="tx-conn-path" d="${roundedPath([[x1,a.midY],[x2,a.midY]], 10)}"/>`; }
     } else {
       const startX = a.right + 6, startY = a.midY;
-      const midY = (a.bottom + b.top) / 2;
-      const endX = b.left + 15, endY = b.top - 8;
       const outX = startX + 14;
-      const d = roundedPath([[startX,startY],[outX,startY],[outX,midY],[endX,midY],[endX,endY]], 10);
+      const endX = b.left - 6, endY = b.midY;
+      const d = roundedPath([[startX,startY],[outX,startY],[outX,endY],[endX,endY]], 10);
       paths += `<path class="tx-conn-path" d="${d}"/>`;
     }
   }
