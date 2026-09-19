@@ -623,10 +623,16 @@ function toggleTheme(){
             <button class="nav-item nav-subitem" id="navm-unidades" onclick="navTo('manage','unidades')">Unidades</button>
           </div></div>
         </div>
-        <button class="nav-item" id="navm-usuarios" onclick="navTo('manage','usuarios')" style="display:none">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>
-          Usuários
-        </button>
+        <div class="nav-submenu" id="navsub-manage-admin" style="display:none">
+          <button class="nav-submenu-toggle" onclick="toggleNavSubmenu('manage-admin')" aria-expanded="false" aria-controls="navsub-manage-admin-list">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>
+            <span class="nav-submenu-label">Administrativo</span>
+            <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+          </button>
+          <div class="nav-submenu-list" id="navsub-manage-admin-list"><div>
+            <button class="nav-item nav-subitem" id="navm-usuarios" onclick="navTo('manage','usuarios')">Usuários</button>
+          </div></div>
+        </div>
       </div>
     </nav>
 
@@ -1031,7 +1037,7 @@ let usuarioEditingId = null;
 let currentUserId = null;
 let currentUserIsAdmin = false;
 function applyAdminVisibility(){
-  document.getElementById('navm-usuarios').style.display = currentUserIsAdmin ? '' : 'none';
+  document.getElementById('navsub-manage-admin').style.display = currentUserIsAdmin ? '' : 'none';
 }
 let trilhaExtraSelected = null;
 let txSelectedModulo = null;
@@ -1249,12 +1255,12 @@ function renderViewColabList(filter){
 function selectColabView(id){ colabSelected = id; renderViewColabDetail(); renderViewColabList(document.getElementById('vcolab-search').value); }
 
 function colabEnrolledTrilhas(c){
-  // Only trilhas/ciclos/módulos this specific person actually has a progresso record in —
-  // trilhaIds is just program membership; being "inserido" means having a real progresso doc.
+  // Todos os módulos dos ciclos das trilhas em que a pessoa está matriculada —
+  // sem progresso registrado, o módulo aparece como "Não iniciado" (ver render abaixo).
   return (c.trilhaIds||[]).map(tid=>{
     const t = trilhaById(tid); if(!t) return null;
     const ciclosComMods = sortedCiclosOf(tid).map(ci=>{
-      const mods = modulosOf(ci.id).filter(m => progressoDoc(c.id, m.id));
+      const mods = modulosOf(ci.id);
       return {ci, mods};
     }).filter(x=>x.mods.length);
     return ciclosComMods.length ? {t, ciclosComMods} : null;
