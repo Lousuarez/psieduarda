@@ -199,6 +199,9 @@ function toggleTheme(){
   .legend-dot.lideranca{ background:var(--verde-ink); } .legend-dot.metodo{ background:var(--ink-faint); } .legend-dot.ambos{ background:var(--verde); }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .legend-dot.lideranca{ background:var(--verde); } }
   :root[data-theme="dark"] .legend-dot.lideranca{ background:var(--verde); }
+  .legend-dot.done{ background:var(--verde-ink); } .legend-dot.on{ background:var(--status-prog-ink); } .legend-dot.off{ background:var(--line); }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .legend-dot.done{ background:var(--verde); } }
+  :root[data-theme="dark"] .legend-dot.done{ background:var(--verde); }
   .jornada-track{ position:relative; height:4px; background:var(--line); border-radius:4px; margin:0 0 22px; }
   .jornada-track-fill{ position:absolute; left:0; top:0; height:100%; background:var(--verde-ink); border-radius:4px; transition:width .3s ease-out; }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .jornada-track-fill{ background:var(--verde); } }
@@ -288,8 +291,8 @@ function toggleTheme(){
   .tx-node-label{ font-size:10.5px; font-weight:800; color:var(--verde-ink); text-transform:uppercase; letter-spacing:.03em; margin:9px 0 2px; }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-node-label{ color:var(--verde); } }
   :root[data-theme="dark"] .tx-node-label{ color:var(--verde); }
-  .tx-node-name{ font-size:10.5px; font-weight:700; color:var(--ink); line-height:1.3; margin:0 0 3px; }
-  .tx-node-status{ width:7px; height:7px; border-radius:50%; margin-top:6px; }
+  .tx-node-name{ font-size:10.5px; font-weight:700; color:var(--ink); line-height:1.3; margin:0; }
+  .tx-node-status{ position:absolute; right:-1px; bottom:-1px; width:11px; height:11px; border-radius:50%; border:2px solid var(--bg-sunken); box-sizing:border-box; z-index:2; }
   .tx-node-status.done{ background:var(--verde-ink); }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-node-status.done{ background:var(--verde); } }
   :root[data-theme="dark"] .tx-node-status.done{ background:var(--verde); }
@@ -727,6 +730,11 @@ function toggleTheme(){
             </div>
           </div>
           <div class="window-body">
+            <div class="legend">
+              <span class="legend-item"><span class="legend-dot done"></span>Concluído</span>
+              <span class="legend-item"><span class="legend-dot on"></span>Em andamento</span>
+              <span class="legend-item"><span class="legend-dot off"></span>A iniciar</span>
+            </div>
             <div id="vtrilhaextra-roadmap"></div>
           </div>
         </div>
@@ -1561,10 +1569,9 @@ function renderViewTrilhaExtra(){
       return `
         <div class="tx-node ${isSel?'selected':''}" data-mod-id="${m.id}" title="${tip}" role="button" tabindex="0" aria-pressed="${isSel}"
           onclick="openTxModuleModal('${m.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTxModuleModal('${m.id}');}">
-          <div class="tx-node-icon">${iconSvg(ci.icon)}</div>
+          <div class="tx-node-icon">${iconSvg(ci.icon)}<span class="tx-node-status ${stClass}"></span></div>
           <div class="tx-node-label">${esc(label)}</div>
           <div class="tx-node-name">${esc(m.nome)}</div>
-          <span class="tx-node-status ${stClass}"></span>
         </div>`;
     }).join('');
     const cardHtml = `
