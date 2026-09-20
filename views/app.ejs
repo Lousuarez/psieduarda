@@ -101,6 +101,7 @@ function toggleTheme(){
   :root[data-theme="dark"] .theme-toggle .theme-icon-moon{ display:none; }
   .login-brand .theme-toggle{ margin-left:auto; }
   .sidebar-foot-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:2px; }
+  .sidebar-version{ font-size:9.5px; font-weight:600; color:var(--ink-faint); margin:8px 0 0; letter-spacing:.02em; }
 
 
   .kpi-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:24px; }
@@ -704,6 +705,7 @@ function toggleTheme(){
           <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>
         </button>
       </div>
+      <p class="sidebar-version">v<%= version.hash %><%= version.date ? ' · ' + version.date : '' %></p>
     </div>
   </aside>
 
