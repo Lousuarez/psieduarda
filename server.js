@@ -15,6 +15,7 @@ const progressoRoutes = require('./src/routes/progresso');
 const usuariosRoutes = require('./src/routes/usuarios');
 const minhaTrilhaRoutes = require('./src/routes/minhaTrilha');
 const exportRoutes = require('./src/routes/export');
+const { version } = require('./src/version');
 
 const app = express();
 
@@ -26,7 +27,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
-  res.render('app');
+  res.render('app', { version });
 });
 
 app.get('/minha-trilha/:token', (req, res) => {
