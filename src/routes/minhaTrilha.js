@@ -59,6 +59,13 @@ router.get('/:token', asyncHandler(async (req, res) => {
             .map((m) => ({
               id: m.id,
               nome: m.nome,
+              categoria: m.categoria,
+              descricao: m.descricao || '',
+              mentor: m.mentor || '',
+              formato: m.formato || '',
+              publicoAlvo: m.publico_alvo || '',
+              cargaHoraria: m.carga_horaria || '',
+              linkMaterial: m.link_material || '',
               status: statusByModulo[m.id] || 'Não iniciado',
             })),
         })),
