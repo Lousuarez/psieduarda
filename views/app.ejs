@@ -997,7 +997,7 @@ function toggleTheme(){
 
 <!-- Modal: trilha -->
 <div class="overlay" id="overlay-trilha" onclick="closeTrilhaForm()"></div>
-<div class="modal-center" id="modal-trilha">
+<div class="modal-center" id="modal-trilha" onclick="if(event.target===this) closeTrilhaForm();">
   <div class="modal-box">
     <div class="panel-head"><h3 id="trilha-form-title">Trilha</h3><button class="panel-close" onclick="closeTrilhaForm()">×</button></div>
     <div class="field"><label for="tf-nome">Nome da trilha</label><input type="text" id="tf-nome" placeholder="Ex.: Trilha de Liderança — Operações"></div>
@@ -1014,7 +1014,7 @@ function toggleTheme(){
 
 <!-- Modal: ciclo -->
 <div class="overlay" id="overlay-cycle" onclick="closeCycleModal()"></div>
-<div class="modal-center" id="modal-cycle">
+<div class="modal-center" id="modal-cycle" onclick="if(event.target===this) closeCycleModal();">
   <div class="modal-box">
     <div class="panel-head"><h3 id="cycle-modal-title">Ciclo</h3><button class="panel-close" onclick="closeCycleModal()">×</button></div>
     <div class="field"><label for="cf2-trilha">Trilha</label><select id="cf2-trilha"></select></div>
@@ -1070,7 +1070,7 @@ function toggleTheme(){
 
 <!-- Confirm modal -->
 <div class="overlay" id="overlay-confirm" onclick="closeConfirm()"></div>
-<div class="modal-center" id="modal-confirm">
+<div class="modal-center" id="modal-confirm" onclick="if(event.target===this) closeConfirm();">
   <div class="modal-box confirm-box">
     <div class="panel-head"><h3 id="confirm-title">Confirmar</h3><button class="panel-close" onclick="closeConfirm()">×</button></div>
     <p id="confirm-text"></p>
