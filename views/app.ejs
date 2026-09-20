@@ -108,6 +108,23 @@ function toggleTheme(){
   .kpi-num{ font-weight:800; font-size:24px; color:var(--accent); line-height:1; margin-bottom:5px; font-variant-numeric:tabular-nums; }
   .kpi-label{ font-weight:600; font-size:10.5px; color:var(--ink-dim); line-height:1.3; }
 
+  .dash-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+  .dash-card{ background:var(--bg-sunken); border:1px solid var(--line); border-radius:12px; padding:16px 18px; }
+  .dash-card-title{ font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-dim); margin:0 0 12px; }
+  .dash-empty{ font-size:12px; color:var(--ink-dim); font-style:italic; margin:0; }
+  .dash-rank-row{ display:flex; align-items:center; gap:10px; padding:6px 0; }
+  .dash-rank-num{ width:20px; font-size:11px; font-weight:800; color:var(--ink-faint); flex-shrink:0; }
+  .dash-rank-name{ flex:1; min-width:0; font-size:12.5px; font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .dash-rank-pct{ font-size:12px; font-weight:800; color:var(--verde-ink); flex-shrink:0; }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .dash-rank-pct{ color:var(--verde); } }
+  :root[data-theme="dark"] .dash-rank-pct{ color:var(--verde); }
+  .dash-cat-row{ margin-bottom:12px; }
+  .dash-cat-row:last-child{ margin-bottom:0; }
+  .dash-cat-head{ display:flex; justify-content:space-between; font-size:11.5px; font-weight:700; color:var(--ink); margin-bottom:5px; }
+  .dash-stale-row{ display:flex; align-items:center; gap:10px; padding:6px 0; }
+  .dash-stale-name{ flex:1; min-width:0; font-size:12px; font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .dash-stale-days{ font-size:11px; font-weight:700; color:var(--status-prog-ink); white-space:nowrap; flex-shrink:0; }
+
   /* ===== App shell: sidebar + main content ===== */
   .app-shell{ display:flex; align-items:stretch; min-height:100vh; }
   .sidebar{ width:254px; flex-shrink:0; background:var(--bg-elevated); border-right:1px solid var(--line); display:flex; flex-direction:column; position:sticky; top:0; align-self:flex-start; height:100vh; overflow-y:auto; padding:20px 14px 16px; z-index:60; }
@@ -535,6 +552,15 @@ function toggleTheme(){
   .field-row{ display:flex; gap:10px; } .field-row .field{ flex:1; min-width:0; }
   .field-check{ display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; color:var(--ink); margin-bottom:14px; }
   .field-check input{ width:16px; height:16px; }
+  .field-hint{ font-size:11.5px; color:var(--ink-dim); margin:6px 0 0; }
+  .historico-list{ display:flex; flex-direction:column; }
+  .historico-row{ display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--line); }
+  .historico-row:last-child{ border-bottom:none; }
+  .historico-modulo{ flex:1; min-width:0; font-size:12.5px; font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .historico-date{ font-size:11px; color:var(--ink-faint); white-space:nowrap; flex-shrink:0; }
+  .link-row{ display:flex; gap:8px; }
+  .link-row input{ flex:1; min-width:0; font-family:var(--font); font-size:12.5px; color:var(--ink-dim); background:var(--bg-sunken); border:1px solid var(--line); border-radius:7px; padding:9px 11px; }
+  .link-row .btn-secondary{ flex-shrink:0; white-space:nowrap; }
   .icon-pick{ display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
   .icon-opt{ appearance:none; border:1.5px solid var(--line); background:var(--bg); border-radius:8px; padding:8px 0; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--ink-dim); }
   .icon-opt svg{ width:16px; height:16px; }
@@ -695,6 +721,17 @@ function toggleTheme(){
 
       <!-- ============ VISÃO GERAL (somente consulta) ============ -->
       <div class="view active" id="view-v-colaborador" role="tabpanel">
+        <div class="window" style="margin-bottom:20px;">
+          <div class="window-head">
+            <div>
+              <p class="window-title">Painel analítico</p>
+              <p class="window-sub">Panorama geral da trilha — atualiza junto com os dados.</p>
+            </div>
+          </div>
+          <div class="window-body">
+            <div class="dash-grid" id="dash-grid"></div>
+          </div>
+        </div>
         <div class="window">
           <div class="window-head">
             <div>
@@ -761,7 +798,10 @@ function toggleTheme(){
               <p class="window-title">Cadastro de colaboradores</p>
               <p class="window-sub">Registro completo da equipe — consulte, filtre e edite cada colaborador.</p>
             </div>
-            <button class="reg-new-btn" onclick="openColabForm(null)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Novo colaborador</button>
+            <div style="display:flex; gap:8px;">
+              <button class="btn-secondary" onclick="exportEstadoAtual()" title="Baixa uma planilha com trilha, ciclo, módulo e status de cada colaborador"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M12 3v12m0 0-4-4m4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>Exportar</button>
+              <button class="reg-new-btn" onclick="openColabForm(null)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Novo colaborador</button>
+            </div>
           </div>
           <div class="window-body">
             <div class="mc-filters">
@@ -922,11 +962,22 @@ function toggleTheme(){
             </div>
           </div>
           <div class="field"><label for="cf-nota">Nota / alerta (opcional)</label><textarea id="cf-nota" placeholder="Ex.: afastamento previsto, observação da liderança…"></textarea></div>
+          <div class="field" id="cf-link-field" style="display:none;">
+            <label>Link de acesso pessoal</label>
+            <div class="link-row">
+              <input type="text" id="cf-link-value" readonly placeholder="Nenhum link gerado ainda">
+              <button type="button" class="btn-secondary" id="cf-link-copy-btn" onclick="copyColabLink()" style="display:none;">Copiar</button>
+              <button type="button" class="btn-secondary" onclick="generateColabLink()">Gerar novo link</button>
+            </div>
+            <p class="field-hint">A pessoa vê só a própria trilha e progresso, sem precisar de senha. Gerar um novo link invalida o anterior.</p>
+          </div>
         </form>
       </div>
 
       <div class="form-tab-panel" id="cftab-panel-trilhas">
         <div id="colab-form-trilhas-content"></div>
+        <div class="section-h">Histórico recente</div>
+        <div id="colab-historico-content"></div>
       </div>
     </div>
 
@@ -1188,7 +1239,7 @@ function colabConclusao(colab){
 function renderAll(){
   renderKpis(); renderFoot();
   if(currentMode==='view'){
-    if(currentTab==='colaborador'){ renderViewColabList(document.getElementById('vcolab-search').value); renderViewColabDetail(); }
+    if(currentTab==='colaborador'){ renderViewColabList(document.getElementById('vcolab-search').value); renderViewColabDetail(); renderDashboard(); }
     if(currentTab==='trilhas') renderViewTrilhas();
     if(currentTab==='trilhaExtra') renderViewTrilhaExtra();
   } else {
@@ -1201,6 +1252,73 @@ function renderAll(){
   }
   if(document.getElementById('modal-colab').classList.contains('show')) renderColabFormTrilhas();
   populateSelects();
+}
+
+function renderDashboard(){
+  const el = document.getElementById('dash-grid');
+  if(!el) return;
+  if(dbUnavailable){ el.innerHTML = '<p class="dash-empty">Banco de dados indisponível.</p>'; return; }
+  if(!isLoaded('colaboradores') || !isLoaded('progresso') || !isLoaded('modulos')){
+    el.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando…</div>'; return;
+  }
+
+  const ranking = colaboradores
+    .filter(c => (c.trilhaIds||[]).length)
+    .map(c => ({ c, conc: colabConclusao(c) }))
+    .filter(x => x.conc.total > 0)
+    .sort((a,b) => b.conc.pct - a.conc.pct)
+    .slice(0, 5);
+  const rankingHtml = ranking.length
+    ? ranking.map((x,i) => `<div class="dash-rank-row"><span class="dash-rank-num">${i+1}º</span><span class="dash-rank-name">${esc(x.c.nome)}</span><span class="dash-rank-pct">${x.conc.pct}%</span></div>`).join('')
+    : '<p class="dash-empty">Sem dados suficientes ainda.</p>';
+
+  const categorias = ['Liderança','Método','Liderança e Método'];
+  const catHtml = categorias.map(cat => {
+    const mods = modulos.filter(m => m.categoria === cat);
+    if(!mods.length) return '';
+    let slots = 0, done = 0;
+    mods.forEach(m => {
+      const ci = ciclos.find(x=>x.id===m.cicloId);
+      const enrolled = ci ? colaboradores.filter(c => (c.trilhaIds||[]).includes(ci.trilhaId)) : [];
+      slots += enrolled.length;
+      done += enrolled.filter(c => progresso.some(p=>p.colaboradorId===c.id && p.moduloId===m.id && p.status==='Concluído')).length;
+    });
+    const pct = slots ? Math.round(done/slots*100) : 0;
+    return `<div class="dash-cat-row">
+      <div class="dash-cat-head"><span>${esc(cat)}</span><span>${pct}%</span></div>
+      <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+
+  const now = Date.now();
+  const stale = progresso
+    .filter(p => p.status === 'Em andamento' && p.updatedAt)
+    .map(p => ({
+      c: colaboradores.find(x=>x.id===p.colaboradorId),
+      m: modulos.find(x=>x.id===p.moduloId),
+      days: Math.max(0, Math.floor((now - new Date(p.updatedAt).getTime()) / 86400000)),
+    }))
+    .filter(x => x.c && x.m)
+    .sort((a,b) => b.days - a.days)
+    .slice(0, 5);
+  const staleHtml = stale.length
+    ? stale.map(x => `<div class="dash-stale-row"><span class="dash-stale-name">${esc(x.c.nome)} · ${esc(x.m.nome)}</span><span class="dash-stale-days">${x.days===0?'hoje':x.days+'d'}</span></div>`).join('')
+    : '<p class="dash-empty">Ninguém em andamento no momento.</p>';
+
+  el.innerHTML = `
+    <div class="dash-card">
+      <p class="dash-card-title">Top conclusão</p>
+      ${rankingHtml}
+    </div>
+    <div class="dash-card">
+      <p class="dash-card-title">Conclusão por categoria</p>
+      ${catHtml || '<p class="dash-empty">Sem módulos cadastrados ainda.</p>'}
+    </div>
+    <div class="dash-card">
+      <p class="dash-card-title">Em andamento há mais tempo</p>
+      ${staleHtml}
+    </div>
+  `;
 }
 
 function renderKpis(){
@@ -1749,7 +1867,28 @@ function switchColabFormTab(tab){
   document.getElementById('cftab-panel-trilhas').classList.toggle('active', tab==='trilhas');
   document.getElementById('cf-actions-dados').style.display = tab==='dados' ? '' : 'none';
   document.getElementById('cf-actions-trilhas').style.display = tab==='trilhas' ? '' : 'none';
-  if(tab==='trilhas') renderColabFormTrilhas();
+  if(tab==='trilhas'){ renderColabFormTrilhas(); loadColabHistorico(); }
+}
+
+async function loadColabHistorico(){
+  const el = document.getElementById('colab-historico-content');
+  if(!el || !editingColabId) return;
+  el.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando…</div>';
+  try{
+    const res = await fetch('api/colaboradores/'+encodeURIComponent(editingColabId)+'/historico', { headers: authHeaders() });
+    if(!res.ok){ el.innerHTML = '<p class="field-hint">Não foi possível carregar o histórico.</p>'; return; }
+    const data = await res.json();
+    if(!data.docs.length){ el.innerHTML = '<p class="field-hint">Nenhuma mudança de status registrada ainda.</p>'; return; }
+    el.innerHTML = `<div class="historico-list">` + data.docs.map(h => {
+      const dt = new Date(h.changedAt);
+      const dtStr = dt.toLocaleDateString('pt-BR') + ' às ' + dt.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+      return `<div class="historico-row">
+        <span class="status-pill ${statusPillClass(h.status)}" style="pointer-events:none;">${esc(h.status)}</span>
+        <span class="historico-modulo">${esc(h.moduloNome)}</span>
+        <span class="historico-date">${dtStr}</span>
+      </div>`;
+    }).join('') + `</div>`;
+  }catch(e){ el.innerHTML = '<p class="field-hint">Não foi possível carregar o histórico.</p>'; }
 }
 
 function renderColabFormTrilhas(){
@@ -1831,6 +1970,9 @@ function openColabForm(id){
   document.getElementById('cf-lideranca').checked = !!c?.lideranca;
   document.getElementById('cf-ativo').checked = c?.ativo !== false;
   document.getElementById('cf-nota').value = c?.nota || '';
+  document.getElementById('cf-link-field').style.display = c ? '' : 'none';
+  document.getElementById('cf-link-value').value = c?.hasAccessToken ? 'Link já gerado — clique em "Gerar novo link" para ver e copiar' : '';
+  document.getElementById('cf-link-copy-btn').style.display = 'none';
   populateSelects();
   if(c?.unidadeId) document.getElementById('cf-unidade').value = c.unidadeId;
   document.getElementById('colab-delete-btn').style.display = c ? '' : 'none';
@@ -1862,6 +2004,44 @@ async function saveColab(){
     colabSelected = ref.id;
   }
   closeColabForm(); toast('Colaborador salvo');
+}
+async function exportEstadoAtual(){
+  toast('Gerando planilha…');
+  try{
+    const res = await fetch('api/export', { headers: authHeaders() });
+    if(!res.ok){ toast('Não foi possível exportar'); return; }
+    const blob = await res.blob();
+    const disposition = res.headers.get('Content-Disposition') || '';
+    const match = disposition.match(/filename="([^"]+)"/);
+    const filename = match ? match[1] : 'juntos-a-distancia.xlsx';
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+    toast('Planilha baixada');
+  }catch(e){ toast('Não foi possível exportar'); }
+}
+async function generateColabLink(){
+  if(!editingColabId){ toast('Salve o colaborador antes de gerar o link'); return; }
+  const res = await fetch('api/colaboradores/'+encodeURIComponent(editingColabId)+'/link', { method:'POST', headers: authHeaders() });
+  if(!res.ok){ toast('Não foi possível gerar o link'); return; }
+  const data = await res.json();
+  const url = location.origin + '/minha-trilha/' + data.token;
+  document.getElementById('cf-link-value').value = url;
+  document.getElementById('cf-link-copy-btn').style.display = '';
+  const c = colaboradores.find(x=>x.id===editingColabId);
+  if(c) c.hasAccessToken = true;
+  toast('Link gerado');
+}
+function copyColabLink(){
+  const input = document.getElementById('cf-link-value');
+  input.select();
+  if(navigator.clipboard?.writeText){
+    navigator.clipboard.writeText(input.value).then(()=>toast('Link copiado')).catch(()=>toast('Não foi possível copiar automaticamente'));
+  } else {
+    document.execCommand('copy'); toast('Link copiado');
+  }
 }
 function askDeleteColab(){
   if(!editingColabId) return;
