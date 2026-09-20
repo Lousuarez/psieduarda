@@ -290,7 +290,7 @@ function toggleTheme(){
   :root[data-theme="dark"] .tx-ciclo-eyebrow{ color:var(--verde); }
   .tx-ciclo-name{ font-size:13.5px; font-weight:800; color:var(--ink); margin:1px 0 0; line-height:1.25; }
 
-  .tx-nodes{ display:flex; flex-wrap:wrap; row-gap:18px; column-gap:0; flex:1; align-items:flex-start; align-content:center; }
+  .tx-nodes{ display:flex; flex-wrap:wrap; justify-content:center; row-gap:18px; column-gap:0; flex:1; align-items:flex-start; align-content:center; }
   .tx-node{ flex:1 1 88px; min-width:76px; max-width:118px; display:flex; flex-direction:column; align-items:center; text-align:center; position:relative; padding:6px 4px; border-radius:10px; cursor:pointer; }
   .tx-node:hover{ background:var(--bg-elevated); }
   .tx-node:focus-visible{ outline:2px solid var(--verde-ink); outline-offset:2px; }
@@ -721,17 +721,8 @@ function toggleTheme(){
 
       <!-- ============ VISÃO GERAL (somente consulta) ============ -->
       <div class="view active" id="view-v-colaborador" role="tabpanel">
-        <div class="window" style="margin-bottom:20px;">
-          <div class="window-head">
-            <div>
-              <p class="window-title">Painel analítico</p>
-              <p class="window-sub">Panorama geral da trilha — atualiza junto com os dados.</p>
-            </div>
-          </div>
-          <div class="window-body">
-            <div class="dash-grid" id="dash-grid"></div>
-          </div>
-        </div>
+        <!-- Painel analítico removido da página de entrada por hora (renderDashboard()
+             e o #dash-grid continuam existindo — é só reinserir o bloco aqui pra voltar). -->
         <div class="window">
           <div class="window-head">
             <div>
@@ -997,7 +988,7 @@ function toggleTheme(){
 
 <!-- Modal: trilha -->
 <div class="overlay" id="overlay-trilha" onclick="closeTrilhaForm()"></div>
-<div class="modal-center" id="modal-trilha">
+<div class="modal-center" id="modal-trilha" onclick="if(event.target===this) closeTrilhaForm();">
   <div class="modal-box">
     <div class="panel-head"><h3 id="trilha-form-title">Trilha</h3><button class="panel-close" onclick="closeTrilhaForm()">×</button></div>
     <div class="field"><label for="tf-nome">Nome da trilha</label><input type="text" id="tf-nome" placeholder="Ex.: Trilha de Liderança — Operações"></div>
@@ -1014,7 +1005,7 @@ function toggleTheme(){
 
 <!-- Modal: ciclo -->
 <div class="overlay" id="overlay-cycle" onclick="closeCycleModal()"></div>
-<div class="modal-center" id="modal-cycle">
+<div class="modal-center" id="modal-cycle" onclick="if(event.target===this) closeCycleModal();">
   <div class="modal-box">
     <div class="panel-head"><h3 id="cycle-modal-title">Ciclo</h3><button class="panel-close" onclick="closeCycleModal()">×</button></div>
     <div class="field"><label for="cf2-trilha">Trilha</label><select id="cf2-trilha"></select></div>
@@ -1070,7 +1061,7 @@ function toggleTheme(){
 
 <!-- Confirm modal -->
 <div class="overlay" id="overlay-confirm" onclick="closeConfirm()"></div>
-<div class="modal-center" id="modal-confirm">
+<div class="modal-center" id="modal-confirm" onclick="if(event.target===this) closeConfirm();">
   <div class="modal-box confirm-box">
     <div class="panel-head"><h3 id="confirm-title">Confirmar</h3><button class="panel-close" onclick="closeConfirm()">×</button></div>
     <p id="confirm-text"></p>
