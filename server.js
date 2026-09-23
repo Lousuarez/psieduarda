@@ -11,11 +11,14 @@ const trilhasRoutes = require('./src/routes/trilhas');
 const ciclosRoutes = require('./src/routes/ciclos');
 const modulosRoutes = require('./src/routes/modulos');
 const moduloEtapasRoutes = require('./src/routes/moduloEtapas');
+const moduloFrequenciaRoutes = require('./src/routes/moduloFrequencia');
+const moduloEtapaChamadaRoutes = require('./src/routes/moduloEtapaChamada');
 const colaboradoresRoutes = require('./src/routes/colaboradores');
 const progressoRoutes = require('./src/routes/progresso');
 const usuariosRoutes = require('./src/routes/usuarios');
 const minhaTrilhaRoutes = require('./src/routes/minhaTrilha');
 const exportRoutes = require('./src/routes/export');
+const auditLogRoutes = require('./src/routes/auditLog');
 const { version } = require('./src/version');
 
 const app = express();
@@ -46,10 +49,13 @@ app.use('/api/trilhas', asyncHandler(requireAuth), trilhasRoutes);
 app.use('/api/ciclos', asyncHandler(requireAuth), ciclosRoutes);
 app.use('/api/modulos', asyncHandler(requireAuth), modulosRoutes);
 app.use('/api/modulo-etapas', asyncHandler(requireAuth), moduloEtapasRoutes);
+app.use('/api/modulo-frequencia', asyncHandler(requireAuth), moduloFrequenciaRoutes);
+app.use('/api/modulo-etapa-chamada', asyncHandler(requireAuth), moduloEtapaChamadaRoutes);
 app.use('/api/colaboradores', asyncHandler(requireAuth), colaboradoresRoutes);
 app.use('/api/progresso', asyncHandler(requireAuth), progressoRoutes);
 app.use('/api/usuarios', asyncHandler(requireAuth), requireAdmin, usuariosRoutes);
 app.use('/api/export', asyncHandler(requireAuth), exportRoutes);
+app.use('/api/auditoria', asyncHandler(requireAuth), requireAdmin, auditLogRoutes);
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {

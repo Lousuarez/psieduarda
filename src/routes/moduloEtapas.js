@@ -1,6 +1,7 @@
 const express = require('express');
 const { pool, genId } = require('../db');
 const asyncHandler = require('../asyncHandler');
+const { logAudit } = require('../audit');
 
 const router = express.Router();
 
@@ -44,7 +45,9 @@ router.post('/', asyncHandler(async (req, res) => {
     [id, moduloId, nome, dataInicio, dataFim, status, ordem]
   );
   const [rows] = await pool.query('SELECT * FROM modulo_etapas WHERE id = ?', [id]);
-  res.json(toApi(rows[0]));
+  const depois = toApi(rows[0]);
+  await logAudit({ entidade: 'moduloEtapa', entidadeId: id, acao: 'create', antes: null, depois, req });
+  res.json(depois);
 }));
 
 router.put('/:id', asyncHandler(async (req, res) => {
@@ -52,6 +55,7 @@ router.put('/:id', asyncHandler(async (req, res) => {
   const [rows] = await pool.query('SELECT * FROM modulo_etapas WHERE id = ?', [id]);
   if (!rows.length) return res.status(404).json({ error: 'not_found' });
   const cur = rows[0];
+  const antes = toApi(cur);
   const b = req.body;
   const nome = b.nome !== undefined ? String(b.nome) : cur.nome;
   const dataInicio = b.dataInicio !== undefined ? (b.dataInicio || null) : cur.data_inicio;
@@ -63,12 +67,16 @@ router.put('/:id', asyncHandler(async (req, res) => {
     [nome, dataInicio, dataFim, status, ordem, id]
   );
   const [updated] = await pool.query('SELECT * FROM modulo_etapas WHERE id = ?', [id]);
-  res.json(toApi(updated[0]));
+  const depois = toApi(updated[0]);
+  await logAudit({ entidade: 'moduloEtapa', entidadeId: id, acao: 'update', antes, depois, req });
+  res.json(depois);
 }));
 
 router.delete('/:id', asyncHandler(async (req, res) => {
   const { id } = req.params;
+  const [rows] = await pool.query('SELECT * FROM modulo_etapas WHERE id = ?', [id]);
   await pool.query('DELETE FROM modulo_etapas WHERE id = ?', [id]);
+  if (rows.length) await logAudit({ entidade: 'moduloEtapa', entidadeId: id, acao: 'delete', antes: toApi(rows[0]), depois: null, req });
   res.json({ ok: true });
 }));
 

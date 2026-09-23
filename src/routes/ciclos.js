@@ -1,6 +1,7 @@
 const express = require('express');
 const { pool, genId } = require('../db');
 const asyncHandler = require('../asyncHandler');
+const { logAudit } = require('../audit');
 
 const router = express.Router();
 
@@ -31,7 +32,9 @@ router.post('/', asyncHandler(async (req, res) => {
     'INSERT INTO ciclos (id, trilha_id, nome, tema, ordem, icon) VALUES (?, ?, ?, ?, ?, ?)',
     [id, trilhaId, nome, tema, ordem, icon]
   );
-  res.json({ id, trilhaId, nome, tema, ordem, icon });
+  const depois = { id, trilhaId, nome, tema, ordem, icon };
+  await logAudit({ entidade: 'ciclo', entidadeId: id, acao: 'create', antes: null, depois, req });
+  res.json(depois);
 }));
 
 router.put('/:id', asyncHandler(async (req, res) => {
@@ -39,6 +42,7 @@ router.put('/:id', asyncHandler(async (req, res) => {
   const [rows] = await pool.query('SELECT * FROM ciclos WHERE id = ?', [id]);
   if (!rows.length) return res.status(404).json({ error: 'not_found' });
   const cur = rows[0];
+  const antes = toApi(cur);
   const trilhaId = req.body.trilhaId !== undefined ? String(req.body.trilhaId) : cur.trilha_id;
   const nome = req.body.nome !== undefined ? String(req.body.nome) : cur.nome;
   const tema = req.body.tema !== undefined ? String(req.body.tema) : cur.tema;
@@ -48,13 +52,17 @@ router.put('/:id', asyncHandler(async (req, res) => {
     'UPDATE ciclos SET trilha_id = ?, nome = ?, tema = ?, ordem = ?, icon = ? WHERE id = ?',
     [trilhaId, nome, tema, ordem, icon, id]
   );
-  res.json({ id, trilhaId, nome, tema, ordem, icon });
+  const depois = { id, trilhaId, nome, tema, ordem, icon };
+  await logAudit({ entidade: 'ciclo', entidadeId: id, acao: 'update', antes, depois, req });
+  res.json(depois);
 }));
 
 router.delete('/:id', asyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
+    const [rows] = await pool.query('SELECT * FROM ciclos WHERE id = ?', [id]);
     await pool.query('DELETE FROM ciclos WHERE id = ?', [id]);
+    if (rows.length) await logAudit({ entidade: 'ciclo', entidadeId: id, acao: 'delete', antes: toApi(rows[0]), depois: null, req });
     res.json({ ok: true });
   } catch (err) {
     if (err && err.code === 'ER_ROW_IS_REFERENCED_2') {

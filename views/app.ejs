@@ -155,6 +155,15 @@ function toggleTheme(){
   .nav-submenu-list{ display:grid; grid-template-rows:0fr; transition:grid-template-rows .2s ease-out; }
   .nav-submenu-list > div{ overflow:hidden; }
   .nav-submenu.open .nav-submenu-list{ grid-template-rows:1fr; }
+
+  .nav-group-toggle{ display:flex; align-items:center; justify-content:space-between; gap:6px; width:100%; text-align:left; padding:0 12px 8px; background:none; border:none; cursor:pointer; }
+  .nav-group-toggle:hover .nav-group-label{ color:var(--ink-dim); }
+  .nav-group-toggle .nav-group-label{ margin:0; padding:0; }
+  .nav-group-toggle .nav-chevron{ color:var(--ink-faint); }
+  .nav-group.open .nav-group-toggle .nav-chevron{ transform:rotate(90deg); }
+  .nav-group-list{ display:grid; grid-template-rows:0fr; transition:grid-template-rows .2s ease-out; }
+  .nav-group-list > div{ overflow:hidden; }
+  .nav-group.open .nav-group-list{ grid-template-rows:1fr; }
   .nav-subitem{ padding-left:34px; font-size:13px; }
   .sidebar-foot{ font-size:10.5px; font-weight:600; color:var(--ink-faint); padding:14px 12px 2px; border-top:1px solid var(--line); margin-top:6px; letter-spacing:.02em; }
   .sidebar-overlay{ display:none; }
@@ -217,8 +226,10 @@ function toggleTheme(){
   :root[data-theme="dark"] .legend-dot.done{ background:var(--verde); }
   .d-eyebrow{ font-size:10.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-dim); margin:0 0 6px; }
   .d-cat-label.lideranca{ color:var(--verde-ink); } .d-cat-label.metodo{ color:var(--ink-dim); } .d-cat-label.ambos{ color:var(--verde-ink); }
-  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .d-cat-label.lideranca, :root:not([data-theme="light"]) .d-cat-label.ambos{ color:var(--verde); } }
+  .d-cat-label.autoconhecimento{ color:#6B4FA0; } .d-cat-label.inovacao{ color:#1D6FA5; }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .d-cat-label.lideranca, :root:not([data-theme="light"]) .d-cat-label.ambos{ color:var(--verde); } :root:not([data-theme="light"]) .d-cat-label.autoconhecimento{ color:#B79CE8; } :root:not([data-theme="light"]) .d-cat-label.inovacao{ color:#6FC2E8; } }
   :root[data-theme="dark"] .d-cat-label.lideranca, :root[data-theme="dark"] .d-cat-label.ambos{ color:var(--verde); }
+  :root[data-theme="dark"] .d-cat-label.autoconhecimento{ color:#B79CE8; } :root[data-theme="dark"] .d-cat-label.inovacao{ color:#6FC2E8; }
   .d-title{ font-size:19px; font-weight:800; color:var(--ink); margin:0 0 10px; }
   .d-desc{ font-size:13px; color:var(--ink-dim); line-height:1.55; margin:14px 0; max-width:680px; }
   .meta-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin:14px 0; }
@@ -241,6 +252,8 @@ function toggleTheme(){
   .tx-select-label{ font-size:10px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-faint); }
   .tx-select-wrap select{ appearance:none; font-family:var(--font); font-size:13px; font-weight:700; color:var(--ink); background:var(--bg-elevated); border:1px solid var(--line); border-radius:8px; padding:9px 30px 9px 12px; min-width:220px; cursor:pointer; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 8px center; background-size:15px; }
   .tx-select-wrap select:focus{ border-color:var(--verde-ink); }
+  .tx-select-wrap input[type=date]{ font-family:var(--font); font-size:13px; font-weight:700; color:var(--ink); background:var(--bg-elevated); border:1px solid var(--line); border-radius:8px; padding:8px 12px; min-width:220px; color-scheme: light dark; }
+  .tx-select-wrap input[type=date]:focus{ border-color:var(--verde-ink); outline:none; }
   .tx-roadmap-stat{ font-size:12px; color:var(--ink-dim); margin:0 0 20px; }
 
   .tx-row{ position:relative; display:flex; flex-wrap:wrap; align-items:stretch; row-gap:56px; column-gap:34px; }
@@ -453,8 +466,11 @@ function toggleTheme(){
   .module-node.cat-lideranca::before{ background:var(--verde-ink); }
   .module-node.cat-metodo::before{ background:var(--ink-faint); }
   .module-node.cat-ambos::before{ background:var(--verde); }
-  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .module-node.cat-lideranca::before, :root:not([data-theme="light"]) .module-node.cat-ambos::before{ background:var(--verde); } }
+  .module-node.cat-autoconhecimento::before{ background:#6B4FA0; }
+  .module-node.cat-inovacao::before{ background:#1D6FA5; }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .module-node.cat-lideranca::before, :root:not([data-theme="light"]) .module-node.cat-ambos::before{ background:var(--verde); } :root:not([data-theme="light"]) .module-node.cat-autoconhecimento::before{ background:#B79CE8; } :root:not([data-theme="light"]) .module-node.cat-inovacao::before{ background:#6FC2E8; } }
   :root[data-theme="dark"] .module-node.cat-lideranca::before, :root[data-theme="dark"] .module-node.cat-ambos::before{ background:var(--verde); }
+  :root[data-theme="dark"] .module-node.cat-autoconhecimento::before{ background:#B79CE8; } :root[data-theme="dark"] .module-node.cat-inovacao::before{ background:#6FC2E8; }
   .module-etapa{ font-size:9px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--verde-ink); margin:0 0 4px; }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .module-etapa{ color:var(--verde); } }
   :root[data-theme="dark"] .module-etapa{ color:var(--verde); }
@@ -463,7 +479,9 @@ function toggleTheme(){
   .module-cat-label{ display:flex; align-items:center; gap:5px; font-size:10px; font-weight:700; color:var(--ink-dim); }
   .cat-dot{ width:6px; height:6px; border-radius:50%; flex-shrink:0; }
   .cat-dot.lideranca{ background:var(--verde-ink); } .cat-dot.metodo{ background:var(--ink-faint); } .cat-dot.ambos{ background:var(--verde); }
-  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .cat-dot.lideranca{ background:var(--verde); } }
+  .cat-dot.autoconhecimento{ background:#6B4FA0; } .cat-dot.inovacao{ background:#1D6FA5; }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .cat-dot.lideranca{ background:var(--verde); } :root:not([data-theme="light"]) .cat-dot.autoconhecimento{ background:#B79CE8; } :root:not([data-theme="light"]) .cat-dot.inovacao{ background:#6FC2E8; } }
+  :root[data-theme="dark"] .cat-dot.autoconhecimento{ background:#B79CE8; } :root[data-theme="dark"] .cat-dot.inovacao{ background:#6FC2E8; }
   :root[data-theme="dark"] .cat-dot.lideranca{ background:var(--verde); }
   .add-tile{ appearance:none; width:100%; text-align:left; background:none; border:1.5px dashed var(--line); border-radius:8px; padding:9px 10px; margin-top:2px; font-family:var(--font); font-size:12px; font-weight:700; color:var(--ink-dim); cursor:pointer; display:flex; align-items:center; gap:7px; }
   .add-tile:hover{ border-color:var(--verde-ink); color:var(--verde-ink); }
@@ -541,6 +559,39 @@ function toggleTheme(){
   .cronograma-row-info{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
   .cronograma-row-nome{ font-size:12.5px; font-weight:600; color:var(--ink); }
   .cronograma-row-periodo{ font-size:11px; color:var(--ink-dim); }
+  .prog-remove-btn{ appearance:none; background:none; border:none; cursor:pointer; color:var(--ink-faint); font-size:16px; line-height:1; padding:2px; }
+  .prog-remove-btn:hover{ color:var(--danger); }
+  .freq-summary{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:14px; padding-bottom:16px; border-bottom:1px solid var(--line); }
+  .freq-summary-count{ font-size:26px; font-weight:800; color:var(--verde-ink); line-height:1; margin:0; }
+  .freq-summary-count span{ font-size:13px; font-weight:600; color:var(--ink-dim); margin-left:4px; }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .freq-summary-count{ color:var(--verde); } }
+  :root[data-theme="dark"] .freq-summary-count{ color:var(--verde); }
+  .freq-bulk-actions{ display:flex; gap:8px; flex-wrap:wrap; }
+  .freq-filters{ display:flex; gap:14px; flex-wrap:wrap; padding-bottom:18px; border-bottom:1px solid var(--line); }
+  .freq-lock{ text-align:center; padding:48px 20px; }
+  .freq-lock p{ font-size:13px; color:var(--ink-dim); margin:0 0 18px; }
+  .freq-chamada-status{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:14px; padding-bottom:16px; border-bottom:1px solid var(--line); }
+  .freq-chamada-meta{ font-size:12px; color:var(--ink-dim); }
+  .relfreq-row{ border:1px solid var(--line); border-radius:10px; margin-bottom:10px; overflow:hidden; }
+  .relfreq-row-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; cursor:pointer; background:var(--bg-elevated); }
+  .relfreq-row-head:hover{ background:var(--bg-sunken); }
+  .relfreq-row-main{ min-width:0; }
+  .relfreq-row-body{ padding:14px 16px; border-top:1px solid var(--line); background:var(--bg); }
+  .relfreq-versao{ padding:10px 0; border-bottom:1px solid var(--line); }
+  .relfreq-versao:last-child{ border-bottom:none; padding-bottom:0; }
+  .relfreq-versao:first-child{ padding-top:0; }
+  .relfreq-versao-title{ font-size:11.5px; font-weight:800; color:var(--ink-dim); margin:0 0 8px; text-transform:uppercase; letter-spacing:.03em; }
+  .audit-badge{ display:inline-block; font-size:9.5px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; padding:2px 8px; border-radius:20px; margin-left:8px; vertical-align:middle; }
+  .audit-badge-create{ background:var(--status-done-bg); color:var(--status-done-ink); }
+  .audit-badge-update{ background:var(--status-prog-bg); color:var(--status-prog-ink); }
+  .audit-badge-delete{ background:rgba(220,53,69,.14); color:var(--danger); }
+  .audit-diff-row{ display:grid; grid-template-columns:150px 1fr 16px 1fr; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid var(--line); font-size:12.5px; }
+  .audit-diff-row:last-child{ border-bottom:none; }
+  .audit-diff-row .prog-name{ font-size:12px; }
+  .audit-diff-before{ color:var(--ink-dim); text-decoration:line-through; overflow-wrap:anywhere; }
+  .audit-diff-arrow{ color:var(--ink-faint); text-align:center; }
+  .audit-diff-after{ color:var(--ink); font-weight:600; overflow-wrap:anywhere; }
+  @media (max-width:640px){ .audit-diff-row{ grid-template-columns:1fr; gap:2px; } .audit-diff-arrow{ display:none; } }
   .icon-pick{ display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
   .icon-opt{ appearance:none; border:1.5px solid var(--line); background:var(--bg); border-radius:8px; padding:8px 0; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--ink-dim); }
   .icon-opt svg{ width:16px; height:16px; }
@@ -628,10 +679,18 @@ function toggleTheme(){
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.4"/><circle cx="6" cy="18" r="2.4"/><circle cx="18" cy="6" r="2.4"/><path d="M6 8.4V15.6M8.4 6H15.6a2.4 2.4 0 0 1 2.4 2.4V6"/><path d="M8.4 18H14a4 4 0 0 0 4-4v-.2"/></svg>
           Trilha
         </button>
+        <button class="nav-item" id="navv-frequencia" onclick="navTo('view','frequencia')" style="display:none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5 11 13.5 15 9"/><rect x="3.5" y="4.5" width="17" height="16" rx="2.2"/><path d="M3.5 9.5h17"/></svg>
+          Frequência
+        </button>
       </div>
 
-      <div class="nav-group">
-        <p class="nav-group-label">Cadastros</p>
+      <div class="nav-group" id="navgroup-cadastros">
+        <button class="nav-group-toggle" onclick="toggleNavGroup('cadastros')" aria-expanded="false" aria-controls="navgroup-cadastros-list">
+          <span class="nav-group-label">Cadastros</span>
+          <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+        </button>
+        <div class="nav-group-list" id="navgroup-cadastros-list"><div>
         <div class="nav-submenu" id="navsub-manage-trilhas">
           <button class="nav-submenu-toggle" onclick="toggleNavSubmenu('manage-trilhas')" aria-expanded="false" aria-controls="navsub-manage-trilhas-list">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.4"/><circle cx="6" cy="18" r="2.4"/><circle cx="18" cy="6" r="2.4"/><path d="M6 8.4V15.6M8.4 6H15.6a2.4 2.4 0 0 1 2.4 2.4V6"/><path d="M8.4 18H14a4 4 0 0 0 4-4v-.2"/></svg>
@@ -665,6 +724,28 @@ function toggleTheme(){
             <button class="nav-item nav-subitem" id="navm-usuarios" onclick="navTo('manage','usuarios')">Usuários</button>
           </div></div>
         </div>
+        </div></div>
+      </div>
+
+      <div class="nav-group" id="navgroup-relatorios">
+        <button class="nav-group-toggle" onclick="toggleNavGroup('relatorios')" aria-expanded="false" aria-controls="navgroup-relatorios-list">
+          <span class="nav-group-label">Relatórios</span>
+          <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+        </button>
+        <div class="nav-group-list" id="navgroup-relatorios-list"><div>
+        <button class="nav-item" id="navr-frequencia" onclick="navTo('reports','frequencia')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5 11 13.5 15 9"/><rect x="3.5" y="4.5" width="17" height="16" rx="2.2"/><path d="M3.5 9.5h17"/></svg>
+          Frequência
+        </button>
+        <button class="nav-item" id="navr-frequencia-colab" onclick="navTo('reports','frequenciaColab')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a5 5 0 0 1 5-5h6a5 5 0 0 1 5 5v1"/><path d="M8.5 14.5 10 16l3-3"/></svg>
+          Frequência p/ colaborador
+        </button>
+        <button class="nav-item" id="navr-auditoria" onclick="navTo('reports','auditoria')" style="display:none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20.5 20.5-4-4"/><path d="M8.5 11h5M11 8.5v5"/></svg>
+          Auditoria
+        </button>
+        </div></div>
       </div>
     </nav>
 
@@ -737,6 +818,159 @@ function toggleTheme(){
               <span class="legend-item"><span class="legend-dot off"></span>A iniciar</span>
             </div>
             <div id="vtrilhaextra-roadmap"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="view" id="view-v-frequencia">
+        <div class="window">
+          <div class="window-head">
+            <div>
+              <p class="window-title">Frequência</p>
+              <p class="window-sub">Filtre pela data da aula (ou navegue por trilha/ciclo/módulo) e faça a chamada da etapa.</p>
+            </div>
+          </div>
+          <div class="window-body" style="padding-bottom:0;">
+            <div class="freq-filters">
+              <div class="tx-select-wrap">
+                <label for="freq-data-input" class="tx-select-label">Data</label>
+                <input type="date" id="freq-data-input" onchange="selectFreqData(this.value)">
+              </div>
+              <div class="tx-select-wrap">
+                <label for="freq-trilha-select" class="tx-select-label">Trilha</label>
+                <select id="freq-trilha-select" onchange="selectFreqTrilha(this.value)"></select>
+              </div>
+              <div class="tx-select-wrap">
+                <label for="freq-ciclo-select" class="tx-select-label">Ciclo</label>
+                <select id="freq-ciclo-select" onchange="selectFreqCiclo(this.value)"></select>
+              </div>
+              <div class="tx-select-wrap">
+                <label for="freq-modulo-select" class="tx-select-label">Módulo</label>
+                <select id="freq-modulo-select" onchange="selectFreqModulo(this.value)"></select>
+              </div>
+              <div class="tx-select-wrap">
+                <label for="freq-etapa-select" class="tx-select-label">Etapa</label>
+                <select id="freq-etapa-select" onchange="selectFreqEtapa(this.value)"></select>
+              </div>
+            </div>
+          </div>
+          <div class="window-body">
+            <div id="freq-content"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ RELATÓRIOS ============ -->
+      <div class="view" id="view-r-frequencia">
+        <div class="window">
+          <div class="window-head">
+            <div>
+              <p class="window-title">Relatório de frequência</p>
+              <p class="window-sub">Todas as chamadas já fechadas — inclusive o histórico de versões quando uma chamada fechada é reaberta e editada.</p>
+            </div>
+            <div style="display:flex;gap:8px;align-items:flex-end;">
+              <button type="button" class="btn-secondary" onclick="exportFrequencia()">Exportar Excel</button>
+            </div>
+          </div>
+          <div class="window-body" style="padding-bottom:0;">
+            <div class="freq-filters">
+              <div class="tx-select-wrap">
+                <label for="relfreq-data-input" class="tx-select-label">Data</label>
+                <input type="date" id="relfreq-data-input" onchange="selectRelfreqData(this.value)">
+              </div>
+              <div class="tx-select-wrap">
+                <label for="relfreq-trilha-select" class="tx-select-label">Trilha</label>
+                <select id="relfreq-trilha-select" onchange="selectRelfreqTrilha(this.value)"></select>
+              </div>
+              <div class="tx-select-wrap">
+                <label for="relfreq-ciclo-select" class="tx-select-label">Ciclo</label>
+                <select id="relfreq-ciclo-select" onchange="selectRelfreqCiclo(this.value)"></select>
+              </div>
+              <div class="tx-select-wrap">
+                <label for="relfreq-modulo-select" class="tx-select-label">Módulo</label>
+                <select id="relfreq-modulo-select" onchange="selectRelfreqModulo(this.value)"></select>
+              </div>
+              <div class="tx-select-wrap">
+                <label for="relfreq-etapa-select" class="tx-select-label">Etapa</label>
+                <select id="relfreq-etapa-select" onchange="selectRelfreqEtapa(this.value)"></select>
+              </div>
+            </div>
+          </div>
+          <div class="window-body">
+            <div class="reg-toolbar">
+              <input type="text" id="relfreq-search" class="reg-search" placeholder="Buscar por trilha, módulo ou etapa…" oninput="renderRelatorioFrequencia(this.value)">
+            </div>
+            <div id="relfreq-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="view" id="view-r-frequencia-colab">
+        <div class="window">
+          <div class="window-head">
+            <div>
+              <p class="window-title">Frequência por colaborador</p>
+              <p class="window-sub">Frequência de cada colaborador nas aulas já fechadas — geral e detalhada por trilha, ciclo e módulo.</p>
+            </div>
+          </div>
+          <div class="window-body">
+            <div class="colab-layout">
+              <div>
+                <div class="colab-toolbar">
+                  <input type="text" class="colab-search" id="relfreqcolab-search" placeholder="Buscar colaborador…" aria-label="Buscar colaborador" oninput="renderRelfreqColabList(this.value)">
+                </div>
+                <div class="colab-list" id="relfreqcolab-list"></div>
+              </div>
+              <div class="colab-detail" id="relfreqcolab-detail"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="view" id="view-r-auditoria">
+        <div class="window">
+          <div class="window-head">
+            <div>
+              <p class="window-title">Auditoria</p>
+              <p class="window-sub">Toda criação, edição e exclusão no sistema — quem fez, onde, quando, e o valor antes/depois.</p>
+            </div>
+          </div>
+          <div class="window-body" style="padding-bottom:0;">
+            <div class="freq-filters">
+              <div class="tx-select-wrap">
+                <label for="audit-de-input" class="tx-select-label">De</label>
+                <input type="date" id="audit-de-input" onchange="onAuditFilterChange()">
+              </div>
+              <div class="tx-select-wrap">
+                <label for="audit-ate-input" class="tx-select-label">Até</label>
+                <input type="date" id="audit-ate-input" onchange="onAuditFilterChange()">
+              </div>
+              <div class="tx-select-wrap">
+                <label for="audit-entidade-select" class="tx-select-label">Área</label>
+                <select id="audit-entidade-select" onchange="onAuditFilterChange()"><option value="">(todas as áreas)</option></select>
+              </div>
+              <div class="tx-select-wrap">
+                <label for="audit-acao-select" class="tx-select-label">Ação</label>
+                <select id="audit-acao-select" onchange="onAuditFilterChange()">
+                  <option value="">(todas)</option>
+                  <option value="create">Criação</option>
+                  <option value="update">Atualização</option>
+                  <option value="delete">Exclusão</option>
+                </select>
+              </div>
+              <div class="tx-select-wrap">
+                <label for="audit-usuario-select" class="tx-select-label">Usuário</label>
+                <select id="audit-usuario-select" onchange="onAuditFilterChange()"><option value="">(todos os usuários)</option></select>
+              </div>
+            </div>
+          </div>
+          <div class="window-body">
+            <div class="reg-toolbar">
+              <input type="text" id="audit-search" class="reg-search" placeholder="Buscar por ID, usuário, campo ou valor…" oninput="onAuditSearchInput()">
+            </div>
+            <p class="field-hint" id="audit-count" style="margin:0 0 12px;"></p>
+            <div id="audit-list"></div>
+            <button type="button" class="btn-secondary" id="audit-load-more" style="margin-top:14px;display:none;" onclick="loadMoreAudit()">Carregar mais</button>
           </div>
         </div>
       </div>
@@ -993,6 +1227,7 @@ function toggleTheme(){
     </div>
     <div class="form-tabs colab-modal-tabs" id="module-form-tabs">
       <button type="button" class="form-tab active" data-tab="dados" onclick="switchModuleFormTab('dados')">Dados cadastrais</button>
+      <button type="button" class="form-tab" data-tab="turma" onclick="switchModuleFormTab('turma')">Turma</button>
       <button type="button" class="form-tab" data-tab="cronograma" id="module-tab-cronograma-btn" onclick="switchModuleFormTab('cronograma')" style="display:none;">Cronograma</button>
     </div>
 
@@ -1006,7 +1241,7 @@ function toggleTheme(){
           </div>
           <div class="field"><label for="mf-nome">Nome do módulo</label><input type="text" id="mf-nome"></div>
           <div class="field-row">
-            <div class="field"><label for="mf-categoria">Categoria</label><select id="mf-categoria"><option>Liderança</option><option>Método</option><option>Liderança e Método</option></select></div>
+            <div class="field"><label for="mf-categoria">Categoria</label><select id="mf-categoria"><option>Liderança</option><option>Método</option><option>Liderança e Método</option><option>Autoconhecimento</option><option>Inovação</option></select></div>
             <div class="field"><label for="mf-status">Status da turma</label><select id="mf-status"><option>A iniciar</option><option>Em andamento</option><option>Concluído</option></select></div>
           </div>
           <div class="field"><label for="mf-desc">Descrição</label><textarea id="mf-desc"></textarea></div>
@@ -1022,6 +1257,10 @@ function toggleTheme(){
           <div class="field"><label for="mf-material">Link do material</label><input type="text" id="mf-material" placeholder="https://…"></div>
           <label class="field-check"><input type="checkbox" id="mf-tem-cronograma" onchange="toggleCronogramaTab()"> Informar cronograma?</label>
         </form>
+      </div>
+
+      <div class="form-tab-panel" id="mftab-panel-turma">
+        <div id="module-turma-content"></div>
       </div>
 
       <div class="form-tab-panel" id="mftab-panel-cronograma">
@@ -1084,7 +1323,7 @@ function warnSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="current
 
 /* ---------- State ---------- */
 let db = null;
-let unidades = [], trilhas = [], ciclos = [], modulos = [], colaboradores = [], progresso = [], usuarios = [], moduloEtapas = [];
+let unidades = [], trilhas = [], ciclos = [], modulos = [], colaboradores = [], progresso = [], usuarios = [], moduloEtapas = [], moduloFrequencia = [], moduloChamadas = [];
 let dbUnavailable = false;
 let currentMode = 'view';
 let currentTab = 'colaborador';
@@ -1101,9 +1340,27 @@ let currentUserId = null;
 let currentUserIsAdmin = false;
 function applyAdminVisibility(){
   document.getElementById('navsub-manage-admin').style.display = currentUserIsAdmin ? '' : 'none';
+  document.getElementById('navv-frequencia').style.display = currentUserIsAdmin ? '' : 'none';
+  document.getElementById('navr-auditoria').style.display = currentUserIsAdmin ? '' : 'none';
+  if(!currentUserIsAdmin && currentMode==='view' && currentTab==='frequencia') navTo('view','colaborador');
+  if(!currentUserIsAdmin && currentMode==='reports' && currentTab==='auditoria') navTo('reports','frequencia');
 }
 let trilhaExtraSelected = null;
 let txSelectedModulo = null;
+let freqData = new Date().toISOString().slice(0,10);
+let freqTrilhaId = '';
+let freqCicloId = '';
+let freqModuloId = null;
+let freqEtapaId = null;
+let relfreqData = '';
+let relfreqTrilhaId = '';
+let relfreqCicloId = '';
+let relfreqModuloId = '';
+let relfreqEtapaId = '';
+const relfreqVersoesCache = {};
+const relfreqOpen = new Set();
+let relfreqColabSelected = null;
+let relfreqColabPresencas = null;
 const loadedCols = new Set();
 function isLoaded(name){ return dbUnavailable || loadedCols.has(name); }
 
@@ -1178,6 +1435,8 @@ async function boot(){
   db.collection('ciclos').onSnapshot(s => { ciclos = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('ciclos'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
   db.collection('modulos').onSnapshot(s => { modulos = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('modulos'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
   db.collection('modulo-etapas').onSnapshot(s => { moduloEtapas = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('modulo-etapas'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
+  db.collection('modulo-frequencia').onSnapshot(s => { moduloFrequencia = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('modulo-frequencia'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
+  db.collection('modulo-etapa-chamada').onSnapshot(s => { moduloChamadas = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('modulo-etapa-chamada'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
   db.collection('colaboradores').onSnapshot(s => { colaboradores = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('colaboradores'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
   db.collection('progresso').onSnapshot(s => { progresso = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('progresso'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
   // Só usuários administradores têm permissão pra ler /api/usuarios (403 pros
@@ -1198,7 +1457,7 @@ function unidadeById(id){ return unidades.find(u=>u.id===id); }
 function moduloById(id){ return modulos.find(m=>m.id===id); }
 function progressoDoc(colabId, modId){ return progresso.find(p=>p.colaboradorId===colabId && p.moduloId===modId); }
 function modulosDaTrilha(trilhaId){ const cids = ciclos.filter(c=>c.trilhaId===trilhaId).map(c=>c.id); return modulos.filter(m=>cids.includes(m.cicloId)); }
-function catDotClass(cat){ if(cat==='Liderança') return 'lideranca'; if(cat==='Método') return 'metodo'; return 'ambos'; }
+function catDotClass(cat){ if(cat==='Liderança') return 'lideranca'; if(cat==='Método') return 'metodo'; if(cat==='Autoconhecimento') return 'autoconhecimento'; if(cat==='Inovação') return 'inovacao'; return 'ambos'; }
 function statusPillClass(status){ if(status==='Concluído') return 'done'; if(status==='Em andamento') return 'on'; return 'off'; }
 function nextStatus(status){ if(status==='Não iniciado' || !status) return 'Em andamento'; if(status==='Em andamento') return 'Concluído'; return 'Não iniciado'; }
 
@@ -1216,15 +1475,21 @@ function renderAll(){
   if(currentMode==='view'){
     if(currentTab==='colaborador'){ renderViewColabList(document.getElementById('vcolab-search').value); renderViewColabDetail(); renderDashboard(); }
     if(currentTab==='trilhaExtra') renderViewTrilhaExtra();
-  } else {
+    if(currentTab==='frequencia') renderFrequenciaView();
+  } else if(currentMode==='manage'){
     if(currentTab==='colaborador') renderManageColabTable();
     if(currentTab==='trilhas') renderTrilhas(document.getElementById('trilhas-search')?.value);
     if(currentTab==='ciclos') renderCadastroCiclos(document.getElementById('ciclos-search')?.value);
     if(currentTab==='modulos') renderCadastroModulos(document.getElementById('modulos-search')?.value);
     if(currentTab==='unidades') renderUnidades();
     if(currentTab==='usuarios') renderUsuarios();
+  } else if(currentMode==='reports'){
+    if(currentTab==='frequencia') renderRelatorioFrequencia(document.getElementById('relfreq-search')?.value);
+    if(currentTab==='frequenciaColab') renderRelfreqColabView(document.getElementById('relfreqcolab-search')?.value);
+    if(currentTab==='auditoria') renderAuditoriaView();
   }
   if(document.getElementById('modal-colab').classList.contains('show')) renderColabFormTrilhas();
+  if(document.getElementById('modal-module').classList.contains('show')){ renderModuleTurma(); renderModuleCronograma(); }
   populateSelects();
 }
 
@@ -1246,7 +1511,7 @@ function renderDashboard(){
     ? ranking.map((x,i) => `<div class="dash-rank-row"><span class="dash-rank-num">${i+1}º</span><span class="dash-rank-name">${esc(x.c.nome)}</span><span class="dash-rank-pct">${x.conc.pct}%</span></div>`).join('')
     : '<p class="dash-empty">Sem dados suficientes ainda.</p>';
 
-  const categorias = ['Liderança','Método','Liderança e Método'];
+  const categorias = ['Liderança','Método','Liderança e Método','Autoconhecimento','Inovação'];
   const catHtml = categorias.map(cat => {
     const mods = modulos.filter(m => m.categoria === cat);
     if(!mods.length) return '';
@@ -1314,12 +1579,14 @@ function renderFoot(){
 }
 
 const NAV_IDS = {
-  view: {colaborador:'navv-colab', trilhaExtra:'navv-trilhaExtra'},
-  manage: {colaborador:'navm-colab', trilhas:'navm-trilhas', ciclos:'navm-ciclos', modulos:'navm-modulos', unidades:'navm-unidades', usuarios:'navm-usuarios'}
+  view: {colaborador:'navv-colab', trilhaExtra:'navv-trilhaExtra', frequencia:'navv-frequencia'},
+  manage: {colaborador:'navm-colab', trilhas:'navm-trilhas', ciclos:'navm-ciclos', modulos:'navm-modulos', unidades:'navm-unidades', usuarios:'navm-usuarios'},
+  reports: {frequencia:'navr-frequencia', frequenciaColab:'navr-frequencia-colab', auditoria:'navr-auditoria'}
 };
 const PANE_IDS = {
-  view: {colaborador:'view-v-colaborador', trilhaExtra:'view-v-trilhaExtra'},
-  manage: {colaborador:'view-m-colaborador', trilhas:'view-m-trilhas', ciclos:'view-m-ciclos', modulos:'view-m-modulos', unidades:'view-m-unidades', usuarios:'view-m-usuarios'}
+  view: {colaborador:'view-v-colaborador', trilhaExtra:'view-v-trilhaExtra', frequencia:'view-v-frequencia'},
+  manage: {colaborador:'view-m-colaborador', trilhas:'view-m-trilhas', ciclos:'view-m-ciclos', modulos:'view-m-modulos', unidades:'view-m-unidades', usuarios:'view-m-usuarios'},
+  reports: {frequencia:'view-r-frequencia', frequenciaColab:'view-r-frequencia-colab', auditoria:'view-r-auditoria'}
 };
 
 function navTo(mode, name){
@@ -1327,6 +1594,8 @@ function navTo(mode, name){
   document.querySelectorAll('.nav-item').forEach(el=>{ el.classList.remove('active'); el.removeAttribute('aria-current'); });
   const activeNav = document.getElementById(NAV_IDS[mode][name]);
   activeNav.classList.add('active'); activeNav.setAttribute('aria-current','page');
+  const parentGroup = activeNav.closest('.nav-group[id^="navgroup-"]');
+  if(parentGroup) openNavGroup(parentGroup);
   const parentSubmenu = activeNav.closest('.nav-submenu');
   if(parentSubmenu) openNavSubmenu(parentSubmenu);
 
@@ -1345,6 +1614,15 @@ function toggleNavSubmenu(key){
   const el = document.getElementById('navsub-'+key);
   const isOpen = el.classList.toggle('open');
   el.querySelector('.nav-submenu-toggle').setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+}
+function openNavGroup(el){
+  el.classList.add('open');
+  el.querySelector('.nav-group-toggle')?.setAttribute('aria-expanded','true');
+}
+function toggleNavGroup(key){
+  const el = document.getElementById('navgroup-'+key);
+  const isOpen = el.classList.toggle('open');
+  el.querySelector('.nav-group-toggle').setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 }
 
 function openSidebar(){ document.getElementById('sidebar').classList.add('show'); document.getElementById('sidebar-overlay').classList.add('show'); }
@@ -1485,13 +1763,564 @@ function toggleProgMore(id){
   if(btn) btn.textContent = btn.textContent.replace(open ? '− ocultar' : '+ mostrar', open ? '+ mostrar' : '− ocultar');
 }
 
-function catLabel(cat){ if(cat==='Método') return 'Método'; if(cat==='Liderança e Método') return 'Liderança e Método'; return 'Liderança'; }
+function catLabel(cat){ return ['Método','Liderança e Método','Autoconhecimento','Inovação'].includes(cat) ? cat : 'Liderança'; }
 
 /* ================= Trilha - Extra: roadmap sequencial por trilha ================= */
 function selectTrilhaExtra(id){
   if(id !== trilhaExtraSelected){ txSelectedModulo = null; closeTxModuleModal(); }
   trilhaExtraSelected = id; renderViewTrilhaExtra();
 }
+
+/* ================= FREQUÊNCIA (facilitador) ================= */
+function chamadaOf(etapaId){ return moduloChamadas.find(c=>c.etapaId===etapaId) || null; }
+function etapaMatchesDate(e, date){
+  if(!date) return true;
+  const ini = e.dataInicio || e.dataFim;
+  const fim = e.dataFim || e.dataInicio;
+  if(!ini) return false;
+  return date >= ini && date <= fim;
+}
+function formatDateHora(dt){
+  if(!dt) return '';
+  const d = new Date(dt);
+  return d.toLocaleDateString('pt-BR') + ' às ' + d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+}
+function selectFreqData(v){ freqData = v; freqModuloId = null; freqEtapaId = null; renderFrequenciaView(); }
+function selectFreqTrilha(id){ freqTrilhaId = id; freqCicloId = ''; freqModuloId = null; freqEtapaId = null; renderFrequenciaView(); }
+function selectFreqCiclo(id){ freqCicloId = id; freqModuloId = null; freqEtapaId = null; renderFrequenciaView(); }
+function selectFreqModulo(id){ freqModuloId = id; freqEtapaId = null; renderFrequenciaView(); }
+function selectFreqEtapa(id){ freqEtapaId = id; renderFrequenciaView(); }
+
+function renderFrequenciaView(){
+  const dataInput = document.getElementById('freq-data-input');
+  const trilhaSel = document.getElementById('freq-trilha-select');
+  const cicloSel = document.getElementById('freq-ciclo-select');
+  const modSel = document.getElementById('freq-modulo-select');
+  const etSel = document.getElementById('freq-etapa-select');
+  const content = document.getElementById('freq-content');
+  if(!dataInput || !trilhaSel || !cicloSel || !modSel || !etSel || !content) return;
+  if(!currentUserIsAdmin){ content.innerHTML = '<div class="empty-state">Somente administradores podem realizar a chamada.</div>'; return; }
+  if(dbUnavailable){ content.innerHTML = '<div class="empty-state">Este visualizador não tem acesso ao banco de dados do artifact.</div>'; return; }
+  if(!isLoaded('modulos') || !isLoaded('ciclos') || !isLoaded('trilhas') || !isLoaded('modulo-etapas') || !isLoaded('progresso') || !isLoaded('colaboradores') || !isLoaded('modulo-frequencia') || !isLoaded('modulo-etapa-chamada')){
+    content.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando…</div>'; return;
+  }
+
+  dataInput.value = freqData || '';
+
+  const eligibleMods = modulos.filter(m => m.temCronograma && moduloEtapas.some(e=>e.moduloId===m.id && etapaMatchesDate(e, freqData)));
+
+  const trilhaIdsElig = [...new Set(eligibleMods.map(m => cicloById(m.cicloId)?.trilhaId).filter(Boolean))];
+  const trilhaOptions = trilhaIdsElig.map(id=>trilhaById(id)).filter(Boolean).sort((a,b)=>a.nome.localeCompare(b.nome));
+  if(freqTrilhaId && !trilhaOptions.find(t=>t.id===freqTrilhaId)) freqTrilhaId = '';
+  trilhaSel.innerHTML = '<option value="">(todas as trilhas)</option>' + trilhaOptions.map(t=>`<option value="${esc(t.id)}" ${t.id===freqTrilhaId?'selected':''}>${esc(t.nome)}</option>`).join('');
+
+  const modsAfterTrilha = freqTrilhaId ? eligibleMods.filter(m => cicloById(m.cicloId)?.trilhaId === freqTrilhaId) : eligibleMods;
+  const cicloIdsElig = [...new Set(modsAfterTrilha.map(m=>m.cicloId))];
+  const cicloOptions = cicloIdsElig.map(id=>cicloById(id)).filter(Boolean).sort((a,b)=>a.nome.localeCompare(b.nome));
+  if(freqCicloId && !cicloOptions.find(c=>c.id===freqCicloId)) freqCicloId = '';
+  cicloSel.innerHTML = '<option value="">(todos os ciclos)</option>' + cicloOptions.map(c=>`<option value="${esc(c.id)}" ${c.id===freqCicloId?'selected':''}>${esc(c.nome)}</option>`).join('');
+
+  const modsAfterCiclo = freqCicloId ? modsAfterTrilha.filter(m=>m.cicloId===freqCicloId) : modsAfterTrilha;
+  const moduloOptions = [...modsAfterCiclo].sort((a,b)=>{
+    const ta = cicloById(a.cicloId), tb = cicloById(b.cicloId);
+    return (trilhaById(ta?.trilhaId)?.nome||'').localeCompare(trilhaById(tb?.trilhaId)?.nome||'') || (a.ordem??0)-(b.ordem??0);
+  });
+
+  if(!moduloOptions.length){
+    modSel.innerHTML = '<option value="">(nenhum módulo elegível)</option>';
+    etSel.innerHTML = '';
+    content.innerHTML = `<div class="empty-cta"><p class="empty-title">Nenhuma etapa encontrada</p><p>${freqData ? 'Nenhum módulo tem etapa cadastrada nessa data — troque a data ou limpe o filtro.' : 'Marque "Informar cronograma?" no cadastro de um módulo e adicione etapas para poder registrar frequência.'}</p></div>`;
+    return;
+  }
+  if(!freqModuloId || !moduloOptions.find(m=>m.id===freqModuloId)) freqModuloId = moduloOptions[0].id;
+  modSel.innerHTML = moduloOptions.map(m=>`<option value="${esc(m.id)}" ${m.id===freqModuloId?'selected':''}>${esc(m.nome)}</option>`).join('');
+
+  const etapas = moduloEtapas.filter(e=>e.moduloId===freqModuloId && etapaMatchesDate(e, freqData)).sort((a,b)=>(a.ordem??0)-(b.ordem??0));
+  if(!freqEtapaId || !etapas.find(e=>e.id===freqEtapaId)) freqEtapaId = etapas[0]?.id || null;
+  etSel.innerHTML = etapas.map(e=>`<option value="${esc(e.id)}" ${e.id===freqEtapaId?'selected':''}>${esc(e.nome)}${e.dataInicio?' · '+formatDateBR(e.dataInicio):''}</option>`).join('');
+
+  if(!freqEtapaId){
+    content.innerHTML = `<div class="empty-cta"><p class="empty-title">Nenhuma etapa encontrada</p><p>${freqData ? 'Este módulo não tem etapa nessa data.' : 'Este módulo ainda não tem etapas cadastradas.'}</p></div>`;
+    return;
+  }
+
+  const matriculados = progresso.filter(p=>p.moduloId===freqModuloId)
+    .map(p=>({...p, colab: colaboradores.find(c=>c.id===p.colaboradorId)}))
+    .filter(p=>p.colab)
+    .sort((a,b)=>a.colab.nome.localeCompare(b.colab.nome));
+
+  if(!matriculados.length){
+    content.innerHTML = '<div class="empty-cta"><p class="empty-title">Ninguém matriculado neste módulo ainda</p><p>Matricule colaboradores pelo cadastro do módulo, na aba "Turma".</p></div>';
+    return;
+  }
+
+  const chamada = chamadaOf(freqEtapaId);
+  const presentCount = matriculados.filter(p => moduloFrequencia.find(f=>f.etapaId===freqEtapaId && f.colaboradorId===p.colab.id)?.presente).length;
+
+  if(!chamada){
+    content.innerHTML = `<div class="freq-lock">
+      <p>A chamada desta etapa ainda não foi iniciada.</p>
+      <button type="button" class="btn-save" onclick="iniciarChamada()">Iniciar chamada</button>
+    </div>`;
+    return;
+  }
+
+  if(chamada.status === 'fechada'){
+    let html = `<div class="freq-chamada-status">
+      <div>
+        <p class="freq-summary-count" style="margin-bottom:2px;">${presentCount}<span>/${matriculados.length} presentes</span></p>
+        <p class="freq-chamada-meta">Chamada fechada em ${formatDateHora(chamada.fechadaEm)}${chamada.fechadaPor?' por '+esc(chamada.fechadaPor):''}${chamada.versoesCount>1?' · '+chamada.versoesCount+' versões (ver Relatórios)':''}</p>
+      </div>
+      <button type="button" class="btn-secondary" onclick="reabrirChamada()">Reabrir para editar</button>
+    </div>`;
+    html += matriculados.map(p => {
+      const presente = !!moduloFrequencia.find(f=>f.etapaId===freqEtapaId && f.colaboradorId===p.colab.id)?.presente;
+      return `<div class="prog-row">
+        <span class="prog-name">${esc(p.colab.nome)}</span>
+        <span class="status-pill ${presente?'done':'off'}" style="pointer-events:none;">${presente?'Presente':'Ausente'}</span>
+      </div>`;
+    }).join('');
+    content.innerHTML = html;
+    return;
+  }
+
+  // aberta — editável
+  let html = `<div class="freq-summary">
+    <div>
+      <p class="freq-summary-count">${presentCount}<span>/${matriculados.length} presentes</span></p>
+      <p class="freq-chamada-meta">Chamada aberta desde ${formatDateHora(chamada.iniciadaEm)}${chamada.iniciadaPor?' por '+esc(chamada.iniciadaPor):''}</p>
+    </div>
+    <div class="freq-bulk-actions">
+      <button type="button" class="btn-secondary" onclick="marcarTodosFrequencia(true)">Marcar todos presentes</button>
+      <button type="button" class="btn-secondary" onclick="marcarTodosFrequencia(false)">Marcar todos ausentes</button>
+      <button type="button" class="btn-save" onclick="fecharChamada()">Fechar chamada</button>
+    </div>
+  </div>`;
+  html += matriculados.map(p => {
+    const presente = !!moduloFrequencia.find(f=>f.etapaId===freqEtapaId && f.colaboradorId===p.colab.id)?.presente;
+    return `<div class="prog-row">
+      <span class="prog-name">${esc(p.colab.nome)}</span>
+      <button class="status-pill ${presente?'done':'off'}" onclick="toggleFrequencia('${freqEtapaId}','${p.colab.id}',${presente})">${presente?'Presente':'Ausente'}</button>
+    </div>`;
+  }).join('');
+  content.innerHTML = html;
+}
+async function iniciarChamada(){
+  if(!db || !freqEtapaId) return;
+  const res = await fetch('api/modulo-etapa-chamada/'+encodeURIComponent(freqEtapaId), {
+    method:'PUT', headers:{...authHeaders(), 'Content-Type':'application/json'}, body: JSON.stringify({status:'aberta'})
+  });
+  if(!res.ok){ toast('Não foi possível iniciar a chamada'); return; }
+  await db.reload('modulo-etapa-chamada');
+  toast('Chamada iniciada');
+}
+async function fecharChamada(){
+  if(!db || !freqEtapaId) return;
+  const res = await fetch('api/modulo-etapa-chamada/'+encodeURIComponent(freqEtapaId), {
+    method:'PUT', headers:{...authHeaders(), 'Content-Type':'application/json'}, body: JSON.stringify({status:'fechada'})
+  });
+  if(!res.ok){ toast('Não foi possível fechar a chamada'); return; }
+  await db.reload('modulo-etapa-chamada');
+  toast('Chamada fechada e salva');
+}
+async function reabrirChamada(){
+  if(!db || !freqEtapaId) return;
+  const res = await fetch('api/modulo-etapa-chamada/'+encodeURIComponent(freqEtapaId), {
+    method:'PUT', headers:{...authHeaders(), 'Content-Type':'application/json'}, body: JSON.stringify({status:'aberta'})
+  });
+  if(!res.ok){ toast('Não foi possível reabrir a chamada'); return; }
+  await db.reload('modulo-etapa-chamada');
+  toast('Chamada reaberta — ao fechar de novo, uma nova versão é salva');
+}
+async function marcarTodosFrequencia(presente){
+  if(!db || !freqEtapaId) return;
+  const alvos = progresso.filter(p=>p.moduloId===freqModuloId).map(p=>p.colaboradorId);
+  for(const colabId of alvos){
+    await fetch('api/modulo-frequencia/'+encodeURIComponent(freqEtapaId)+'/'+encodeURIComponent(colabId), {
+      method:'PUT', headers:{...authHeaders(), 'Content-Type':'application/json'}, body: JSON.stringify({presente})
+    });
+  }
+  await db.reload('modulo-frequencia');
+  toast(presente ? 'Todos marcados como presentes' : 'Todos marcados como ausentes');
+}
+
+/* ================= RELATÓRIOS: Frequência ================= */
+function selectRelfreqData(v){ relfreqData = v; relfreqModuloId = ''; relfreqEtapaId = ''; renderRelatorioFrequencia(document.getElementById('relfreq-search')?.value); }
+function selectRelfreqTrilha(id){ relfreqTrilhaId = id; relfreqCicloId = ''; relfreqModuloId = ''; relfreqEtapaId = ''; renderRelatorioFrequencia(document.getElementById('relfreq-search')?.value); }
+function selectRelfreqCiclo(id){ relfreqCicloId = id; relfreqModuloId = ''; relfreqEtapaId = ''; renderRelatorioFrequencia(document.getElementById('relfreq-search')?.value); }
+function selectRelfreqModulo(id){ relfreqModuloId = id; relfreqEtapaId = ''; renderRelatorioFrequencia(document.getElementById('relfreq-search')?.value); }
+function selectRelfreqEtapa(id){ relfreqEtapaId = id; renderRelatorioFrequencia(document.getElementById('relfreq-search')?.value); }
+
+function renderRelatorioFrequencia(filter){
+  const el = document.getElementById('relfreq-list');
+  const dataInput = document.getElementById('relfreq-data-input');
+  const trilhaSel = document.getElementById('relfreq-trilha-select');
+  const cicloSel = document.getElementById('relfreq-ciclo-select');
+  const modSel = document.getElementById('relfreq-modulo-select');
+  const etSel = document.getElementById('relfreq-etapa-select');
+  if(!el || !dataInput || !trilhaSel || !cicloSel || !modSel || !etSel) return;
+  if(dbUnavailable){ el.innerHTML = '<div class="empty-state">Este visualizador não tem acesso ao banco de dados do artifact.</div>'; return; }
+  if(!isLoaded('modulo-etapa-chamada') || !isLoaded('modulo-etapas') || !isLoaded('modulos') || !isLoaded('ciclos') || !isLoaded('trilhas')){
+    el.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando…</div>'; return;
+  }
+
+  dataInput.value = relfreqData || '';
+
+  const base = moduloChamadas.filter(c => c.versoesCount > 0).map(c => {
+    const e = moduloEtapas.find(x=>x.id===c.etapaId);
+    const m = e ? moduloById(e.moduloId) : null;
+    const ci = m ? cicloById(m.cicloId) : null;
+    const t = ci ? trilhaById(ci.trilhaId) : null;
+    return { chamada: c, etapa: e, modulo: m, ciclo: ci, trilha: t };
+  }).filter(r => r.etapa && r.modulo && r.ciclo && r.trilha);
+
+  const afterData = base.filter(r => etapaMatchesDate(r.etapa, relfreqData));
+
+  const trilhaOptions = [...new Map(afterData.map(r=>[r.trilha.id, r.trilha])).values()].sort((a,b)=>a.nome.localeCompare(b.nome));
+  if(relfreqTrilhaId && !trilhaOptions.find(t=>t.id===relfreqTrilhaId)) relfreqTrilhaId = '';
+  trilhaSel.innerHTML = '<option value="">(todas as trilhas)</option>' + trilhaOptions.map(t=>`<option value="${esc(t.id)}" ${t.id===relfreqTrilhaId?'selected':''}>${esc(t.nome)}</option>`).join('');
+
+  const afterTrilha = relfreqTrilhaId ? afterData.filter(r=>r.trilha.id===relfreqTrilhaId) : afterData;
+  const cicloOptions = [...new Map(afterTrilha.map(r=>[r.ciclo.id, r.ciclo])).values()].sort((a,b)=>a.nome.localeCompare(b.nome));
+  if(relfreqCicloId && !cicloOptions.find(c=>c.id===relfreqCicloId)) relfreqCicloId = '';
+  cicloSel.innerHTML = '<option value="">(todos os ciclos)</option>' + cicloOptions.map(c=>`<option value="${esc(c.id)}" ${c.id===relfreqCicloId?'selected':''}>${esc(c.nome)}</option>`).join('');
+
+  const afterCiclo = relfreqCicloId ? afterTrilha.filter(r=>r.ciclo.id===relfreqCicloId) : afterTrilha;
+  const moduloOptions = [...new Map(afterCiclo.map(r=>[r.modulo.id, r.modulo])).values()].sort((a,b)=>a.nome.localeCompare(b.nome));
+  if(relfreqModuloId && !moduloOptions.find(m=>m.id===relfreqModuloId)) relfreqModuloId = '';
+  modSel.innerHTML = '<option value="">(todos os módulos)</option>' + moduloOptions.map(m=>`<option value="${esc(m.id)}" ${m.id===relfreqModuloId?'selected':''}>${esc(m.nome)}</option>`).join('');
+
+  const afterModulo = relfreqModuloId ? afterCiclo.filter(r=>r.modulo.id===relfreqModuloId) : afterCiclo;
+  const etapaOptions = [...new Map(afterModulo.map(r=>[r.etapa.id, r.etapa])).values()].sort((a,b)=>(a.ordem??0)-(b.ordem??0));
+  if(relfreqEtapaId && !etapaOptions.find(e=>e.id===relfreqEtapaId)) relfreqEtapaId = '';
+  etSel.innerHTML = '<option value="">(todas as etapas)</option>' + etapaOptions.map(e=>`<option value="${esc(e.id)}" ${e.id===relfreqEtapaId?'selected':''}>${esc(e.nome)}${e.dataInicio?' · '+formatDateBR(e.dataInicio):''}</option>`).join('');
+
+  let registros = relfreqEtapaId ? afterModulo.filter(r=>r.etapa.id===relfreqEtapaId) : afterModulo;
+
+  const f = norm(filter||'');
+  if(f){
+    registros = registros.filter(r => norm(r.trilha.nome).includes(f) || norm(r.ciclo.nome).includes(f) || norm(r.modulo.nome).includes(f) || norm(r.etapa.nome).includes(f));
+  }
+  registros.sort((a,b) => new Date(b.chamada.fechadaEm||0) - new Date(a.chamada.fechadaEm||0));
+
+  if(!registros.length){
+    el.innerHTML = base.length ? '<p class="colab-empty">Nenhum resultado para os filtros aplicados.</p>' : '<p class="colab-empty">Nenhuma chamada fechada ainda.</p>';
+    return;
+  }
+
+  el.innerHTML = registros.map(r => {
+    const isOpen = relfreqOpen.has(r.etapa.id);
+    return `<div class="relfreq-row">
+      <div class="relfreq-row-head" onclick="toggleRelfreqRow('${r.etapa.id}')">
+        <div class="relfreq-row-main">
+          <div class="reg-row-title">${esc(r.trilha?.nome||'—')} / ${esc(r.modulo?.nome||'—')} — ${esc(r.etapa.nome)}</div>
+          <div class="reg-row-sub">${r.etapa.dataInicio?formatDateBR(r.etapa.dataInicio)+' · ':''}${r.chamada.status==='fechada'?'Fechada':'Reaberta (em edição)'} em ${formatDateHora(r.chamada.fechadaEm)}${r.chamada.fechadaPor?' por '+esc(r.chamada.fechadaPor):''}${r.chamada.versoesCount>1?' · '+r.chamada.versoesCount+' versões':''}</div>
+        </div>
+        <span class="btn-ghost-sm" style="pointer-events:none;">${isOpen?'▲':'▼'}</span>
+      </div>
+      ${isOpen ? `<div class="relfreq-row-body" id="relfreq-body-${r.etapa.id}"><div class="loading-row"><span class="spinner"></span>Carregando versões…</div></div>` : ''}
+    </div>`;
+  }).join('');
+
+  registros.forEach(r => { if(relfreqOpen.has(r.etapa.id)) loadRelfreqVersoes(r.etapa.id); });
+}
+function toggleRelfreqRow(etapaId){
+  if(relfreqOpen.has(etapaId)) relfreqOpen.delete(etapaId); else relfreqOpen.add(etapaId);
+  renderRelatorioFrequencia(document.getElementById('relfreq-search')?.value);
+}
+async function loadRelfreqVersoes(etapaId){
+  if(!relfreqVersoesCache[etapaId]){
+    try{
+      const res = await fetch('api/modulo-etapa-chamada/'+encodeURIComponent(etapaId)+'/versoes', { headers: authHeaders() });
+      const data = await res.json();
+      relfreqVersoesCache[etapaId] = data.docs;
+    }catch(e){ relfreqVersoesCache[etapaId] = []; }
+  }
+  const body = document.getElementById('relfreq-body-'+etapaId);
+  if(!body) return;
+  const versoes = relfreqVersoesCache[etapaId];
+  if(!versoes.length){ body.innerHTML = '<p class="field-hint" style="margin:0;">Nenhuma versão encontrada.</p>'; return; }
+  body.innerHTML = versoes.map(v => {
+    const presentes = v.presencas.filter(p=>p.presente).length;
+    const motivoLabel = v.motivo === 'fechamento' ? 'Fechamento original' : 'Edição';
+    const rows = [...v.presencas].sort((a,b)=>{
+      const na = colaboradores.find(c=>c.id===a.colaboradorId)?.nome || '';
+      const nb = colaboradores.find(c=>c.id===b.colaboradorId)?.nome || '';
+      return na.localeCompare(nb);
+    }).map(p => {
+      const nome = colaboradores.find(c=>c.id===p.colaboradorId)?.nome || '(colaborador removido)';
+      return `<div class="prog-row prog-row-sm"><span class="prog-name">${esc(nome)}</span><span class="status-pill ${p.presente?'done':'off'}" style="pointer-events:none;">${p.presente?'Presente':'Ausente'}</span></div>`;
+    }).join('');
+    return `<div class="relfreq-versao">
+      <p class="relfreq-versao-title">Versão ${v.versao} · ${motivoLabel} · ${formatDateHora(v.criadaEm)}${v.criadaPor?' por '+esc(v.criadaPor):''} · ${presentes}/${v.presencas.length} presentes</p>
+      ${rows}
+    </div>`;
+  }).join('');
+}
+async function exportFrequencia(){
+  toast('Gerando planilha…');
+  try{
+    const res = await fetch('api/export/frequencia', { headers: authHeaders() });
+    if(!res.ok){ toast('Não foi possível exportar'); return; }
+    const blob = await res.blob();
+    const disposition = res.headers.get('Content-Disposition') || '';
+    const match = disposition.match(/filename="([^"]+)"/);
+    const filename = match ? match[1] : 'frequencia.xlsx';
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+    toast('Planilha baixada');
+  }catch(e){ toast('Não foi possível exportar'); }
+}
+
+/* ================= RELATÓRIOS: Frequência por colaborador ================= */
+async function renderRelfreqColabView(filter){
+  renderRelfreqColabList(filter);
+  await loadRelfreqColabPresencas();
+  renderRelfreqColabDetail();
+}
+async function loadRelfreqColabPresencas(){
+  try{
+    const res = await fetch('api/modulo-etapa-chamada/presencas', { headers: authHeaders() });
+    const data = await res.json();
+    relfreqColabPresencas = data.docs;
+  }catch(e){ relfreqColabPresencas = []; }
+}
+function renderRelfreqColabList(filter){
+  const list = document.getElementById('relfreqcolab-list');
+  if(!list) return;
+  const f = norm(filter||'');
+  const items = [...colaboradores].filter(c => norm(c.nome).includes(f)).sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
+  if(dbUnavailable){ list.innerHTML = '<p class="colab-empty">Banco de dados indisponível nesta visualização.</p>'; return; }
+  if(!isLoaded('colaboradores')){ list.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando…</div>'; return; }
+  if(colaboradores.length===0){ list.innerHTML = '<p class="colab-empty">Nenhum colaborador cadastrado ainda.</p>'; return; }
+  if(items.length===0){ list.innerHTML = `<p class="colab-empty">Nenhum resultado para "${esc(filter||'')}".</p>`; return; }
+  list.innerHTML = items.map(c => `
+    <button class="colab-btn ${c.id===relfreqColabSelected?'selected':''} ${c.ativo===false?'inativo':''}" onclick="selectRelfreqColab('${c.id}')">
+      ${c.lideranca ? '<span class="lead-dot" title="Liderança"></span>' : '<span style="width:6px"></span>'}
+      <span class="colab-btn-name">${esc(c.nome)}</span>
+    </button>`).join('');
+}
+function selectRelfreqColab(id){
+  relfreqColabSelected = id;
+  renderRelfreqColabList(document.getElementById('relfreqcolab-search')?.value);
+  renderRelfreqColabDetail();
+}
+function renderRelfreqColabDetail(){
+  const el = document.getElementById('relfreqcolab-detail');
+  if(!el) return;
+  if(dbUnavailable){ el.innerHTML = '<div class="empty-state">Este visualizador não tem acesso ao banco de dados do artifact.</div>'; return; }
+  if(!isLoaded('modulo-etapas') || !isLoaded('modulos') || !isLoaded('ciclos') || !isLoaded('trilhas') || relfreqColabPresencas===null){
+    el.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando…</div>'; return;
+  }
+  const c = colaboradores.find(x=>x.id===relfreqColabSelected);
+  if(!c){ el.innerHTML = '<div class="empty-state">Selecione um colaborador na lista.</div>'; return; }
+
+  const registros = relfreqColabPresencas.filter(p=>p.colaboradorId===c.id).map(p=>{
+    const e = moduloEtapas.find(x=>x.id===p.etapaId);
+    const m = e ? moduloById(e.moduloId) : null;
+    const ci = m ? cicloById(m.cicloId) : null;
+    const t = ci ? trilhaById(ci.trilhaId) : null;
+    return { etapa: e, modulo: m, ciclo: ci, trilha: t, presente: p.presente };
+  }).filter(r => r.etapa && r.modulo && r.ciclo && r.trilha);
+
+  const total = registros.length;
+  const presentes = registros.filter(r=>r.presente).length;
+  const pct = total ? Math.round(presentes/total*100) : 0;
+
+  let html = `<div class="colab-head-row">
+    <div>
+      <h2>${esc(c.nome)}</h2>
+      <div class="colab-meta-row">
+        ${c.lideranca ? '<span class="badge lideranca">Liderança</span>' : ''}
+        ${c.ativo===false ? '<span class="badge inativo">Inativo</span>' : ''}
+      </div>
+    </div>
+    ${total ? `<div class="colab-head-stat">
+      <span class="colab-head-stat-num">${pct}%</span>
+      <span class="colab-head-stat-label">${presentes}/${total} aulas presentes</span>
+    </div>` : ''}
+  </div>`;
+
+  if(!total){
+    html += `<p style="font-size:12.5px;color:var(--ink-dim);">Nenhuma chamada fechada envolvendo este colaborador ainda.</p>`;
+    el.innerHTML = html;
+    return;
+  }
+
+  html += `<div class="section-h">Por trilha</div>`;
+  const trilhasMap = new Map();
+  registros.forEach(r => { if(!trilhasMap.has(r.trilha.id)) trilhasMap.set(r.trilha.id, { trilha:r.trilha, regs:[] }); trilhasMap.get(r.trilha.id).regs.push(r); });
+  [...trilhasMap.values()].sort((a,b)=>a.trilha.nome.localeCompare(b.trilha.nome)).forEach(({trilha, regs}) => {
+    const pT = regs.filter(r=>r.presente).length;
+    const pctT = regs.length ? Math.round(pT/regs.length*100) : 0;
+    html += `<div class="progress-group">
+      <div class="progress-group-title">${esc(trilha.nome)}</div>
+      <div class="progress-group-stat-row">
+        <span class="progress-group-stat-num">${pctT}%</span>
+        <span class="progress-group-stat-label">${pT}/${regs.length} aulas presentes</span>
+      </div>
+      <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:${pctT}%"></div></div>`;
+
+    const ciclosMap = new Map();
+    regs.forEach(r => { if(!ciclosMap.has(r.ciclo.id)) ciclosMap.set(r.ciclo.id, { ciclo:r.ciclo, regs:[] }); ciclosMap.get(r.ciclo.id).regs.push(r); });
+    [...ciclosMap.values()].sort((a,b)=>a.ciclo.nome.localeCompare(b.ciclo.nome)).forEach(({ciclo, regs: regsCi}) => {
+      const pCi = regsCi.filter(r=>r.presente).length;
+      const pctCi = regsCi.length ? Math.round(pCi/regsCi.length*100) : 0;
+      html += `<div class="progress-cycle-card">
+        <div class="progress-cycle-head">
+          <span class="progress-cycle-title">${esc(ciclo.nome)}</span>
+          <span class="progress-cycle-count">${pCi}/${regsCi.length}</span>
+        </div>
+        <div class="progress-bar-outer progress-bar-outer-sm"><div class="progress-bar-inner" style="width:${pctCi}%"></div></div>
+        <div class="prog-list">`;
+
+      const modsMap = new Map();
+      regsCi.forEach(r => { if(!modsMap.has(r.modulo.id)) modsMap.set(r.modulo.id, { modulo:r.modulo, regs:[] }); modsMap.get(r.modulo.id).regs.push(r); });
+      [...modsMap.values()].sort((a,b)=>a.modulo.nome.localeCompare(b.modulo.nome)).forEach(({modulo, regs: regsMod}) => {
+        const pMod = regsMod.filter(r=>r.presente).length;
+        html += `<div class="prog-row"><span class="prog-name">${esc(modulo.nome)}</span><span class="status-pill ${pMod===regsMod.length?'done':(pMod===0?'off':'on')}" style="pointer-events:none;">${pMod}/${regsMod.length}</span></div>`;
+        [...regsMod].sort((a,b)=>(a.etapa.ordem??0)-(b.etapa.ordem??0)).forEach(r => {
+          html += `<div class="prog-row prog-row-sm"><span class="prog-name">${esc(r.etapa.nome)}${r.etapa.dataInicio?' · '+formatDateBR(r.etapa.dataInicio):''}</span><span class="status-pill ${r.presente?'done':'off'}" style="pointer-events:none;">${r.presente?'Presente':'Ausente'}</span></div>`;
+        });
+      });
+      html += `</div></div>`;
+    });
+    html += `</div>`;
+  });
+
+  el.innerHTML = html;
+}
+
+/* ================= RELATÓRIOS: Auditoria ================= */
+let auditFiltrosLoaded = false;
+let auditDocs = [];
+let auditTotal = 0;
+let auditOffset = 0;
+const AUDIT_LIMIT = 100;
+const auditOpen = new Set();
+let auditSearchTimer = null;
+
+async function renderAuditoriaView(){
+  if(!currentUserIsAdmin) return;
+  if(!auditFiltrosLoaded){
+    await loadAuditFiltros();
+    auditFiltrosLoaded = true;
+  }
+  await fetchAudit(true);
+}
+async function loadAuditFiltros(){
+  try{
+    const res = await fetch('api/auditoria/filtros', { headers: authHeaders() });
+    const data = await res.json();
+    const entSel = document.getElementById('audit-entidade-select');
+    if(entSel) entSel.innerHTML = '<option value="">(todas as áreas)</option>' + data.entidades.map(e=>`<option value="${esc(e.valor)}">${esc(e.label)}</option>`).join('');
+    const userSel = document.getElementById('audit-usuario-select');
+    if(userSel) userSel.innerHTML = '<option value="">(todos os usuários)</option>' + data.usuarios.map(u=>`<option value="${esc(u)}">${esc(u)}</option>`).join('');
+  }catch(e){}
+}
+function onAuditFilterChange(){ fetchAudit(true); }
+function onAuditSearchInput(){
+  clearTimeout(auditSearchTimer);
+  auditSearchTimer = setTimeout(()=>fetchAudit(true), 300);
+}
+function auditQueryParams(offset){
+  const params = new URLSearchParams();
+  const entidade = document.getElementById('audit-entidade-select')?.value;
+  const acao = document.getElementById('audit-acao-select')?.value;
+  const usuarioNome = document.getElementById('audit-usuario-select')?.value;
+  const de = document.getElementById('audit-de-input')?.value;
+  const ate = document.getElementById('audit-ate-input')?.value;
+  const q = document.getElementById('audit-search')?.value;
+  if(entidade) params.set('entidade', entidade);
+  if(acao) params.set('acao', acao);
+  if(usuarioNome) params.set('usuarioNome', usuarioNome);
+  if(de) params.set('de', de);
+  if(ate) params.set('ate', ate);
+  if(q) params.set('q', q);
+  params.set('limit', AUDIT_LIMIT);
+  params.set('offset', offset);
+  return params;
+}
+async function fetchAudit(reset){
+  const list = document.getElementById('audit-list');
+  if(!list) return;
+  if(reset){ auditOffset = 0; auditDocs = []; auditOpen.clear(); list.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando…</div>'; }
+  try{
+    const params = auditQueryParams(auditOffset);
+    const res = await fetch('api/auditoria?'+params.toString(), { headers: authHeaders() });
+    if(!res.ok){ list.innerHTML = '<p class="colab-empty">Não foi possível carregar a auditoria.</p>'; return; }
+    const data = await res.json();
+    auditDocs = reset ? data.docs : [...auditDocs, ...data.docs];
+    auditTotal = data.total;
+    renderAuditList();
+  }catch(e){ list.innerHTML = '<p class="colab-empty">Não foi possível carregar a auditoria.</p>'; }
+}
+function loadMoreAudit(){
+  auditOffset += AUDIT_LIMIT;
+  fetchAudit(false);
+}
+function renderAuditList(){
+  const list = document.getElementById('audit-list');
+  const countEl = document.getElementById('audit-count');
+  const moreBtn = document.getElementById('audit-load-more');
+  if(!list) return;
+  if(countEl) countEl.textContent = auditTotal ? `${auditDocs.length} de ${auditTotal} registro${auditTotal===1?'':'s'}` : '';
+  if(!auditDocs.length){ list.innerHTML = '<p class="colab-empty">Nenhum registro de auditoria para os filtros aplicados.</p>'; if(moreBtn) moreBtn.style.display='none'; return; }
+  list.innerHTML = auditDocs.map(a => {
+    const isOpen = auditOpen.has(a.id);
+    return `<div class="relfreq-row">
+      <div class="relfreq-row-head" onclick="toggleAuditRow('${a.id}')">
+        <div class="relfreq-row-main">
+          <div class="reg-row-title">${esc(a.interface||a.entidade)}<span class="audit-badge audit-badge-${a.acao}">${auditAcaoLabel(a.acao)}</span></div>
+          <div class="reg-row-sub">${formatDateHora(a.criadoEm)} · ${esc(a.usuarioNome||'—')} · ID ${esc(a.entidadeId)}</div>
+        </div>
+        <span class="btn-ghost-sm" style="pointer-events:none;">${isOpen?'▲':'▼'}</span>
+      </div>
+      ${isOpen ? `<div class="relfreq-row-body">${auditDiffHtml(a)}</div>` : ''}
+    </div>`;
+  }).join('');
+  if(moreBtn) moreBtn.style.display = auditDocs.length < auditTotal ? '' : 'none';
+}
+function toggleAuditRow(id){
+  if(auditOpen.has(id)) auditOpen.delete(id); else auditOpen.add(id);
+  renderAuditList();
+}
+function auditAcaoLabel(acao){ return acao==='create'?'Criação':acao==='delete'?'Exclusão':'Atualização'; }
+function humanizeKey(k){ return k.replace(/([A-Z])/g,' $1').replace(/^./,c=>c.toUpperCase()); }
+function formatAuditValue(v){
+  if(v===null || v===undefined || v==='') return '—';
+  if(typeof v==='boolean') return v?'Sim':'Não';
+  if(Array.isArray(v)) return v.length ? v.join(', ') : '—';
+  if(typeof v==='object') return JSON.stringify(v);
+  return String(v);
+}
+function auditDiffHtml(a){
+  const antes = a.valoresAntes || {};
+  const depois = a.valoresDepois || {};
+  if(a.acao==='create'){
+    const keys = Object.keys(depois).filter(k=>k!=='id');
+    if(!keys.length) return '<p class="field-hint" style="margin:0;">Sem detalhes registrados.</p>';
+    return keys.map(k=>`<div class="prog-row prog-row-sm"><span class="prog-name">${esc(humanizeKey(k))}</span><span style="font-size:12px;color:var(--ink-dim);">${esc(formatAuditValue(depois[k]))}</span></div>`).join('');
+  }
+  if(a.acao==='delete'){
+    const keys = Object.keys(antes).filter(k=>k!=='id');
+    if(!keys.length) return '<p class="field-hint" style="margin:0;">Sem detalhes registrados.</p>';
+    return keys.map(k=>`<div class="prog-row prog-row-sm"><span class="prog-name">${esc(humanizeKey(k))}</span><span style="font-size:12px;color:var(--ink-dim);">${esc(formatAuditValue(antes[k]))}</span></div>`).join('');
+  }
+  const keys = [...new Set([...Object.keys(antes), ...Object.keys(depois)])].filter(k=>k!=='id');
+  const changed = keys.filter(k => JSON.stringify(antes[k]) !== JSON.stringify(depois[k]));
+  if(!changed.length) return '<p class="field-hint" style="margin:0;">Nenhum campo mudou de valor.</p>';
+  return changed.map(k => `<div class="audit-diff-row">
+    <span class="prog-name">${esc(humanizeKey(k))}</span>
+    <span class="audit-diff-before">${esc(formatAuditValue(antes[k]))}</span>
+    <span class="audit-diff-arrow">→</span>
+    <span class="audit-diff-after">${esc(formatAuditValue(depois[k]))}</span>
+  </div>`).join('');
+}
+
 function formatDateBR(iso){
   if(!iso) return '';
   const [y,m,d] = iso.split('-');
@@ -2129,7 +2958,9 @@ function closeModuleDrawer(){ document.getElementById('overlay-module').classLis
 function switchModuleFormTab(tab){
   document.querySelectorAll('#module-form-tabs .form-tab').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
   document.getElementById('mftab-panel-dados').classList.toggle('active', tab==='dados');
+  document.getElementById('mftab-panel-turma').classList.toggle('active', tab==='turma');
   document.getElementById('mftab-panel-cronograma').classList.toggle('active', tab==='cronograma');
+  if(tab==='turma') renderModuleTurma();
   if(tab==='cronograma') renderModuleCronograma();
 }
 function toggleCronogramaTab(){
@@ -2137,6 +2968,66 @@ function toggleCronogramaTab(){
   const tabBtn = document.getElementById('module-tab-cronograma-btn');
   tabBtn.style.display = on ? '' : 'none';
   if(!on && tabBtn.classList.contains('active')) switchModuleFormTab('dados');
+}
+function renderModuleTurma(){
+  const el = document.getElementById('module-turma-content');
+  if(!el) return;
+  if(!editingModuleId){
+    el.innerHTML = '<p class="field-hint" style="margin:0;">Salve o módulo para poder matricular colaboradores.</p>';
+    return;
+  }
+  const m = moduloById(editingModuleId);
+  const ci = m ? cicloById(m.cicloId) : null;
+  const trilha = ci ? trilhaById(ci.trilhaId) : null;
+  const matriculados = progresso.filter(p=>p.moduloId===editingModuleId)
+    .map(p=>({...p, colab: colaboradores.find(c=>c.id===p.colaboradorId)}))
+    .filter(p=>p.colab)
+    .sort((a,b)=>a.colab.nome.localeCompare(b.colab.nome));
+
+  let html = `<div class="section-h">Colaboradores matriculados (${matriculados.length})</div>`;
+  if(matriculados.length){
+    html += matriculados.map(p => `
+      <div class="prog-row">
+        <span class="prog-name">${esc(p.colab.nome)}</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button class="status-pill ${statusPillClass(p.status)}" onclick="cycleProgresso('${p.colab.id}','${editingModuleId}')">${esc(p.status)}</button>
+          <button class="prog-remove-btn" onclick="desmatricularDoModulo('${p.colab.id}')" title="Remover da turma">×</button>
+        </div>
+      </div>`).join('');
+  } else {
+    html += '<p class="field-hint" style="margin:0 0 10px;">Ninguém matriculado ainda.</p>';
+  }
+
+  const available = colaboradores.filter(c => !matriculados.find(p=>p.colab.id===c.id)).sort((a,b)=>a.nome.localeCompare(b.nome));
+  if(available.length){
+    html += `<select class="add-chip-select" style="margin-top:12px;" onchange="if(this.value){matricularNoModulo(this.value); this.value='';}">
+      <option value="">+ matricular colaborador</option>${available.map(c=>`<option value="${esc(c.id)}">${esc(c.nome)}</option>`).join('')}</select>`;
+    if(trilha) html += `<p class="field-hint">Quem ainda não estiver na trilha "${esc(trilha.nome)}" será adicionado a ela automaticamente.</p>`;
+  }
+  el.innerHTML = html;
+}
+async function matricularNoModulo(colabId){
+  if(!db || !editingModuleId) return;
+  const m = moduloById(editingModuleId);
+  const ci = m ? cicloById(m.cicloId) : null;
+  const c = colaboradores.find(x=>x.id===colabId);
+  if(ci && c && !(c.trilhaIds||[]).includes(ci.trilhaId)){
+    await fetch('api/colaboradores/'+encodeURIComponent(colabId)+'/trilhas/'+encodeURIComponent(ci.trilhaId), { method:'POST', headers: authHeaders() });
+    await db.reload('colaboradores');
+  }
+  await fetch('api/progresso/'+encodeURIComponent(colabId)+'/'+encodeURIComponent(editingModuleId), {
+    method:'PUT', headers:{...authHeaders(), 'Content-Type':'application/json'}, body: JSON.stringify({status:'Em andamento'})
+  });
+  await db.reload('progresso');
+  toast('Colaborador matriculado');
+}
+async function desmatricularDoModulo(colabId){
+  if(!db || !editingModuleId) return;
+  await fetch('api/progresso/'+encodeURIComponent(colabId)+'/'+encodeURIComponent(editingModuleId), {
+    method:'PUT', headers:{...authHeaders(), 'Content-Type':'application/json'}, body: JSON.stringify({status:'Não iniciado'})
+  });
+  await db.reload('progresso');
+  toast('Colaborador removido da turma');
 }
 function renderModuleCronograma(){
   const el = document.getElementById('module-cronograma-list');
@@ -2158,7 +3049,15 @@ function renderModuleCronograma(){
           <option ${e.status==='Concluído'?'selected':''}>Concluído</option>
         </select></div>
       </div>
+      ${e.id ? '' : `<p class="field-hint" style="margin:0;">Salve o módulo para poder registrar frequência desta etapa no menu "Frequência".</p>`}
     </div>`).join('');
+}
+async function toggleFrequencia(etapaId, colabId, current){
+  if(!db) return;
+  await fetch('api/modulo-frequencia/'+encodeURIComponent(etapaId)+'/'+encodeURIComponent(colabId), {
+    method:'PUT', headers:{...authHeaders(), 'Content-Type':'application/json'}, body: JSON.stringify({presente: !current})
+  });
+  await db.reload('modulo-frequencia');
 }
 function addEtapaDraft(){
   moduleEtapasDraft.push({ id:null, nome:'', dataInicio:'', dataFim:'', status:'A iniciar' });
@@ -2207,6 +3106,7 @@ async function saveModule(){
       if(e.id) await db.doc('modulo-etapas/'+e.id).update(payload);
       else await db.collection('modulo-etapas').add(payload);
     }
+    await db.reload('modulo-frequencia'); // exclusão em cascata de etapas removidas acontece no banco
   }
 
   closeModuleDrawer(); toast('Módulo salvo');
@@ -2218,6 +3118,7 @@ function askDeleteModule(){
     await db.doc('modulos/'+editingModuleId).delete();
     await db.reload('progresso'); // exclusão em cascata acontece no banco
     await db.reload('modulo-etapas');
+    await db.reload('modulo-frequencia');
     closeModuleDrawer(); toast('Módulo excluído');
   });
 }

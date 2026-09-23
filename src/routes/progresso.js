@@ -1,6 +1,7 @@
 const express = require('express');
 const { pool, genId } = require('../db');
 const asyncHandler = require('../asyncHandler');
+const { logAudit } = require('../audit');
 
 const router = express.Router();
 
@@ -29,6 +30,9 @@ router.get('/', asyncHandler(async (req, res) => {
 router.put('/:colaboradorId/:moduloId', asyncHandler(async (req, res) => {
   const { colaboradorId, moduloId } = req.params;
   const status = String(req.body.status || '');
+  const entidadeId = `${colaboradorId}-${moduloId}`;
+  const [existing] = await pool.query('SELECT status FROM progresso WHERE colaborador_id = ? AND modulo_id = ?', [colaboradorId, moduloId]);
+  const antes = { colaboradorId, moduloId, status: existing[0]?.status || 'Não iniciado' };
 
   if (status === 'Não iniciado') {
     await pool.query(
@@ -36,7 +40,9 @@ router.put('/:colaboradorId/:moduloId', asyncHandler(async (req, res) => {
       [colaboradorId, moduloId]
     );
     await logHistorico(colaboradorId, moduloId, 'Não iniciado');
-    return res.json({ id: `${colaboradorId}-${moduloId}`, colaboradorId, moduloId, status: 'Não iniciado' });
+    const depois = { colaboradorId, moduloId, status: 'Não iniciado' };
+    await logAudit({ entidade: 'progresso', entidadeId, acao: 'update', antes, depois, req });
+    return res.json({ id: entidadeId, ...depois });
   }
 
   await pool.query(
@@ -45,7 +51,9 @@ router.put('/:colaboradorId/:moduloId', asyncHandler(async (req, res) => {
     [colaboradorId, moduloId, status]
   );
   await logHistorico(colaboradorId, moduloId, status);
-  res.json({ id: `${colaboradorId}-${moduloId}`, colaboradorId, moduloId, status });
+  const depois = { colaboradorId, moduloId, status };
+  await logAudit({ entidade: 'progresso', entidadeId, acao: existing.length ? 'update' : 'create', antes: existing.length ? antes : null, depois, req });
+  res.json({ id: entidadeId, ...depois });
 }));
 
 module.exports = router;
