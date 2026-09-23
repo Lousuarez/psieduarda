@@ -44,9 +44,30 @@ CREATE TABLE IF NOT EXISTS modulos (
     carga_horaria VARCHAR(64),
     inicio_previsto VARCHAR(64),
     link_material VARCHAR(500),
+    tem_cronograma BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (ciclo_id) REFERENCES ciclos(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Rodar de novo é seguro (idempotente) — cobre bancos que já tinham a
+-- tabela "modulos" criada antes da coluna tem_cronograma existir.
+ALTER TABLE modulos ADD COLUMN IF NOT EXISTS tem_cronograma BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- Cronograma de etapas de um módulo (opcional — só usado quando
+-- modulos.tem_cronograma = TRUE). Cada etapa tem seu próprio período e
+-- status de execução, independente do status geral da turma do módulo.
+CREATE TABLE IF NOT EXISTS modulo_etapas (
+    id CHAR(18) PRIMARY KEY,
+    modulo_id CHAR(18) NOT NULL,
+    nome VARCHAR(191) NOT NULL,
+    data_inicio DATE,
+    data_fim DATE,
+    status ENUM('A iniciar','Em andamento','Concluído') NOT NULL DEFAULT 'A iniciar',
+    ordem INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (modulo_id) REFERENCES modulos(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS colaboradores (

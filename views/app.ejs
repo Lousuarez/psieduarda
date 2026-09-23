@@ -494,8 +494,6 @@ function toggleTheme(){
   /* Drawer + modal (shared) */
   .overlay{ display:none; position:fixed; inset:0; background:rgba(10,15,12,.45); z-index:100; }
   .overlay.show{ display:block; }
-  .drawer{ position:fixed; top:0; right:0; bottom:0; width:min(440px,100%); background:var(--bg-elevated); z-index:101; box-shadow:-16px 0 48px rgba(0,0,0,.18); transform:translateX(100%); transition:transform .28s cubic-bezier(.2,.7,.2,1); overflow-y:auto; padding:26px 26px 100px; }
-  .drawer.show{ transform:translateX(0); }
   .modal-center{ display:none; position:fixed; inset:0; z-index:102; align-items:center; justify-content:center; padding:20px; }
   .modal-center.show{ display:flex; }
   .modal-box{ background:var(--bg-elevated); border-radius:12px; padding:26px 28px; width:100%; max-width:440px; max-height:88vh; overflow-y:auto; box-shadow:0 16px 48px rgba(0,0,0,.22); }
@@ -530,6 +528,18 @@ function toggleTheme(){
   .link-row{ display:flex; gap:8px; }
   .link-row input{ flex:1; min-width:0; font-family:var(--font); font-size:12.5px; color:var(--ink-dim); background:var(--bg-sunken); border:1px solid var(--line); border-radius:7px; padding:9px 11px; }
   .link-row .btn-secondary{ flex-shrink:0; white-space:nowrap; }
+  .etapa-row{ border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin-bottom:10px; background:var(--bg-sunken); position:relative; }
+  .etapa-row .field{ margin-bottom:10px; }
+  .etapa-row .field:last-child{ margin-bottom:0; }
+  .etapa-remove-btn{ position:absolute; top:10px; right:10px; appearance:none; background:none; border:none; cursor:pointer; color:var(--ink-faint); font-size:18px; line-height:1; padding:4px; }
+  .etapa-remove-btn:hover{ color:var(--danger); }
+  .etapa-row-title{ font-size:11px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-dim); margin:0 0 10px; }
+  .cronograma-block{ margin:16px 0; }
+  .cronograma-row{ display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--line); }
+  .cronograma-row:last-child{ border-bottom:none; }
+  .cronograma-row-info{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+  .cronograma-row-nome{ font-size:12.5px; font-weight:600; color:var(--ink); }
+  .cronograma-row-periodo{ font-size:11px; color:var(--ink-dim); }
   .icon-pick{ display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
   .icon-opt{ appearance:none; border:1.5px solid var(--line); background:var(--bg); border-radius:8px; padding:8px 0; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--ink-dim); }
   .icon-opt svg{ width:16px; height:16px; }
@@ -974,38 +984,60 @@ function toggleTheme(){
 
 <!-- Drawer: módulo -->
 <div class="overlay" id="overlay-module" onclick="closeModuleDrawer()"></div>
-<div class="drawer" id="drawer-module">
-  <div class="panel-head"><h3 id="module-drawer-title">Módulo</h3><button class="panel-close" onclick="closeModuleDrawer()">×</button></div>
-  <form onsubmit="return false;">
-    <div class="field"><label for="mf-ciclo">Ciclo</label><select id="mf-ciclo"></select></div>
-    <div class="field-row">
-      <div class="field"><label for="mf-etapa">Etapa (ex.: Mês 1)</label><input type="text" id="mf-etapa"></div>
-      <div class="field"><label for="mf-ordem">Ordem</label><input type="number" id="mf-ordem" step="1"></div>
+<div class="modal-center" id="modal-module" onclick="if(event.target===this) closeModuleDrawer();">
+  <div class="modal-box colab-modal-box">
+    <div class="colab-modal-head">
+      <h3 id="module-drawer-title">Módulo</h3>
+      <button class="panel-close" onclick="closeModuleDrawer()">×</button>
     </div>
-    <div class="field"><label for="mf-nome">Nome do módulo</label><input type="text" id="mf-nome"></div>
-    <div class="field-row">
-      <div class="field"><label for="mf-categoria">Categoria</label><select id="mf-categoria"><option>Liderança</option><option>Método</option><option>Liderança e Método</option></select></div>
-      <div class="field"><label for="mf-status">Status da turma</label><select id="mf-status"><option>A iniciar</option><option>Em andamento</option><option>Concluído</option></select></div>
+    <div class="form-tabs colab-modal-tabs" id="module-form-tabs">
+      <button type="button" class="form-tab active" data-tab="dados" onclick="switchModuleFormTab('dados')">Dados cadastrais</button>
+      <button type="button" class="form-tab" data-tab="cronograma" id="module-tab-cronograma-btn" onclick="switchModuleFormTab('cronograma')" style="display:none;">Cronograma</button>
     </div>
-    <div class="field"><label for="mf-desc">Descrição</label><textarea id="mf-desc"></textarea></div>
-    <div class="field-row">
-      <div class="field"><label for="mf-mentor">Mentor(es)</label><input type="text" id="mf-mentor"></div>
-      <div class="field"><label for="mf-formato">Formato</label><input type="text" id="mf-formato"></div>
+
+    <div class="colab-modal-body">
+      <div class="form-tab-panel active" id="mftab-panel-dados">
+        <form onsubmit="return false;">
+          <div class="field"><label for="mf-ciclo">Ciclo</label><select id="mf-ciclo"></select></div>
+          <div class="field-row">
+            <div class="field"><label for="mf-etapa">Etapa (ex.: Mês 1)</label><input type="text" id="mf-etapa"></div>
+            <div class="field"><label for="mf-ordem">Ordem</label><input type="number" id="mf-ordem" step="1"></div>
+          </div>
+          <div class="field"><label for="mf-nome">Nome do módulo</label><input type="text" id="mf-nome"></div>
+          <div class="field-row">
+            <div class="field"><label for="mf-categoria">Categoria</label><select id="mf-categoria"><option>Liderança</option><option>Método</option><option>Liderança e Método</option></select></div>
+            <div class="field"><label for="mf-status">Status da turma</label><select id="mf-status"><option>A iniciar</option><option>Em andamento</option><option>Concluído</option></select></div>
+          </div>
+          <div class="field"><label for="mf-desc">Descrição</label><textarea id="mf-desc"></textarea></div>
+          <div class="field-row">
+            <div class="field"><label for="mf-mentor">Mentor(es)</label><input type="text" id="mf-mentor"></div>
+            <div class="field"><label for="mf-formato">Formato</label><input type="text" id="mf-formato"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="mf-publico">Público-alvo</label><input type="text" id="mf-publico"></div>
+            <div class="field"><label for="mf-carga">Carga horária</label><input type="text" id="mf-carga"></div>
+          </div>
+          <div class="field"><label for="mf-inicio">Início previsto</label><input type="text" id="mf-inicio"></div>
+          <div class="field"><label for="mf-material">Link do material</label><input type="text" id="mf-material" placeholder="https://…"></div>
+          <label class="field-check"><input type="checkbox" id="mf-tem-cronograma" onchange="toggleCronogramaTab()"> Informar cronograma?</label>
+        </form>
+      </div>
+
+      <div class="form-tab-panel" id="mftab-panel-cronograma">
+        <div class="section-h">Etapas do cronograma</div>
+        <div id="module-cronograma-list"></div>
+        <button type="button" class="add-chip-select" onclick="addEtapaDraft()" style="margin-top:8px;">+ etapa</button>
+      </div>
     </div>
-    <div class="field-row">
-      <div class="field"><label for="mf-publico">Público-alvo</label><input type="text" id="mf-publico"></div>
-      <div class="field"><label for="mf-carga">Carga horária</label><input type="text" id="mf-carga"></div>
-    </div>
-    <div class="field"><label for="mf-inicio">Início previsto</label><input type="text" id="mf-inicio"></div>
-    <div class="field"><label for="mf-material">Link do material</label><input type="text" id="mf-material" placeholder="https://…"></div>
-    <div class="panel-actions">
+
+    <div class="panel-actions colab-modal-actions" id="mf-actions-dados">
       <button type="button" class="btn-danger" id="module-delete-btn" onclick="askDeleteModule()">Excluir módulo</button>
       <div style="display:flex;gap:8px;">
         <button type="button" class="btn-secondary" onclick="closeModuleDrawer()">Cancelar</button>
         <button type="button" class="btn-save" onclick="saveModule()">Salvar</button>
       </div>
     </div>
-  </form>
+  </div>
 </div>
 
 <!-- Confirm modal -->
@@ -1051,7 +1083,7 @@ function warnSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="current
 
 /* ---------- State ---------- */
 let db = null;
-let unidades = [], trilhas = [], ciclos = [], modulos = [], colaboradores = [], progresso = [], usuarios = [];
+let unidades = [], trilhas = [], ciclos = [], modulos = [], colaboradores = [], progresso = [], usuarios = [], moduloEtapas = [];
 let dbUnavailable = false;
 let currentMode = 'view';
 let currentTab = 'colaborador';
@@ -1060,6 +1092,7 @@ let editingColabId = null;
 let editingTrilhaId = null;
 let editingCycleId = null;
 let editingModuleId = null;
+let moduleEtapasDraft = [];
 let confirmActionFn = null;
 let unidadeEditingId = null;
 let usuarioEditingId = null;
@@ -1143,6 +1176,7 @@ async function boot(){
   db.collection('trilhas').onSnapshot(s => { trilhas = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('trilhas'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
   db.collection('ciclos').onSnapshot(s => { ciclos = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('ciclos'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
   db.collection('modulos').onSnapshot(s => { modulos = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('modulos'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
+  db.collection('modulo-etapas').onSnapshot(s => { moduloEtapas = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('modulo-etapas'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
   db.collection('colaboradores').onSnapshot(s => { colaboradores = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('colaboradores'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
   db.collection('progresso').onSnapshot(s => { progresso = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('progresso'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
   // Só usuários administradores têm permissão pra ler /api/usuarios (403 pros
@@ -1457,6 +1491,34 @@ function selectTrilhaExtra(id){
   if(id !== trilhaExtraSelected){ txSelectedModulo = null; closeTxModuleModal(); }
   trilhaExtraSelected = id; renderViewTrilhaExtra();
 }
+function formatDateBR(iso){
+  if(!iso) return '';
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+function formatPeriodo(inicio, fim){
+  const i = formatDateBR(inicio), f = formatDateBR(fim);
+  if(i && f) return `${i} – ${f}`;
+  if(i) return `A partir de ${i}`;
+  if(f) return `Até ${f}`;
+  return 'Data a definir';
+}
+function cronogramaBlockHtml(m){
+  if(!m.temCronograma) return '';
+  const etapas = moduloEtapas.filter(e=>e.moduloId===m.id).sort((a,b)=>(a.ordem??0)-(b.ordem??0));
+  return `<div class="cronograma-block">
+    <p class="people-label">Cronograma</p>
+    ${etapas.length ? etapas.map(e => `
+      <div class="cronograma-row">
+        <span class="status-dot ${statusPillClass(e.status)}"></span>
+        <div class="cronograma-row-info">
+          <span class="cronograma-row-nome">${esc(e.nome)}</span>
+          <span class="cronograma-row-periodo">${formatPeriodo(e.dataInicio, e.dataFim)}</span>
+        </div>
+        <span class="status-pill ${statusPillClass(e.status)}" style="pointer-events:none;">${esc(e.status)}</span>
+      </div>`).join('') : '<p class="no-material" style="margin-top:0;">Nenhuma etapa cadastrada ainda.</p>'}
+  </div>`;
+}
 function openTxModuleModal(id){
   const m = moduloById(id);
   const ci = m ? cicloById(m.cicloId) : null;
@@ -1483,6 +1545,7 @@ function openTxModuleModal(id){
         <div><div class="meta-label">Mentor</div><div class="meta-val">${m.mentor?esc(m.mentor):'—'}</div></div>
         <div><div class="meta-label">Carga horária</div><div class="meta-val">${m.cargaHoraria?esc(m.cargaHoraria):'—'}</div></div>
       </div>
+      ${cronogramaBlockHtml(m)}
       <div class="people-block">
         <p class="people-label">Inscritos por status (${grp.total})</p>
         ${grp.total===0 ? '<p class="no-material" style="margin-top:0;">Nenhum colaborador inscrito ainda.</p>' : `
@@ -2053,15 +2116,65 @@ function openModuleForm(id, cicloIdForNew){
   document.getElementById('mf-carga').value = m?.cargaHoraria || '';
   document.getElementById('mf-inicio').value = m?.inicioPrevisto || '';
   document.getElementById('mf-material').value = m?.linkMaterial || '';
+  document.getElementById('mf-tem-cronograma').checked = !!m?.temCronograma;
   document.getElementById('module-delete-btn').style.display = m ? '' : 'none';
+  moduleEtapasDraft = m ? moduloEtapas.filter(e=>e.moduloId===id).sort((a,b)=>(a.ordem??0)-(b.ordem??0)).map(e=>({...e})) : [];
+  switchModuleFormTab('dados');
+  toggleCronogramaTab();
   document.getElementById('overlay-module').classList.add('show');
-  document.getElementById('drawer-module').classList.add('show');
+  document.getElementById('modal-module').classList.add('show');
 }
-function closeModuleDrawer(){ document.getElementById('overlay-module').classList.remove('show'); document.getElementById('drawer-module').classList.remove('show'); }
+function closeModuleDrawer(){ document.getElementById('overlay-module').classList.remove('show'); document.getElementById('modal-module').classList.remove('show'); }
+function switchModuleFormTab(tab){
+  document.querySelectorAll('#module-form-tabs .form-tab').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
+  document.getElementById('mftab-panel-dados').classList.toggle('active', tab==='dados');
+  document.getElementById('mftab-panel-cronograma').classList.toggle('active', tab==='cronograma');
+  if(tab==='cronograma') renderModuleCronograma();
+}
+function toggleCronogramaTab(){
+  const on = document.getElementById('mf-tem-cronograma').checked;
+  const tabBtn = document.getElementById('module-tab-cronograma-btn');
+  tabBtn.style.display = on ? '' : 'none';
+  if(!on && tabBtn.classList.contains('active')) switchModuleFormTab('dados');
+}
+function renderModuleCronograma(){
+  const el = document.getElementById('module-cronograma-list');
+  if(!moduleEtapasDraft.length){
+    el.innerHTML = '<p class="field-hint" style="margin:0 0 10px;">Nenhuma etapa ainda — clique em "+ etapa" para começar.</p>';
+    return;
+  }
+  el.innerHTML = moduleEtapasDraft.map((e, i) => `
+    <div class="etapa-row">
+      <button type="button" class="etapa-remove-btn" onclick="removeEtapaDraft(${i})" title="Remover etapa" aria-label="Remover etapa">×</button>
+      <p class="etapa-row-title">Etapa ${i+1}</p>
+      <div class="field"><label>Nome da etapa</label><input type="text" value="${esc(e.nome)}" oninput="updateEtapaDraft(${i},'nome',this.value)" placeholder="Ex.: Levantamento de dados"></div>
+      <div class="field-row">
+        <div class="field"><label>Início</label><input type="date" value="${esc(e.dataInicio||'')}" oninput="updateEtapaDraft(${i},'dataInicio',this.value)"></div>
+        <div class="field"><label>Fim</label><input type="date" value="${esc(e.dataFim||'')}" oninput="updateEtapaDraft(${i},'dataFim',this.value)"></div>
+        <div class="field"><label>Status</label><select onchange="updateEtapaDraft(${i},'status',this.value)">
+          <option ${e.status==='A iniciar'?'selected':''}>A iniciar</option>
+          <option ${e.status==='Em andamento'?'selected':''}>Em andamento</option>
+          <option ${e.status==='Concluído'?'selected':''}>Concluído</option>
+        </select></div>
+      </div>
+    </div>`).join('');
+}
+function addEtapaDraft(){
+  moduleEtapasDraft.push({ id:null, nome:'', dataInicio:'', dataFim:'', status:'A iniciar' });
+  renderModuleCronograma();
+}
+function removeEtapaDraft(i){
+  moduleEtapasDraft.splice(i, 1);
+  renderModuleCronograma();
+}
+function updateEtapaDraft(i, field, value){
+  moduleEtapasDraft[i][field] = value;
+}
 async function saveModule(){
   const nome = document.getElementById('mf-nome').value.trim();
   const cicloId = document.getElementById('mf-ciclo').value;
   if(!nome || !cicloId){ toast('Informe ciclo e nome do módulo'); return; }
+  const temCronograma = document.getElementById('mf-tem-cronograma').checked;
   const data = {
     cicloId, nome, etapa: document.getElementById('mf-etapa').value.trim(),
     ordem: parseInt(document.getElementById('mf-ordem').value)||0,
@@ -2074,10 +2187,27 @@ async function saveModule(){
     cargaHoraria: document.getElementById('mf-carga').value.trim(),
     inicioPrevisto: document.getElementById('mf-inicio').value.trim(),
     linkMaterial: document.getElementById('mf-material').value.trim(),
+    temCronograma,
   };
   if(!db){ toast('Banco indisponível'); return; }
-  if(editingModuleId){ await db.doc('modulos/'+editingModuleId).update(data); }
-  else { await db.collection('modulos').add(data); }
+  let moduleId = editingModuleId;
+  if(moduleId){ await db.doc('modulos/'+moduleId).update(data); }
+  else { const ref = await db.collection('modulos').add(data); moduleId = ref.id; }
+
+  if(temCronograma){
+    const existentes = moduloEtapas.filter(e=>e.moduloId===moduleId);
+    const draftIds = new Set(moduleEtapasDraft.filter(e=>e.id).map(e=>e.id));
+    for(const old of existentes){
+      if(!draftIds.has(old.id)) await db.doc('modulo-etapas/'+old.id).delete();
+    }
+    for(let i=0; i<moduleEtapasDraft.length; i++){
+      const e = moduleEtapasDraft[i];
+      const payload = { moduloId: moduleId, nome: e.nome.trim() || `Etapa ${i+1}`, dataInicio: e.dataInicio||'', dataFim: e.dataFim||'', status: e.status, ordem: i };
+      if(e.id) await db.doc('modulo-etapas/'+e.id).update(payload);
+      else await db.collection('modulo-etapas').add(payload);
+    }
+  }
+
   closeModuleDrawer(); toast('Módulo salvo');
 }
 function askDeleteModule(){
@@ -2086,6 +2216,7 @@ function askDeleteModule(){
   openConfirm(`Excluir ${m?.nome||'módulo'}?`, 'O progresso dos colaboradores neste módulo também será removido.', async () => {
     await db.doc('modulos/'+editingModuleId).delete();
     await db.reload('progresso'); // exclusão em cascata acontece no banco
+    await db.reload('modulo-etapas');
     closeModuleDrawer(); toast('Módulo excluído');
   });
 }

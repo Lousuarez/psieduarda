@@ -20,6 +20,7 @@ function toApi(row) {
     cargaHoraria: row.carga_horaria || '',
     inicioPrevisto: row.inicio_previsto || '',
     linkMaterial: row.link_material || '',
+    temCronograma: !!row.tem_cronograma,
   };
 }
 
@@ -37,6 +38,7 @@ const FIELDS = [
   ['cargaHoraria', 'carga_horaria', String],
   ['inicioPrevisto', 'inicio_previsto', String],
   ['linkMaterial', 'link_material', String],
+  ['temCronograma', 'tem_cronograma', Boolean],
 ];
 
 router.get('/', asyncHandler(async (req, res) => {
@@ -58,6 +60,8 @@ router.post('/', asyncHandler(async (req, res) => {
       vals.push(req.body[apiKey] || 'Liderança');
     } else if (apiKey === 'status') {
       vals.push(req.body[apiKey] || 'A iniciar');
+    } else if (apiKey === 'temCronograma') {
+      vals.push(!!req.body[apiKey]);
     } else {
       vals.push(req.body[apiKey] !== undefined ? cast(req.body[apiKey]) : '');
     }
