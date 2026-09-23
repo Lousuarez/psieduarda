@@ -258,19 +258,21 @@ function toggleTheme(){
 
   .tx-row{ position:relative; display:flex; flex-wrap:wrap; align-items:stretch; row-gap:56px; column-gap:34px; }
   .tx-transversal-group{ display:flex; flex-direction:column; gap:14px; margin-bottom:32px; }
-  .tx-ciclo-transversal{ max-width:none; flex:1 1 100%; padding-bottom:14px; }
-  .tx-ciclo-transversal .tx-nodes{ justify-content:flex-start; row-gap:8px; }
-  .tx-ciclo-transversal .tx-node{ flex:0 0 auto; padding:2px 10px 2px 2px; }
-  .tx-ciclo-transversal .tx-node-label, .tx-ciclo-transversal .tx-node-name{ display:none; }
-  .tx-ciclo-transversal .tx-node::before, .tx-ciclo-transversal .tx-node::after{ top:21px; }
-  .tx-ciclo-transversal .tx-node-dot{ top:21px; }
+  .tx-ciclo.tx-ciclo-transversal{ max-width:none; width:100%; flex:1 1 100%; padding:14px 18px; }
+  .tx-transversal-row{ display:flex; align-items:center; gap:18px; }
+  .tx-transversal-row .tx-ciclo-heading{ flex-shrink:0; margin:0; }
+  .tx-transversal-row .tx-nodes{ flex:1; justify-content:flex-start; row-gap:0; }
+  .tx-transversal-row .tx-node{ flex:0 0 auto; padding:2px 10px 2px 2px; }
+  .tx-transversal-row .tx-node-label, .tx-transversal-row .tx-node-name{ display:none; }
+  .tx-transversal-row .tx-node::before, .tx-transversal-row .tx-node::after{ top:23px; }
+  .tx-transversal-row .tx-node-dot{ top:23px; }
   .tx-connector-svg{ position:absolute; top:0; left:0; pointer-events:none; overflow:visible; z-index:0; }
   .tx-conn-path{ fill:none; stroke:var(--verde-ink); stroke-width:2.6; stroke-linecap:round; stroke-dasharray:0.1 10; opacity:.85; }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-conn-path{ stroke:var(--verde); } }
   :root[data-theme="dark"] .tx-conn-path{ stroke:var(--verde); }
-  .tx-ciclo{ position:relative; z-index:1; flex:1 1 250px; max-width:300px; background:var(--bg-sunken); border:1px solid var(--line); border-radius:14px; padding:16px 16px 18px; display:flex; flex-direction:column; }
-  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-ciclo{ background:#17181A; border-color:#2B2D2F; } }
-  :root[data-theme="dark"] .tx-ciclo{ background:#17181A; border-color:#2B2D2F; }
+  .tx-ciclo{ position:relative; z-index:1; flex:1 1 250px; max-width:300px; background:var(--bg-sunken); border:1px solid var(--line); border-radius:16px; padding:16px 16px 18px; display:flex; flex-direction:column; box-shadow:0 1px 2px rgba(20,20,15,.04), 0 10px 26px -16px rgba(20,20,15,.16); }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-ciclo{ background:#17181A; border-color:#2B2D2F; box-shadow:0 1px 2px rgba(0,0,0,.3), 0 14px 30px -16px rgba(0,0,0,.6); } }
+  :root[data-theme="dark"] .tx-ciclo{ background:#17181A; border-color:#2B2D2F; box-shadow:0 1px 2px rgba(0,0,0,.3), 0 14px 30px -16px rgba(0,0,0,.6); }
   .tx-ciclo-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid var(--line); }
   .tx-ciclo-heading{ min-width:0; margin:0; display:flex; align-items:center; flex-wrap:wrap; gap:7px; }
   .tx-ciclo-eyebrow{ display:inline-flex; align-items:center; padding:2.5px 9px; border-radius:20px; font-size:10px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; background:var(--status-done-bg); color:var(--status-done-ink); }
@@ -290,22 +292,22 @@ function toggleTheme(){
   .tx-node:hover{ background:var(--bg-elevated); }
   .tx-node:focus-visible{ outline:2px solid var(--verde-ink); outline-offset:2px; }
   .tx-node.selected{ background:var(--status-done-bg); }
-  .tx-node::before, .tx-node::after{ content:""; position:absolute; top:25px; height:1.5px; background:var(--line); z-index:0; }
+  .tx-node::before, .tx-node::after{ content:""; position:absolute; top:27px; height:1.5px; background:var(--line); z-index:0; }
   .tx-node::before{ left:0; width:50%; }
   .tx-node::after{ right:0; width:50%; }
   .tx-node:first-child::before{ display:none; }
   .tx-node:last-child::after{ display:none; }
-  .tx-node-dot{ position:absolute; top:25px; right:0; width:5px; height:5px; margin:-2.5px -2.5px 0 0; border-radius:50%; background:var(--verde-ink); z-index:1; }
+  .tx-node-dot{ position:absolute; top:27px; right:0; width:5px; height:5px; margin:-2.5px -2.5px 0 0; border-radius:50%; background:var(--verde-ink); z-index:1; }
   .tx-node:last-child .tx-node-dot{ display:none; }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-node-dot{ background:var(--verde); } }
   :root[data-theme="dark"] .tx-node-dot{ background:var(--verde); }
-  .tx-node-icon{ position:relative; width:38px; height:38px; border-radius:50%; background:var(--bg-elevated); border:1.5px solid var(--verde-ink); color:var(--verde-ink); display:flex; align-items:center; justify-content:center; flex-shrink:0; z-index:1; }
+  .tx-node-icon{ position:relative; width:42px; height:42px; border-radius:50%; background:var(--bg-elevated); border:1.5px solid var(--verde-ink); color:var(--verde-ink); display:flex; align-items:center; justify-content:center; flex-shrink:0; z-index:1; }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-node-icon{ border-color:var(--verde); color:var(--verde); } }
   :root[data-theme="dark"] .tx-node-icon{ border-color:var(--verde); color:var(--verde); }
   .tx-node.selected .tx-node-icon{ background:var(--verde-ink); color:#fff; }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-node.selected .tx-node-icon{ background:var(--verde); color:var(--verde-ink); } }
   :root[data-theme="dark"] .tx-node.selected .tx-node-icon{ background:var(--verde); color:var(--verde-ink); }
-  .tx-node-icon svg{ width:17px; height:17px; }
+  .tx-node-icon svg{ width:19px; height:19px; }
   .tx-node-label{ font-size:10.5px; font-weight:800; color:var(--verde-ink); text-transform:uppercase; letter-spacing:.03em; margin:9px 0 2px; }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-node-label{ color:var(--verde); } }
   :root[data-theme="dark"] .tx-node-label{ color:var(--verde); }
@@ -2479,8 +2481,11 @@ function renderViewTrilhaExtra(){
     const mods = modulosOf(ci.id);
     totalMods += mods.length;
     return `<div class="tx-ciclo tx-ciclo-transversal">
-      ${txCicloHeadHtml('Transversal', ci.nome)}
-      <div class="tx-nodes">${txNodesHtml(ci, mods)}</div>
+      <div class="tx-transversal-row">
+        <p class="tx-ciclo-heading"><span class="tx-ciclo-eyebrow">Transversal</span><span class="tx-ciclo-sep">|</span><span class="tx-ciclo-name">${esc(ci.nome)}</span></p>
+        <div class="tx-nodes">${txNodesHtml(ci, mods)}</div>
+        <span class="tx-ciclo-chevron-btn"><svg class="tx-ciclo-chevron" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+      </div>
     </div>`;
   }).join('');
 
