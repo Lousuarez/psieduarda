@@ -13,6 +13,7 @@ function toApi(row) {
     tema: row.tema || '',
     ordem: row.ordem,
     icon: row.icon,
+    transversal: !!row.transversal,
   };
 }
 
@@ -28,11 +29,12 @@ router.post('/', asyncHandler(async (req, res) => {
   const tema = req.body.tema !== undefined ? String(req.body.tema) : '';
   const ordem = Number.isFinite(Number(req.body.ordem)) ? Number(req.body.ordem) : 0;
   const icon = req.body.icon !== undefined ? String(req.body.icon) : 'layers';
+  const transversal = !!req.body.transversal;
   await pool.query(
-    'INSERT INTO ciclos (id, trilha_id, nome, tema, ordem, icon) VALUES (?, ?, ?, ?, ?, ?)',
-    [id, trilhaId, nome, tema, ordem, icon]
+    'INSERT INTO ciclos (id, trilha_id, nome, tema, ordem, icon, transversal) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    [id, trilhaId, nome, tema, ordem, icon, transversal]
   );
-  const depois = { id, trilhaId, nome, tema, ordem, icon };
+  const depois = { id, trilhaId, nome, tema, ordem, icon, transversal };
   await logAudit({ entidade: 'ciclo', entidadeId: id, acao: 'create', antes: null, depois, req });
   res.json(depois);
 }));
@@ -48,11 +50,12 @@ router.put('/:id', asyncHandler(async (req, res) => {
   const tema = req.body.tema !== undefined ? String(req.body.tema) : cur.tema;
   const ordem = req.body.ordem !== undefined ? Number(req.body.ordem) : cur.ordem;
   const icon = req.body.icon !== undefined ? String(req.body.icon) : cur.icon;
+  const transversal = req.body.transversal !== undefined ? !!req.body.transversal : !!cur.transversal;
   await pool.query(
-    'UPDATE ciclos SET trilha_id = ?, nome = ?, tema = ?, ordem = ?, icon = ? WHERE id = ?',
-    [trilhaId, nome, tema, ordem, icon, id]
+    'UPDATE ciclos SET trilha_id = ?, nome = ?, tema = ?, ordem = ?, icon = ?, transversal = ? WHERE id = ?',
+    [trilhaId, nome, tema, ordem, icon, transversal, id]
   );
-  const depois = { id, trilhaId, nome, tema, ordem, icon };
+  const depois = { id, trilhaId, nome, tema, ordem, icon, transversal };
   await logAudit({ entidade: 'ciclo', entidadeId: id, acao: 'update', antes, depois, req });
   res.json(depois);
 }));
