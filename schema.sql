@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS modulos (
     nome VARCHAR(191) NOT NULL,
     etapa VARCHAR(191),
     ordem INT NOT NULL DEFAULT 0,
-    categoria ENUM('Liderança','Método','Liderança e Método') NOT NULL DEFAULT 'Liderança',
+    categoria ENUM('Liderança','Método','Liderança e Método','Autoconhecimento','Inovação') NOT NULL DEFAULT 'Liderança',
     status ENUM('A iniciar','Em andamento','Concluído') NOT NULL DEFAULT 'A iniciar',
     descricao TEXT,
     mentor VARCHAR(191),
@@ -44,9 +44,34 @@ CREATE TABLE IF NOT EXISTS modulos (
     carga_horaria VARCHAR(64),
     inicio_previsto VARCHAR(64),
     link_material VARCHAR(500),
+    tem_cronograma BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (ciclo_id) REFERENCES ciclos(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Rodar de novo é seguro (idempotente) — cobre bancos que já tinham a
+-- tabela "modulos" criada antes da coluna tem_cronograma existir.
+ALTER TABLE modulos ADD COLUMN IF NOT EXISTS tem_cronograma BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- Rodar de novo é seguro — cobre bancos que já tinham "modulos" criada antes
+-- de "Autoconhecimento"/"Inovação" existirem como categoria.
+ALTER TABLE modulos MODIFY COLUMN categoria ENUM('Liderança','Método','Liderança e Método','Autoconhecimento','Inovação') NOT NULL DEFAULT 'Liderança';
+
+-- Cronograma de etapas de um módulo (opcional — só usado quando
+-- modulos.tem_cronograma = TRUE). Cada etapa tem seu próprio período e
+-- status de execução, independente do status geral da turma do módulo.
+CREATE TABLE IF NOT EXISTS modulo_etapas (
+    id CHAR(18) PRIMARY KEY,
+    modulo_id CHAR(18) NOT NULL,
+    nome VARCHAR(191) NOT NULL,
+    data_inicio DATE,
+    data_fim DATE,
+    status ENUM('A iniciar','Em andamento','Concluído') NOT NULL DEFAULT 'A iniciar',
+    ordem INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (modulo_id) REFERENCES modulos(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS colaboradores (
@@ -69,6 +94,56 @@ CREATE TABLE IF NOT EXISTS colaboradores (
 -- Rodar de novo é seguro (idempotente) — cobre bancos que já tinham a
 -- tabela "colaboradores" criada antes da coluna access_token existir.
 ALTER TABLE colaboradores ADD COLUMN IF NOT EXISTS access_token CHAR(64) UNIQUE;
+
+-- Frequência (presença) de colaboradores em cada etapa/aula do cronograma
+-- de um módulo. Uma linha só existe quando a presença já foi marcada
+-- (ausência de linha = frequência ainda não registrada para aquele par).
+CREATE TABLE IF NOT EXISTS modulo_etapa_frequencia (
+    etapa_id CHAR(18) NOT NULL,
+    colaborador_id CHAR(18) NOT NULL,
+    presente BOOLEAN NOT NULL DEFAULT FALSE,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (etapa_id, colaborador_id),
+    FOREIGN KEY (etapa_id) REFERENCES modulo_etapas(id) ON DELETE CASCADE,
+    FOREIGN KEY (colaborador_id) REFERENCES colaboradores(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Estado da "chamada" (processo de presença) de uma etapa. Ausência de linha
+-- = chamada ainda não iniciada (tela de frequência fica bloqueada). Uma vez
+-- fechada, pode ser reaberta pra corrigir — cada fechamento grava uma versão
+-- em modulo_etapa_chamada_versao (auditoria: mostra o "antes" e o "depois").
+CREATE TABLE IF NOT EXISTS modulo_etapa_chamada (
+    etapa_id CHAR(18) PRIMARY KEY,
+    status ENUM('aberta','fechada') NOT NULL DEFAULT 'aberta',
+    iniciada_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    iniciada_por VARCHAR(191),
+    fechada_em TIMESTAMP NULL,
+    fechada_por VARCHAR(191),
+    FOREIGN KEY (etapa_id) REFERENCES modulo_etapas(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Um snapshot completo da lista de presença sempre que a chamada de uma
+-- etapa é fechada (a primeira vez = motivo "fechamento"; reaberturas
+-- seguintes = motivo "edicao"). "criada_por" fica como texto (não FK) de
+-- propósito — é registro de auditoria, deve sobreviver à exclusão do usuário.
+CREATE TABLE IF NOT EXISTS modulo_etapa_chamada_versao (
+    id CHAR(18) PRIMARY KEY,
+    etapa_id CHAR(18) NOT NULL,
+    versao INT NOT NULL,
+    motivo ENUM('fechamento','edicao') NOT NULL DEFAULT 'fechamento',
+    criada_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    criada_por VARCHAR(191),
+    FOREIGN KEY (etapa_id) REFERENCES modulo_etapas(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS modulo_etapa_chamada_versao_presenca (
+    versao_id CHAR(18) NOT NULL,
+    colaborador_id CHAR(18) NOT NULL,
+    presente BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY (versao_id, colaborador_id),
+    FOREIGN KEY (versao_id) REFERENCES modulo_etapa_chamada_versao(id) ON DELETE CASCADE,
+    FOREIGN KEY (colaborador_id) REFERENCES colaboradores(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS colaborador_trilhas (
     colaborador_id CHAR(18) NOT NULL,
@@ -128,6 +203,30 @@ CREATE TABLE IF NOT EXISTS auth_tokens (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     expires_at TIMESTAMP NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Log de auditoria genérico — uma linha por criação/edição/exclusão em
+-- qualquer entidade do sistema. "valores_antes"/"valores_depois" guardam o
+-- registro (no formato camelCase que a API já expõe) antes e depois da
+-- mudança, em JSON — null em "antes" significa criação, null em "depois"
+-- significa exclusão. "usuario_nome" e "interface" ficam como texto (não
+-- FK) de propósito: são registro de auditoria, devem sobreviver mesmo que o
+-- usuário seja excluído depois.
+CREATE TABLE IF NOT EXISTS audit_log (
+    id CHAR(18) PRIMARY KEY,
+    entidade VARCHAR(64) NOT NULL,
+    entidade_id VARCHAR(64) NOT NULL,
+    acao ENUM('create','update','delete') NOT NULL,
+    valores_antes JSON,
+    valores_depois JSON,
+    usuario_id CHAR(18),
+    usuario_nome VARCHAR(191),
+    interface VARCHAR(191),
+    rota VARCHAR(191),
+    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_audit_entidade (entidade, entidade_id, criado_em),
+    KEY idx_audit_usuario (usuario_id, criado_em),
+    KEY idx_audit_criado (criado_em)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Usuário administrador padrão (senha: Prestes@admin2026 — troque depois

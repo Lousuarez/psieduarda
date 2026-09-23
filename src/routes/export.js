@@ -70,4 +70,72 @@ router.get('/', asyncHandler(async (req, res) => {
   res.send(buf);
 }));
 
+// Exporta o histórico completo de frequência (todas as versões de todas as
+// chamadas já fechadas) — uma linha por colaborador x versão, pra dar pra
+// auditar exatamente o que mudou entre um fechamento e uma edição posterior.
+router.get('/frequencia', asyncHandler(async (req, res) => {
+  const [versoes] = await pool.query(
+    `SELECT v.*, e.nome AS etapa_nome, e.data_inicio, e.modulo_id
+     FROM modulo_etapa_chamada_versao v
+     JOIN modulo_etapas e ON e.id = v.etapa_id
+     ORDER BY e.modulo_id, v.etapa_id, v.versao`
+  );
+  if (!versoes.length) {
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet([]);
+    XLSX.utils.book_append_sheet(wb, ws, 'Frequência');
+    const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename="frequencia.xlsx"');
+    return res.send(buf);
+  }
+
+  const [presencas] = await pool.query('SELECT * FROM modulo_etapa_chamada_versao_presenca');
+  const presencasByVersao = {};
+  presencas.forEach((p) => { (presencasByVersao[p.versao_id] ||= []).push(p); });
+
+  const [modulos] = await pool.query('SELECT * FROM modulos');
+  const [ciclos] = await pool.query('SELECT * FROM ciclos');
+  const [trilhas] = await pool.query('SELECT * FROM trilhas');
+  const [colaboradores] = await pool.query('SELECT * FROM colaboradores');
+  const moduloById = Object.fromEntries(modulos.map((m) => [m.id, m]));
+  const cicloById = Object.fromEntries(ciclos.map((c) => [c.id, c]));
+  const trilhaById = Object.fromEntries(trilhas.map((t) => [t.id, t]));
+  const colabById = Object.fromEntries(colaboradores.map((c) => [c.id, c]));
+
+  const rows = [];
+  for (const v of versoes) {
+    const m = moduloById[v.modulo_id];
+    const ci = m ? cicloById[m.ciclo_id] : null;
+    const t = ci ? trilhaById[ci.trilha_id] : null;
+    const lista = presencasByVersao[v.id] || [];
+    for (const p of lista) {
+      const c = colabById[p.colaborador_id];
+      rows.push({
+        Trilha: t?.nome || '',
+        Ciclo: ci?.nome || '',
+        Módulo: m?.nome || '',
+        Etapa: v.etapa_nome,
+        'Data da etapa': v.data_inicio ? new Date(v.data_inicio).toLocaleDateString('pt-BR') : '',
+        Versão: v.versao,
+        Motivo: v.motivo === 'fechamento' ? 'Fechamento original' : 'Edição',
+        'Registrada em': v.criada_em ? new Date(v.criada_em).toLocaleString('pt-BR') : '',
+        'Registrada por': v.criada_por || '',
+        Colaborador: c?.nome || '',
+        Presente: p.presente ? 'Sim' : 'Não',
+      });
+    }
+  }
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(rows);
+  XLSX.utils.book_append_sheet(wb, ws, 'Frequência');
+  const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+
+  const filename = `frequencia-${new Date().toISOString().slice(0, 10)}.xlsx`;
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.send(buf);
+}));
+
 module.exports = router;
