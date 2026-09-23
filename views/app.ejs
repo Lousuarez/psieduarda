@@ -258,9 +258,12 @@ function toggleTheme(){
 
   .tx-row{ position:relative; display:flex; flex-wrap:wrap; align-items:stretch; row-gap:56px; column-gap:34px; }
   .tx-transversal-group{ display:flex; flex-direction:column; gap:14px; margin-bottom:32px; }
-  .tx-ciclo-transversal{ max-width:none; flex:1 1 100%; }
-  .tx-ciclo-transversal .tx-nodes{ justify-content:flex-start; }
-  .tx-ciclo-transversal .tx-node{ flex:0 0 auto; }
+  .tx-ciclo-transversal{ max-width:none; flex:1 1 100%; padding-bottom:14px; }
+  .tx-ciclo-transversal .tx-nodes{ justify-content:flex-start; row-gap:8px; }
+  .tx-ciclo-transversal .tx-node{ flex:0 0 auto; padding:2px 10px 2px 2px; }
+  .tx-ciclo-transversal .tx-node-label, .tx-ciclo-transversal .tx-node-name{ display:none; }
+  .tx-ciclo-transversal .tx-node::before, .tx-ciclo-transversal .tx-node::after{ top:21px; }
+  .tx-ciclo-transversal .tx-node-dot{ top:21px; }
   .tx-connector-svg{ position:absolute; top:0; left:0; pointer-events:none; overflow:visible; z-index:0; }
   .tx-conn-path{ fill:none; stroke:var(--verde-ink); stroke-width:2.6; stroke-linecap:round; stroke-dasharray:0.1 10; opacity:.85; }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-conn-path{ stroke:var(--verde); } }
@@ -275,10 +278,10 @@ function toggleTheme(){
   :root[data-theme="dark"] .tx-ciclo-eyebrow{ background:var(--verde); color:var(--verde-ink); }
   .tx-ciclo-sep{ color:var(--ink-faint); font-weight:700; }
   .tx-ciclo-name{ font-size:11px; font-weight:800; letter-spacing:.02em; text-transform:uppercase; color:var(--ink); line-height:1.3; }
-  .tx-ciclo-chevron-btn{ flex-shrink:0; width:25px; height:25px; border-radius:7px; display:flex; align-items:center; justify-content:center; background:var(--status-done-bg); }
+  .tx-ciclo-chevron-btn{ flex-shrink:0; width:27px; height:27px; border-radius:8px; display:flex; align-items:center; justify-content:center; background:var(--status-done-bg); }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-ciclo-chevron-btn{ background:var(--verde); } }
   :root[data-theme="dark"] .tx-ciclo-chevron-btn{ background:var(--verde); }
-  .tx-ciclo-chevron{ width:14px; height:14px; color:var(--status-done-ink); }
+  .tx-ciclo-chevron{ width:13px; height:13px; margin-left:1.5px; color:var(--status-done-ink); }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-ciclo-chevron{ color:var(--verde-ink); } }
   :root[data-theme="dark"] .tx-ciclo-chevron{ color:var(--verde-ink); }
 
@@ -292,6 +295,10 @@ function toggleTheme(){
   .tx-node::after{ right:0; width:50%; }
   .tx-node:first-child::before{ display:none; }
   .tx-node:last-child::after{ display:none; }
+  .tx-node-dot{ position:absolute; top:25px; right:0; width:5px; height:5px; margin:-2.5px -2.5px 0 0; border-radius:50%; background:var(--verde-ink); z-index:1; }
+  .tx-node:last-child .tx-node-dot{ display:none; }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-node-dot{ background:var(--verde); } }
+  :root[data-theme="dark"] .tx-node-dot{ background:var(--verde); }
   .tx-node-icon{ position:relative; width:38px; height:38px; border-radius:50%; background:var(--bg-elevated); border:1.5px solid var(--verde-ink); color:var(--verde-ink); display:flex; align-items:center; justify-content:center; flex-shrink:0; z-index:1; }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-node-icon{ border-color:var(--verde); color:var(--verde); } }
   :root[data-theme="dark"] .tx-node-icon{ border-color:var(--verde); color:var(--verde); }
@@ -2429,7 +2436,7 @@ function groupParticipantesByStatus(modId){
 function txCicloHeadHtml(badgeLabel, nome){
   return `<div class="tx-ciclo-head">
     <p class="tx-ciclo-heading"><span class="tx-ciclo-eyebrow">${esc(badgeLabel)}</span><span class="tx-ciclo-sep">|</span><span class="tx-ciclo-name">${esc(nome)}</span></p>
-    <span class="tx-ciclo-chevron-btn"><svg class="tx-ciclo-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></span>
+    <span class="tx-ciclo-chevron-btn"><svg class="tx-ciclo-chevron" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
   </div>`;
 }
 function txNodesHtml(ci, mods){
@@ -2443,6 +2450,7 @@ function txNodesHtml(ci, mods){
       <div class="tx-node ${isSel?'selected':''}" data-mod-id="${m.id}" title="${tip}" role="button" tabindex="0" aria-pressed="${isSel}"
         onclick="openTxModuleModal('${m.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTxModuleModal('${m.id}');}">
         <div class="tx-node-icon">${iconSvg(ci.icon)}<span class="tx-node-status ${stClass}"></span></div>
+        <span class="tx-node-dot"></span>
         <div class="tx-node-label">${esc(label)}</div>
         <div class="tx-node-name">${esc(m.nome)}</div>
       </div>`;
