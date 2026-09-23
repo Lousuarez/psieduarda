@@ -206,13 +206,6 @@ function toggleTheme(){
   /* Visão geral (read-only) */
   .module-node.readonly, .cycle-head.readonly{ cursor:default; }
   .module-node.readonly:hover{ border-color:var(--line); }
-  .sysmap-stat{ font-size:10.5px; color:var(--ink-dim); margin-top:6px; }
-
-  /* Jornada da trilha (visão geral > trilhas) */
-  .jornada-block{ margin-bottom:30px; } .jornada-block:last-child{ margin-bottom:0; }
-  .jornada-head{ margin-bottom:14px; }
-  .jornada-head h3{ font-size:16.5px; font-weight:700; margin:0 0 4px; color:var(--ink); }
-  .jornada-head p{ font-size:12.5px; color:var(--ink-dim); margin:0 0 4px; max-width:640px; }
   .legend{ display:flex; gap:16px; flex-wrap:wrap; margin-bottom:16px; }
   .legend-item{ display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:var(--ink-dim); }
   .legend-dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
@@ -222,31 +215,6 @@ function toggleTheme(){
   .legend-dot.done{ background:var(--verde-ink); } .legend-dot.on{ background:var(--status-prog-ink); } .legend-dot.off{ background:var(--status-todo-ink); }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .legend-dot.done{ background:var(--verde); } }
   :root[data-theme="dark"] .legend-dot.done{ background:var(--verde); }
-  .jornada-track{ position:relative; height:4px; background:var(--line); border-radius:4px; margin:0 0 22px; }
-  .jornada-track-fill{ position:absolute; left:0; top:0; height:100%; background:var(--verde-ink); border-radius:4px; transition:width .3s ease-out; }
-  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .jornada-track-fill{ background:var(--verde); } }
-  :root[data-theme="dark"] .jornada-track-fill{ background:var(--verde); }
-  .jornada-ciclo-group{ margin-bottom:18px; }
-  .jornada-ciclo-label{ font-size:10.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--verde-ink); margin:0 0 10px; display:flex; align-items:center; gap:7px; }
-  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .jornada-ciclo-label{ color:var(--verde); } }
-  :root[data-theme="dark"] .jornada-ciclo-label{ color:var(--verde); }
-  .jornada-ciclo-label svg{ width:14px; height:14px; flex-shrink:0; }
-  .jornada-stations{ display:flex; flex-wrap:wrap; gap:8px; }
-  .station{ appearance:none; display:flex; align-items:center; gap:8px; background:var(--bg-elevated); border:1px solid var(--line); border-radius:10px; padding:8px 14px 8px 8px; cursor:pointer; font-family:var(--font); text-align:left; }
-  .station:hover{ border-color:var(--verde-ink); }
-  .station.selected{ border-color:var(--verde-ink); background:var(--status-done-bg); }
-  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .station:hover, :root:not([data-theme="light"]) .station.selected{ border-color:var(--verde); } }
-  :root[data-theme="dark"] .station:hover, :root[data-theme="dark"] .station.selected{ border-color:var(--verde); }
-  .st-index{ width:20px; height:20px; border-radius:50%; background:var(--bg-sunken); color:var(--ink-dim); font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-  .station.selected .st-index{ background:var(--verde-ink); color:#fff; }
-  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .station.selected .st-index{ background:var(--verde); color:var(--verde-ink); } }
-  :root[data-theme="dark"] .station.selected .st-index{ background:var(--verde); color:var(--verde-ink); }
-  .st-name{ font-size:12.5px; font-weight:700; color:var(--ink); display:flex; align-items:center; gap:7px; line-height:1.3; max-width:230px; }
-  .st-dot{ width:6px; height:6px; border-radius:50%; flex-shrink:0; }
-  .st-dot.lideranca{ background:var(--verde-ink); } .st-dot.metodo{ background:var(--ink-faint); } .st-dot.ambos{ background:var(--verde); }
-  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .st-dot.lideranca{ background:var(--verde); } }
-  :root[data-theme="dark"] .st-dot.lideranca{ background:var(--verde); }
-  .jornada-detail{ margin-top:18px; padding-top:18px; border-top:1px solid var(--line); animation:windowIn .2s ease-out; }
   .d-eyebrow{ font-size:10.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-dim); margin:0 0 6px; }
   .d-cat-label.lideranca{ color:var(--verde-ink); } .d-cat-label.metodo{ color:var(--ink-dim); } .d-cat-label.ambos{ color:var(--verde-ink); }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .d-cat-label.lideranca, :root:not([data-theme="light"]) .d-cat-label.ambos{ color:var(--verde); } }
@@ -645,17 +613,10 @@ function toggleTheme(){
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a5 5 0 0 1 5-5h6a5 5 0 0 1 5 5v1"/></svg>
           Colaboradores
         </button>
-        <div class="nav-submenu" id="navsub-view-trilhas">
-          <button class="nav-submenu-toggle" onclick="toggleNavSubmenu('view-trilhas')" aria-expanded="false" aria-controls="navsub-view-trilhas-list">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.4"/><circle cx="6" cy="18" r="2.4"/><circle cx="18" cy="6" r="2.4"/><path d="M6 8.4V15.6M8.4 6H15.6a2.4 2.4 0 0 1 2.4 2.4V6"/><path d="M8.4 18H14a4 4 0 0 0 4-4v-.2"/></svg>
-            <span class="nav-submenu-label">Trilhas</span>
-            <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
-          </button>
-          <div class="nav-submenu-list" id="navsub-view-trilhas-list"><div>
-            <button class="nav-item nav-subitem" id="navv-trilhas" onclick="navTo('view','trilhas')">Trilhas - Geral</button>
-            <button class="nav-item nav-subitem" id="navv-trilhaExtra" onclick="navTo('view','trilhaExtra')">Trilha - Extra</button>
-          </div></div>
-        </div>
+        <button class="nav-item" id="navv-trilhaExtra" onclick="navTo('view','trilhaExtra')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.4"/><circle cx="6" cy="18" r="2.4"/><circle cx="18" cy="6" r="2.4"/><path d="M6 8.4V15.6M8.4 6H15.6a2.4 2.4 0 0 1 2.4 2.4V6"/><path d="M8.4 18H14a4 4 0 0 0 4-4v-.2"/></svg>
+          Trilha
+        </button>
       </div>
 
       <div class="nav-group">
@@ -742,20 +703,6 @@ function toggleTheme(){
               </div>
               <div class="colab-detail" id="vcolab-detail"></div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="view" id="view-v-trilhas">
-        <div class="window">
-          <div class="window-head">
-            <div>
-              <p class="window-title">Trilhas</p>
-              <p class="window-sub">Panorama dos ciclos e módulos de cada trilha — nada aqui é editável.</p>
-            </div>
-          </div>
-          <div class="window-body">
-            <div id="vtrilhas-list"></div>
           </div>
         </div>
       </div>
@@ -1233,7 +1180,6 @@ function renderAll(){
   renderKpis(); renderFoot();
   if(currentMode==='view'){
     if(currentTab==='colaborador'){ renderViewColabList(document.getElementById('vcolab-search').value); renderViewColabDetail(); renderDashboard(); }
-    if(currentTab==='trilhas') renderViewTrilhas();
     if(currentTab==='trilhaExtra') renderViewTrilhaExtra();
   } else {
     if(currentTab==='colaborador') renderManageColabTable();
@@ -1333,11 +1279,11 @@ function renderFoot(){
 }
 
 const NAV_IDS = {
-  view: {colaborador:'navv-colab', trilhas:'navv-trilhas', trilhaExtra:'navv-trilhaExtra'},
+  view: {colaborador:'navv-colab', trilhaExtra:'navv-trilhaExtra'},
   manage: {colaborador:'navm-colab', trilhas:'navm-trilhas', ciclos:'navm-ciclos', modulos:'navm-modulos', unidades:'navm-unidades', usuarios:'navm-usuarios'}
 };
 const PANE_IDS = {
-  view: {colaborador:'view-v-colaborador', trilhas:'view-v-trilhas', trilhaExtra:'view-v-trilhaExtra'},
+  view: {colaborador:'view-v-colaborador', trilhaExtra:'view-v-trilhaExtra'},
   manage: {colaborador:'view-m-colaborador', trilhas:'view-m-trilhas', ciclos:'view-m-ciclos', modulos:'view-m-modulos', unidades:'view-m-unidades', usuarios:'view-m-usuarios'}
 };
 
@@ -1504,106 +1450,7 @@ function toggleProgMore(id){
   if(btn) btn.textContent = btn.textContent.replace(open ? '− ocultar' : '+ mostrar', open ? '+ mostrar' : '− ocultar');
 }
 
-let viewSelectedModulo = null;
-function selectStationView(modId){
-  viewSelectedModulo = (viewSelectedModulo === modId) ? null : modId;
-  renderViewTrilhas();
-}
-
 function catLabel(cat){ if(cat==='Método') return 'Método'; if(cat==='Liderança e Método') return 'Liderança e Método'; return 'Liderança'; }
-
-function renderViewTrilhas(){
-  const el = document.getElementById('vtrilhas-list');
-  if(dbUnavailable){ el.innerHTML = '<div class="empty-state">Este visualizador não tem acesso ao banco de dados do artifact.</div>'; return; }
-  if(!isLoaded('trilhas')){ el.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando trilhas…</div>'; return; }
-  const list = sortedTrilhas();
-  if(!list.length){ el.innerHTML = '<div class="empty-cta"><p class="empty-title">Nenhuma trilha cadastrada ainda</p><p>Crie a primeira trilha em Cadastros → Trilhas.</p></div>'; return; }
-  el.innerHTML = list.map(t => {
-    const membros = colaboradores.filter(c=>(c.trilhaIds||[]).includes(t.id));
-    const ciclosT = sortedCiclosOf(t.id);
-    const allMods = ciclosT.flatMap(ci => modulosOf(ci.id));
-
-    let idx = 0;
-    const ciclosHtml = ciclosT.map(ci => {
-      const mods = modulosOf(ci.id);
-      if(!mods.length) return '';
-      const stationsHtml = mods.map(m => {
-        idx++;
-        return `
-        <button class="station ${m.id===viewSelectedModulo?'selected':''}" onclick="selectStationView('${m.id}')">
-          <span class="st-index">${idx}</span>
-          <span class="st-name"><span class="st-dot ${catDotClass(m.categoria)}"></span>${esc(m.nome)}</span>
-        </button>`;
-      }).join('');
-      return `
-      <div class="jornada-ciclo-group">
-        <p class="jornada-ciclo-label">${iconSvg(ci.icon)}${esc(ci.nome)}</p>
-        <div class="jornada-stations">${stationsHtml}</div>
-      </div>`;
-    }).join('');
-
-    const total = allMods.length;
-    const doneCount = allMods.filter(m=>m.status==='Concluído').length;
-    const onCount = allMods.filter(m=>m.status==='Em andamento').length;
-    const fillPct = total ? Math.round(((doneCount + onCount*0.5)/total)*100) : 0;
-
-    const selMod = viewSelectedModulo ? allMods.find(m=>m.id===viewSelectedModulo) : null;
-    let detailHtml = '';
-    if(selMod){
-      const ci = cicloById(selMod.cicloId);
-      const cat = catDotClass(selMod.categoria);
-      const posIdx = allMods.findIndex(m=>m.id===selMod.id) + 1;
-      const participantes = progresso.filter(p=>p.moduloId===selMod.id)
-        .map(p=>({...p, colab: colaboradores.find(c=>c.id===p.colaboradorId)}))
-        .filter(p=>p.colab);
-      const concluidos = participantes.filter(p=>p.status==='Concluído');
-      const emAndamento = participantes.filter(p=>p.status!=='Concluído');
-      detailHtml = `
-        <div class="jornada-detail">
-          <p class="d-eyebrow">Etapa ${posIdx} · ${esc(ci?.nome||'')} · <span class="d-cat-label ${cat}">${esc(catLabel(selMod.categoria))}</span></p>
-          <h2 class="d-title">${esc(selMod.nome)}</h2>
-          <span class="status-pill ${statusPillClass(selMod.status)}" style="pointer-events:none;">${esc(selMod.status||'A iniciar')}</span>
-          ${selMod.descricao ? `<p class="d-desc">${esc(selMod.descricao)}</p>` : ''}
-          <div class="meta-grid">
-            ${selMod.formato ? `<div><div class="meta-label">Formato</div><div class="meta-val">${esc(selMod.formato)}</div></div>` : ''}
-            ${selMod.publicoAlvo ? `<div><div class="meta-label">Público</div><div class="meta-val">${esc(selMod.publicoAlvo)}</div></div>` : ''}
-            ${selMod.mentor ? `<div><div class="meta-label">Mentor</div><div class="meta-val">${esc(selMod.mentor)}</div></div>` : ''}
-            ${selMod.cargaHoraria ? `<div><div class="meta-label">Carga horária</div><div class="meta-val">${esc(selMod.cargaHoraria)}</div></div>` : ''}
-          </div>
-          ${participantes.length ? `
-          <div class="people-block">
-            <p class="people-label">Participantes (${participantes.length})</p>
-            <div class="chip-list">
-              ${concluidos.map(p=>`<span class="chip concluido">${esc(p.colab.nome)}</span>`).join('')}
-              ${emAndamento.map(p=>`<span class="chip">${esc(p.colab.nome)}</span>`).join('')}
-            </div>
-          </div>` : ''}
-          ${selMod.linkMaterial ? `
-          <a class="material-btn" href="${esc(selMod.linkMaterial)}" target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
-            Ver material do módulo
-          </a>` : `<p class="no-material">Material do módulo ainda não disponibilizado</p>`}
-        </div>`;
-    }
-
-    return `
-      <div class="jornada-block">
-        <div class="jornada-head">
-          <h3>${esc(t.nome)}</h3>
-          ${t.descricao?`<p>${esc(t.descricao)}</p>`:''}
-          <p class="sysmap-stat">${membros.length} colaborador${membros.length===1?'':'es'} nesta trilha · ${doneCount}/${total} etapas concluídas</p>
-        </div>
-        <div class="legend">
-          <span class="legend-item"><span class="legend-dot lideranca"></span>Liderança</span>
-          <span class="legend-item"><span class="legend-dot metodo"></span>Método</span>
-          <span class="legend-item"><span class="legend-dot ambos"></span>Liderança e Método</span>
-        </div>
-        <div class="jornada-track"><div class="jornada-track-fill" style="width:${fillPct}%"></div></div>
-        ${ciclosHtml || '<p style="font-size:12px;color:var(--ink-dim);">Nenhum ciclo nesta trilha ainda.</p>'}
-        ${detailHtml}
-      </div>`;
-  }).join('');
-}
 
 /* ================= Trilha - Extra: roadmap sequencial por trilha ================= */
 function selectTrilhaExtra(id){
