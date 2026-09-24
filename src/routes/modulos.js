@@ -22,6 +22,8 @@ function toApi(row) {
     inicioPrevisto: row.inicio_previsto || '',
     linkMaterial: row.link_material || '',
     temCronograma: !!row.tem_cronograma,
+    icon: row.icon || 'layers',
+    imagem: row.imagem || '',
   };
 }
 
@@ -40,6 +42,8 @@ const FIELDS = [
   ['inicioPrevisto', 'inicio_previsto', String],
   ['linkMaterial', 'link_material', String],
   ['temCronograma', 'tem_cronograma', Boolean],
+  ['icon', 'icon', String],
+  ['imagem', 'imagem', String],
 ];
 
 router.get('/', asyncHandler(async (req, res) => {
@@ -63,6 +67,8 @@ router.post('/', asyncHandler(async (req, res) => {
       vals.push(req.body[apiKey] || 'A iniciar');
     } else if (apiKey === 'temCronograma') {
       vals.push(!!req.body[apiKey]);
+    } else if (apiKey === 'icon') {
+      vals.push(req.body[apiKey] || 'layers');
     } else {
       vals.push(req.body[apiKey] !== undefined ? cast(req.body[apiKey]) : '');
     }

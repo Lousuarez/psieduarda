@@ -52,6 +52,8 @@ CREATE TABLE IF NOT EXISTS modulos (
     inicio_previsto VARCHAR(64),
     link_material VARCHAR(500),
     tem_cronograma BOOLEAN NOT NULL DEFAULT FALSE,
+    icon VARCHAR(32) NOT NULL DEFAULT 'layers',
+    imagem MEDIUMTEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (ciclo_id) REFERENCES ciclos(id) ON DELETE RESTRICT
@@ -60,6 +62,17 @@ CREATE TABLE IF NOT EXISTS modulos (
 -- Rodar de novo é seguro (idempotente) — cobre bancos que já tinham a
 -- tabela "modulos" criada antes da coluna tem_cronograma existir.
 ALTER TABLE modulos ADD COLUMN IF NOT EXISTS tem_cronograma BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- Rodar de novo é seguro (idempotente) — cobre bancos que já tinham a
+-- tabela "modulos" criada antes de "icon"/"imagem" existirem. A "bolinha"
+-- de um módulo na Trilha-Extra passou a ser parametrizada por módulo (era
+-- por ciclo, via ciclos.icon) — "imagem" guarda um data URL (base64) da
+-- imagem enviada e recortada pelo usuário; quando vazio, usa o ícone padrão
+-- em "icon". Bancos que já tinham módulos antes dessa mudança precisam de
+-- um UPDATE avulso (fora deste script) copiando ciclos.icon para
+-- modulos.icon, pra não perder a seleção que já existia por ciclo.
+ALTER TABLE modulos ADD COLUMN IF NOT EXISTS icon VARCHAR(32) NOT NULL DEFAULT 'layers';
+ALTER TABLE modulos ADD COLUMN IF NOT EXISTS imagem MEDIUMTEXT;
 
 -- Rodar de novo é seguro — cobre bancos que já tinham "modulos" criada antes
 -- de "Autoconhecimento"/"Inovação" existirem como categoria.
