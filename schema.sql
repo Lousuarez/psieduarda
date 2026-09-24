@@ -24,10 +24,17 @@ CREATE TABLE IF NOT EXISTS ciclos (
     tema VARCHAR(191),
     ordem INT NOT NULL DEFAULT 0,
     icon VARCHAR(32) NOT NULL DEFAULT 'layers',
+    transversal BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (trilha_id) REFERENCES trilhas(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Rodar de novo é seguro (idempotente) — cobre bancos que já tinham a
+-- tabela "ciclos" criada antes da coluna transversal existir. Um ciclo
+-- transversal representa módulos que valem para a trilha inteira, fora da
+-- sequência numerada de ciclos (ver renderViewTrilhaExtra no front-end).
+ALTER TABLE ciclos ADD COLUMN IF NOT EXISTS transversal BOOLEAN NOT NULL DEFAULT FALSE;
 
 CREATE TABLE IF NOT EXISTS modulos (
     id CHAR(18) PRIMARY KEY,

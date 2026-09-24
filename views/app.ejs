@@ -257,43 +257,64 @@ function toggleTheme(){
   .tx-roadmap-stat{ font-size:12px; color:var(--ink-dim); margin:0 0 20px; }
 
   .tx-row{ position:relative; display:flex; flex-wrap:wrap; align-items:stretch; row-gap:56px; column-gap:34px; }
+  .tx-transversal-group{ display:flex; flex-direction:column; gap:14px; margin-bottom:32px; }
+  .tx-ciclo.tx-ciclo-transversal{ max-width:none; width:100%; flex:1 1 100%; padding:14px 18px; }
+  .tx-transversal-row{ display:flex; align-items:center; gap:18px; }
+  .tx-transversal-row .tx-ciclo-heading{ flex-shrink:0; margin:0; }
+  .tx-transversal-row .tx-nodes{ flex:1; justify-content:flex-start; row-gap:0; }
+  .tx-transversal-row .tx-node{ flex:0 0 auto; padding:2px 10px 2px 2px; }
+  .tx-transversal-row .tx-node-label, .tx-transversal-row .tx-node-name{ display:none; }
+  .tx-transversal-row .tx-node::before, .tx-transversal-row .tx-node::after{ top:23px; }
+  .tx-transversal-row .tx-node-dot{ top:23px; }
   .tx-connector-svg{ position:absolute; top:0; left:0; pointer-events:none; overflow:visible; z-index:0; }
   .tx-conn-path{ fill:none; stroke:var(--verde-ink); stroke-width:2.6; stroke-linecap:round; stroke-dasharray:0.1 10; opacity:.85; }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-conn-path{ stroke:var(--verde); } }
   :root[data-theme="dark"] .tx-conn-path{ stroke:var(--verde); }
-  .tx-ciclo{ position:relative; z-index:1; flex:1 1 250px; max-width:300px; background:var(--bg-sunken); border:1px solid var(--line); border-radius:14px; padding:16px 16px 18px; display:flex; flex-direction:column; }
-  .tx-ciclo-head{ display:flex; align-items:center; gap:10px; margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid var(--line); }
-  .tx-ciclo-num{ flex-shrink:0; width:30px; height:30px; border-radius:9px; background:var(--verde-ink); color:#fff; font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; }
-  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-ciclo-num{ background:var(--verde); color:var(--verde-ink); } }
-  :root[data-theme="dark"] .tx-ciclo-num{ background:var(--verde); color:var(--verde-ink); }
-  .tx-ciclo-title{ min-width:0; }
-  .tx-ciclo-eyebrow{ font-size:9.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--verde-ink); margin:0; }
-  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-ciclo-eyebrow{ color:var(--verde); } }
-  :root[data-theme="dark"] .tx-ciclo-eyebrow{ color:var(--verde); }
-  .tx-ciclo-name{ font-size:13.5px; font-weight:800; color:var(--ink); margin:1px 0 0; line-height:1.25; }
+  .tx-ciclo{ position:relative; z-index:1; flex:1 1 250px; max-width:300px; background:var(--bg-sunken); border:1px solid var(--line); border-radius:16px; padding:16px 16px 18px; display:flex; flex-direction:column; box-shadow:0 1px 2px rgba(20,20,15,.04), 0 10px 26px -16px rgba(20,20,15,.16); }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-ciclo{ background:#17181A; border-color:#2B2D2F; box-shadow:0 1px 2px rgba(0,0,0,.3), 0 14px 30px -16px rgba(0,0,0,.6); } }
+  :root[data-theme="dark"] .tx-ciclo{ background:#17181A; border-color:#2B2D2F; box-shadow:0 1px 2px rgba(0,0,0,.3), 0 14px 30px -16px rgba(0,0,0,.6); }
+  .tx-ciclo-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid var(--line); }
+  .tx-ciclo-heading{ min-width:0; margin:0; display:flex; align-items:center; flex-wrap:wrap; gap:7px; }
+  .tx-ciclo-eyebrow{ display:inline-flex; align-items:center; padding:2.5px 9px; border-radius:20px; font-size:10px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; background:var(--status-done-bg); color:var(--status-done-ink); }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-ciclo-eyebrow{ background:var(--verde); color:var(--verde-ink); } }
+  :root[data-theme="dark"] .tx-ciclo-eyebrow{ background:var(--verde); color:var(--verde-ink); }
+  .tx-ciclo-sep{ color:var(--ink-faint); font-weight:700; }
+  .tx-ciclo-name{ font-size:11px; font-weight:800; letter-spacing:.02em; text-transform:uppercase; color:var(--ink); line-height:1.3; }
+  .tx-ciclo-chevron-btn{ flex-shrink:0; width:27px; height:27px; border-radius:8px; display:flex; align-items:center; justify-content:center; background:var(--status-done-bg); }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-ciclo-chevron-btn{ background:var(--verde); } }
+  :root[data-theme="dark"] .tx-ciclo-chevron-btn{ background:var(--verde); }
+  .tx-ciclo-chevron{ width:13px; height:13px; margin-left:1.5px; color:var(--status-done-ink); }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-ciclo-chevron{ color:var(--verde-ink); } }
+  :root[data-theme="dark"] .tx-ciclo-chevron{ color:var(--verde-ink); }
 
   .tx-nodes{ display:flex; flex-wrap:wrap; justify-content:center; row-gap:18px; column-gap:0; flex:1; align-items:flex-start; align-content:center; }
   .tx-node{ flex:1 1 88px; min-width:76px; max-width:118px; display:flex; flex-direction:column; align-items:center; text-align:center; position:relative; padding:6px 4px; border-radius:10px; cursor:pointer; }
   .tx-node:hover{ background:var(--bg-elevated); }
   .tx-node:focus-visible{ outline:2px solid var(--verde-ink); outline-offset:2px; }
   .tx-node.selected{ background:var(--status-done-bg); }
-  .tx-node::before, .tx-node::after{ content:""; position:absolute; top:25px; height:1.5px; background:var(--line); z-index:0; }
+  .tx-node::before, .tx-node::after{ content:""; position:absolute; top:27px; height:1.5px; background:var(--line); z-index:0; }
   .tx-node::before{ left:0; width:50%; }
   .tx-node::after{ right:0; width:50%; }
   .tx-node:first-child::before{ display:none; }
   .tx-node:last-child::after{ display:none; }
-  .tx-node-icon{ position:relative; width:38px; height:38px; border-radius:50%; background:var(--bg-elevated); border:1.5px solid var(--verde-ink); color:var(--verde-ink); display:flex; align-items:center; justify-content:center; flex-shrink:0; z-index:1; }
+  .tx-node-dot{ position:absolute; top:27px; right:0; width:5px; height:5px; margin:-2.5px -2.5px 0 0; border-radius:50%; background:var(--verde-ink); z-index:1; }
+  .tx-node:last-child .tx-node-dot{ display:none; }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-node-dot{ background:var(--verde); } }
+  :root[data-theme="dark"] .tx-node-dot{ background:var(--verde); }
+  .tx-node-icon{ position:relative; width:42px; height:42px; border-radius:50%; background:var(--bg-elevated); border:1.5px solid var(--verde-ink); color:var(--verde-ink); display:flex; align-items:center; justify-content:center; flex-shrink:0; z-index:1; }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-node-icon{ border-color:var(--verde); color:var(--verde); } }
   :root[data-theme="dark"] .tx-node-icon{ border-color:var(--verde); color:var(--verde); }
   .tx-node.selected .tx-node-icon{ background:var(--verde-ink); color:#fff; }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-node.selected .tx-node-icon{ background:var(--verde); color:var(--verde-ink); } }
   :root[data-theme="dark"] .tx-node.selected .tx-node-icon{ background:var(--verde); color:var(--verde-ink); }
-  .tx-node-icon svg{ width:17px; height:17px; }
+  .tx-node-icon svg{ width:19px; height:19px; }
   .tx-node-label{ font-size:10.5px; font-weight:800; color:var(--verde-ink); text-transform:uppercase; letter-spacing:.03em; margin:9px 0 2px; }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-node-label{ color:var(--verde); } }
   :root[data-theme="dark"] .tx-node-label{ color:var(--verde); }
   .tx-node-name{ font-size:10.5px; font-weight:700; color:var(--ink); line-height:1.3; margin:0; }
   .tx-node-status{ position:absolute; right:-1px; bottom:-1px; width:11px; height:11px; border-radius:50%; border:2px solid var(--bg-sunken); box-sizing:border-box; z-index:2; }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-node-status{ border-color:#17181A; } }
+  :root[data-theme="dark"] .tx-node-status{ border-color:#17181A; }
   .tx-node-status.done{ background:var(--verde-ink); }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-node-status.done{ background:var(--verde); } }
   :root[data-theme="dark"] .tx-node-status.done{ background:var(--verde); }
@@ -1207,6 +1228,7 @@ function toggleTheme(){
     <div class="field"><label for="cf2-tema">Subtítulo / tema (opcional)</label><input type="text" id="cf2-tema"></div>
     <div class="field"><label for="cf2-ordem">Ordem</label><input type="number" id="cf2-ordem" step="1"></div>
     <div class="field"><label>Ícone</label><div class="icon-pick" id="cf2-icon-pick"></div></div>
+    <label class="field-check"><input type="checkbox" id="cf2-transversal"> Ciclo transversal (módulos valem para toda a trilha, fora da sequência numerada)</label>
     <div class="panel-actions">
       <button type="button" class="btn-danger" id="cycle-delete-btn" onclick="askDeleteCycle()">Excluir ciclo</button>
       <div style="display:flex;gap:8px;">
@@ -2413,6 +2435,29 @@ function groupParticipantesByStatus(modId){
   };
 }
 
+function txCicloHeadHtml(badgeLabel, nome){
+  return `<div class="tx-ciclo-head">
+    <p class="tx-ciclo-heading"><span class="tx-ciclo-eyebrow">${esc(badgeLabel)}</span><span class="tx-ciclo-sep">|</span><span class="tx-ciclo-name">${esc(nome)}</span></p>
+    <span class="tx-ciclo-chevron-btn"><svg class="tx-ciclo-chevron" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+  </div>`;
+}
+function txNodesHtml(ci, mods){
+  return mods.map((m, mIdx) => {
+    const st = m.status || 'A iniciar';
+    const stClass = st==='Concluído' ? 'done' : (st==='Em andamento' ? 'on' : 'off');
+    const label = m.etapa ? m.etapa : `Módulo ${mIdx+1}`;
+    const tip = esc([m.nome, m.descricao || ''].filter(Boolean).join(' — '));
+    const isSel = m.id === txSelectedModulo;
+    return `
+      <div class="tx-node ${isSel?'selected':''}" data-mod-id="${m.id}" title="${tip}" role="button" tabindex="0" aria-pressed="${isSel}"
+        onclick="openTxModuleModal('${m.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTxModuleModal('${m.id}');}">
+        <div class="tx-node-icon">${iconSvg(ci.icon)}<span class="tx-node-status ${stClass}"></span></div>
+        <span class="tx-node-dot"></span>
+        <div class="tx-node-label">${esc(label)}</div>
+        <div class="tx-node-name">${esc(m.nome)}</div>
+      </div>`;
+  }).join('');
+}
 function renderViewTrilhaExtra(){
   const el = document.getElementById('vtrilhaextra-roadmap');
   if(dbUnavailable){ el.innerHTML = '<div class="empty-state">Este visualizador não tem acesso ao banco de dados do artifact.</div>'; return; }
@@ -2421,47 +2466,41 @@ function renderViewTrilhaExtra(){
   if(!list.length){ el.innerHTML = '<div class="empty-cta"><p class="empty-title">Nenhuma trilha cadastrada ainda</p><p>Crie a primeira trilha em Cadastros → Trilhas.</p></div>'; return; }
   if(!trilhaExtraSelected || !list.find(t=>t.id===trilhaExtraSelected)){ trilhaExtraSelected = list[0].id; }
   const t = list.find(x=>x.id===trilhaExtraSelected);
-  const ciclosT = sortedCiclosOf(t.id).filter(ci => modulosOf(ci.id).length);
+  const ciclosComMods = sortedCiclosOf(t.id).filter(ci => modulosOf(ci.id).length);
+  const transversais = ciclosComMods.filter(ci => ci.transversal);
+  const ciclosT = ciclosComMods.filter(ci => !ci.transversal);
 
-  if(!ciclosT.length){
+  if(!ciclosComMods.length){
     el.innerHTML = `<p class="tx-roadmap-stat">${esc(t.nome)}</p><div class="empty-cta"><p class="empty-title">Esta trilha ainda não tem ciclos com módulos</p><p>Cadastre ciclos e módulos em Cadastros para ver a sequência aqui.</p></div>`;
     return;
   }
 
   let totalMods = 0;
+
+  const transversalHtml = transversais.map(ci => {
+    const mods = modulosOf(ci.id);
+    totalMods += mods.length;
+    return `<div class="tx-ciclo tx-ciclo-transversal">
+      <div class="tx-transversal-row">
+        <p class="tx-ciclo-heading"><span class="tx-ciclo-eyebrow">Transversal</span><span class="tx-ciclo-sep">|</span><span class="tx-ciclo-name">${esc(ci.nome)}</span></p>
+        <div class="tx-nodes">${txNodesHtml(ci, mods)}</div>
+        <span class="tx-ciclo-chevron-btn"><svg class="tx-ciclo-chevron" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+      </div>
+    </div>`;
+  }).join('');
+
   const rowHtml = ciclosT.map((ci, ciIdx) => {
     const mods = modulosOf(ci.id);
     totalMods += mods.length;
-    const nodesHtml = mods.map((m, mIdx) => {
-      const st = m.status || 'A iniciar';
-      const stClass = st==='Concluído' ? 'done' : (st==='Em andamento' ? 'on' : 'off');
-      const label = m.etapa ? m.etapa : `Módulo ${mIdx+1}`;
-      const tip = esc([m.nome, m.descricao || ''].filter(Boolean).join(' — '));
-      const isSel = m.id === txSelectedModulo;
-      return `
-        <div class="tx-node ${isSel?'selected':''}" data-mod-id="${m.id}" title="${tip}" role="button" tabindex="0" aria-pressed="${isSel}"
-          onclick="openTxModuleModal('${m.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTxModuleModal('${m.id}');}">
-          <div class="tx-node-icon">${iconSvg(ci.icon)}<span class="tx-node-status ${stClass}"></span></div>
-          <div class="tx-node-label">${esc(label)}</div>
-          <div class="tx-node-name">${esc(m.nome)}</div>
-        </div>`;
-    }).join('');
-    const cardHtml = `
-      <div class="tx-ciclo">
-        <div class="tx-ciclo-head">
-          <div class="tx-ciclo-num">${ciIdx+1}</div>
-          <div class="tx-ciclo-title">
-            <p class="tx-ciclo-eyebrow">Ciclo ${ciIdx+1}</p>
-            <p class="tx-ciclo-name">${esc(ci.nome)}</p>
-          </div>
-        </div>
-        <div class="tx-nodes">${nodesHtml}</div>
-      </div>`;
-    return cardHtml;
+    return `<div class="tx-ciclo">
+      ${txCicloHeadHtml('Ciclo '+(ciIdx+1), ci.nome)}
+      <div class="tx-nodes">${txNodesHtml(ci, mods)}</div>
+    </div>`;
   }).join('');
 
   el.innerHTML = `
-    <p class="tx-roadmap-stat">${esc(t.nome)} · ${ciclosT.length} ciclo${ciclosT.length===1?'':'s'} · ${totalMods} módulo${totalMods===1?'':'s'}</p>
+    <p class="tx-roadmap-stat">${esc(t.nome)} · ${ciclosComMods.length} ciclo${ciclosComMods.length===1?'':'s'} · ${totalMods} módulo${totalMods===1?'':'s'}</p>
+    ${transversalHtml ? `<div class="tx-transversal-group">${transversalHtml}</div>` : ''}
     <div class="tx-row" id="tx-roadmap-row">${rowHtml}</div>`;
 
   requestAnimationFrame(layoutTxConnectors);
@@ -2897,6 +2936,7 @@ function openCycleModal(id, trilhaIdForNew){
   document.getElementById('cf2-nome').value = ci?.nome || '';
   document.getElementById('cf2-tema').value = ci?.tema || '';
   document.getElementById('cf2-ordem').value = ci?.ordem ?? (sortedCiclosOf(ci?.trilhaId||trilhaIdForNew).length+1);
+  document.getElementById('cf2-transversal').checked = !!ci?.transversal;
   renderIconPick();
   pickIcon(ci?.icon || 'layers');
   document.getElementById('cycle-delete-btn').style.display = ci ? '' : 'none';
@@ -2911,7 +2951,8 @@ async function saveCycle(){
   const data = {
     trilhaId, nome, tema: document.getElementById('cf2-tema').value.trim(),
     ordem: parseInt(document.getElementById('cf2-ordem').value)||0,
-    icon: document.getElementById('cf2-icon-pick').dataset.value || 'layers'
+    icon: document.getElementById('cf2-icon-pick').dataset.value || 'layers',
+    transversal: document.getElementById('cf2-transversal').checked
   };
   if(!db){ toast('Banco indisponível'); return; }
   if(editingCycleId){ await db.doc('ciclos/'+editingCycleId).update(data); }
@@ -3138,7 +3179,7 @@ function renderCadastroCiclos(filter){
     <div class="reg-row" onclick="openCycleModal('${ci.id}')">
       <div class="cycle-icon" style="width:26px;height:26px;flex-shrink:0;">${iconSvg(ci.icon)}</div>
       <div class="reg-row-main">
-        <div class="reg-row-title">${esc(ci.nome)}</div>
+        <div class="reg-row-title">${esc(ci.nome)}${ci.transversal?' <span class="badge" style="vertical-align:middle;">Transversal</span>':''}</div>
         <div class="reg-row-sub">${esc(trilhaById(ci.trilhaId)?.nome || '—')}${ci.tema?' · '+esc(ci.tema):''} · ${nMod} módulo${nMod===1?'':'s'}</div>
       </div>
       <span class="btn-ghost-sm" style="pointer-events:none;">${editSvg()}</span>
