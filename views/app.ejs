@@ -308,6 +308,7 @@ function toggleTheme(){
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-node.selected .tx-node-icon{ background:var(--verde); color:var(--verde-ink); } }
   :root[data-theme="dark"] .tx-node.selected .tx-node-icon{ background:var(--verde); color:var(--verde-ink); }
   .tx-node-icon svg{ width:19px; height:19px; }
+  .tx-node-icon img{ width:100%; height:100%; border-radius:50%; object-fit:cover; display:block; }
   .tx-node-label{ font-size:10.5px; font-weight:800; color:var(--verde-ink); text-transform:uppercase; letter-spacing:.03em; margin:9px 0 2px; }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-node-label{ color:var(--verde); } }
   :root[data-theme="dark"] .tx-node-label{ color:var(--verde); }
@@ -617,6 +618,17 @@ function toggleTheme(){
   .icon-opt{ appearance:none; border:1.5px solid var(--line); background:var(--bg); border-radius:8px; padding:8px 0; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--ink-dim); }
   .icon-opt svg{ width:16px; height:16px; }
   .icon-opt.selected{ border-color:var(--verde-ink); color:var(--verde-ink); background:var(--status-done-bg); }
+  .mf-img-row{ display:flex; align-items:center; gap:12px; margin-top:8px; }
+  .mf-img-preview{ width:52px; height:52px; border-radius:50%; flex-shrink:0; border:1.5px dashed var(--line); background:var(--bg-sunken); display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .mf-img-preview img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .mf-img-preview-empty{ font-size:9px; color:var(--ink-faint); text-align:center; line-height:1.2; }
+  .mf-img-actions{ display:flex; flex-direction:column; gap:6px; align-items:flex-start; }
+  .mf-img-upload-btn{ cursor:pointer; }
+  .crop-box{ max-width:340px; }
+  .crop-stage{ position:relative; width:220px; height:220px; margin:14px auto; border-radius:50%; overflow:hidden; background:var(--bg-sunken); border:1px solid var(--line); cursor:grab; touch-action:none; }
+  .crop-stage:active{ cursor:grabbing; }
+  .crop-stage img{ position:absolute; left:0; top:0; max-width:none; user-select:none; pointer-events:none; }
+  .crop-zoom{ display:block; width:100%; margin:4px 0 0; }
   .panel-actions{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
   .form-tabs{ display:flex; gap:18px; margin:0 0 20px; border-bottom:1px solid var(--line); }
   .form-tab{ appearance:none; background:none; border:none; cursor:pointer; font-family:var(--font); font-weight:700; font-size:12.5px; color:var(--ink-dim); padding:0 0 10px; border-bottom:2px solid transparent; }
@@ -1227,7 +1239,6 @@ function toggleTheme(){
     <div class="field"><label for="cf2-nome">Nome do ciclo</label><input type="text" id="cf2-nome" placeholder="Ex.: Liderar a Operação"></div>
     <div class="field"><label for="cf2-tema">Subtítulo / tema (opcional)</label><input type="text" id="cf2-tema"></div>
     <div class="field"><label for="cf2-ordem">Ordem</label><input type="number" id="cf2-ordem" step="1"></div>
-    <div class="field"><label>Ícone</label><div class="icon-pick" id="cf2-icon-pick"></div></div>
     <label class="field-check"><input type="checkbox" id="cf2-transversal"> Ciclo transversal (módulos valem para toda a trilha, fora da sequência numerada)</label>
     <div class="panel-actions">
       <button type="button" class="btn-danger" id="cycle-delete-btn" onclick="askDeleteCycle()">Excluir ciclo</button>
@@ -1277,6 +1288,18 @@ function toggleTheme(){
           </div>
           <div class="field"><label for="mf-inicio">Início previsto</label><input type="text" id="mf-inicio"></div>
           <div class="field"><label for="mf-material">Link do material</label><input type="text" id="mf-material" placeholder="https://…"></div>
+          <div class="field">
+            <label>Imagem da bolinha (Trilha)</label>
+            <div class="icon-pick" id="mf-icon-pick"></div>
+            <div class="mf-img-row">
+              <div class="mf-img-preview" id="mf-img-preview"><span class="mf-img-preview-empty">Sem imagem</span></div>
+              <div class="mf-img-actions">
+                <label class="btn-secondary mf-img-upload-btn">Enviar imagem<input type="file" accept="image/*" id="mf-img-input" style="display:none;" onchange="onModuleImageSelected(event)"></label>
+                <button type="button" class="btn-ghost-sm" id="mf-img-remove-btn" style="display:none;" onclick="removeModuleImage()">Remover imagem</button>
+              </div>
+            </div>
+            <p class="field-hint">Escolha um ícone padrão ou envie uma imagem própria para substituir a bolinha deste módulo na Trilha.</p>
+          </div>
           <label class="field-check"><input type="checkbox" id="mf-tem-cronograma" onchange="toggleCronogramaTab()"> Informar cronograma?</label>
         </form>
       </div>
@@ -1323,6 +1346,23 @@ function toggleTheme(){
   </div>
 </div>
 
+<!-- Modal: recortar imagem do módulo -->
+<div class="overlay" id="overlay-img-crop" onclick="closeCropModal()"></div>
+<div class="modal-center" id="modal-img-crop" onclick="if(event.target===this) closeCropModal();">
+  <div class="modal-box crop-box">
+    <div class="panel-head"><h3>Ajustar imagem</h3><button class="panel-close" onclick="closeCropModal()">×</button></div>
+    <p class="field-hint" style="margin-top:0;">Arraste para posicionar e use o controle abaixo para dar zoom. A área dentro do círculo é o que vai aparecer na bolinha.</p>
+    <div class="crop-stage" id="crop-stage" onpointerdown="cropStagePointerDown(event)" onpointermove="cropStagePointerMove(event)" onpointerup="cropStagePointerUp(event)" onpointerleave="cropStagePointerUp(event)" onpointercancel="cropStagePointerUp(event)">
+      <img id="crop-img" alt="" draggable="false">
+    </div>
+    <input type="range" id="crop-zoom" class="crop-zoom" min="1" max="3" step="0.01" value="1" oninput="onCropZoomChange()">
+    <div class="panel-actions">
+      <button type="button" class="btn-secondary" onclick="closeCropModal()">Cancelar</button>
+      <button type="button" class="btn-save" onclick="confirmCrop()">Aplicar</button>
+    </div>
+  </div>
+</div>
+
 <div class="save-toast" id="save-toast"></div>
 
 <script>
@@ -1355,6 +1395,8 @@ let editingTrilhaId = null;
 let editingCycleId = null;
 let editingModuleId = null;
 let moduleEtapasDraft = [];
+let moduleImageDataUrl = null;
+let cropState = null;
 let confirmActionFn = null;
 let unidadeEditingId = null;
 let usuarioEditingId = null;
@@ -2441,17 +2483,18 @@ function txCicloHeadHtml(badgeLabel, nome){
     <span class="tx-ciclo-chevron-btn"><svg class="tx-ciclo-chevron" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
   </div>`;
 }
-function txNodesHtml(ci, mods){
+function txNodesHtml(mods){
   return mods.map((m, mIdx) => {
     const st = m.status || 'A iniciar';
     const stClass = st==='Concluído' ? 'done' : (st==='Em andamento' ? 'on' : 'off');
     const label = m.etapa ? m.etapa : `Módulo ${mIdx+1}`;
     const tip = esc([m.nome, m.descricao || ''].filter(Boolean).join(' — '));
     const isSel = m.id === txSelectedModulo;
+    const nodeIconHtml = m.imagem ? `<img src="${esc(m.imagem)}" alt="">` : iconSvg(m.icon || 'layers');
     return `
       <div class="tx-node ${isSel?'selected':''}" data-mod-id="${m.id}" title="${tip}" role="button" tabindex="0" aria-pressed="${isSel}"
         onclick="openTxModuleModal('${m.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTxModuleModal('${m.id}');}">
-        <div class="tx-node-icon">${iconSvg(ci.icon)}<span class="tx-node-status ${stClass}"></span></div>
+        <div class="tx-node-icon">${nodeIconHtml}<span class="tx-node-status ${stClass}"></span></div>
         <span class="tx-node-dot"></span>
         <div class="tx-node-label">${esc(label)}</div>
         <div class="tx-node-name">${esc(m.nome)}</div>
@@ -2483,7 +2526,7 @@ function renderViewTrilhaExtra(){
     return `<div class="tx-ciclo tx-ciclo-transversal">
       <div class="tx-transversal-row">
         <p class="tx-ciclo-heading"><span class="tx-ciclo-eyebrow">Transversal</span><span class="tx-ciclo-sep">|</span><span class="tx-ciclo-name">${esc(ci.nome)}</span></p>
-        <div class="tx-nodes">${txNodesHtml(ci, mods)}</div>
+        <div class="tx-nodes">${txNodesHtml(mods)}</div>
         <span class="tx-ciclo-chevron-btn"><svg class="tx-ciclo-chevron" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
       </div>
     </div>`;
@@ -2494,7 +2537,7 @@ function renderViewTrilhaExtra(){
     totalMods += mods.length;
     return `<div class="tx-ciclo">
       ${txCicloHeadHtml('Ciclo '+(ciIdx+1), ci.nome)}
-      <div class="tx-nodes">${txNodesHtml(ci, mods)}</div>
+      <div class="tx-nodes">${txNodesHtml(mods)}</div>
     </div>`;
   }).join('');
 
@@ -2921,11 +2964,19 @@ function askDeleteTrilha(){
 }
 
 function renderIconPick(){
-  document.getElementById('cf2-icon-pick').innerHTML = ICON_KEYS.map(k=>`<button type="button" class="icon-opt" data-icon="${k}" onclick="pickIcon('${k}')">${iconSvg(k)}</button>`).join('');
+  document.getElementById('mf-icon-pick').innerHTML = ICON_KEYS.map(k=>`<button type="button" class="icon-opt" data-icon="${k}" onclick="pickIcon('${k}')">${iconSvg(k)}</button>`).join('');
 }
-function pickIcon(key){
-  document.querySelectorAll('#cf2-icon-pick .icon-opt').forEach(b=>b.classList.toggle('selected', b.dataset.icon===key));
-  document.getElementById('cf2-icon-pick').dataset.value = key;
+// silent=true só atualiza a seleção visual (usado ao abrir o form pra refletir
+// o valor salvo); um clique do usuário troca pra ícone padrão e descarta a
+// imagem enviada, já que a bolinha só mostra uma coisa por vez.
+function pickIcon(key, silent){
+  const el = document.getElementById('mf-icon-pick');
+  el.querySelectorAll('.icon-opt').forEach(b=>b.classList.toggle('selected', b.dataset.icon===key));
+  el.dataset.value = key;
+  if(!silent){
+    moduleImageDataUrl = null;
+    updateModuleImagePreview();
+  }
 }
 function openCycleModal(id, trilhaIdForNew){
   editingCycleId = id;
@@ -2937,8 +2988,6 @@ function openCycleModal(id, trilhaIdForNew){
   document.getElementById('cf2-tema').value = ci?.tema || '';
   document.getElementById('cf2-ordem').value = ci?.ordem ?? (sortedCiclosOf(ci?.trilhaId||trilhaIdForNew).length+1);
   document.getElementById('cf2-transversal').checked = !!ci?.transversal;
-  renderIconPick();
-  pickIcon(ci?.icon || 'layers');
   document.getElementById('cycle-delete-btn').style.display = ci ? '' : 'none';
   document.getElementById('overlay-cycle').classList.add('show');
   document.getElementById('modal-cycle').classList.add('show');
@@ -2951,7 +3000,6 @@ async function saveCycle(){
   const data = {
     trilhaId, nome, tema: document.getElementById('cf2-tema').value.trim(),
     ordem: parseInt(document.getElementById('cf2-ordem').value)||0,
-    icon: document.getElementById('cf2-icon-pick').dataset.value || 'layers',
     transversal: document.getElementById('cf2-transversal').checked
   };
   if(!db){ toast('Banco indisponível'); return; }
@@ -2988,6 +3036,10 @@ function openModuleForm(id, cicloIdForNew){
   document.getElementById('mf-inicio').value = m?.inicioPrevisto || '';
   document.getElementById('mf-material').value = m?.linkMaterial || '';
   document.getElementById('mf-tem-cronograma').checked = !!m?.temCronograma;
+  renderIconPick();
+  pickIcon(m?.icon || 'layers', true);
+  moduleImageDataUrl = m?.imagem || null;
+  updateModuleImagePreview();
   document.getElementById('module-delete-btn').style.display = m ? '' : 'none';
   moduleEtapasDraft = m ? moduloEtapas.filter(e=>e.moduloId===id).sort((a,b)=>(a.ordem??0)-(b.ordem??0)).map(e=>({...e})) : [];
   switchModuleFormTab('dados');
@@ -3129,6 +3181,8 @@ async function saveModule(){
     inicioPrevisto: document.getElementById('mf-inicio').value.trim(),
     linkMaterial: document.getElementById('mf-material').value.trim(),
     temCronograma,
+    icon: document.getElementById('mf-icon-pick').dataset.value || 'layers',
+    imagem: moduleImageDataUrl || '',
   };
   if(!db){ toast('Banco indisponível'); return; }
   let moduleId = editingModuleId;
@@ -3151,6 +3205,106 @@ async function saveModule(){
   }
 
   closeModuleDrawer(); toast('Módulo salvo');
+}
+
+/* ---------- Imagem da bolinha do módulo (upload + recorte) ---------- */
+const CROP_STAGE_SIZE = 220;
+const CROP_OUTPUT_SIZE = 256;
+function updateModuleImagePreview(){
+  const prev = document.getElementById('mf-img-preview');
+  const removeBtn = document.getElementById('mf-img-remove-btn');
+  if(moduleImageDataUrl){
+    prev.innerHTML = `<img src="${moduleImageDataUrl}" alt="">`;
+    removeBtn.style.display = '';
+  } else {
+    prev.innerHTML = '<span class="mf-img-preview-empty">Sem imagem</span>';
+    removeBtn.style.display = 'none';
+  }
+}
+function removeModuleImage(){
+  moduleImageDataUrl = null;
+  updateModuleImagePreview();
+}
+function onModuleImageSelected(evt){
+  const file = evt.target.files && evt.target.files[0];
+  evt.target.value = '';
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => openCropModal(reader.result);
+  reader.readAsDataURL(file);
+}
+function openCropModal(dataUrl){
+  const img = document.getElementById('crop-img');
+  cropState = { scale: 1, baseScale: 1, offsetX: 0, offsetY: 0, naturalW: 0, naturalH: 0, dragging: false, startX: 0, startY: 0, startOffsetX: 0, startOffsetY: 0 };
+  img.onload = () => {
+    cropState.naturalW = img.naturalWidth;
+    cropState.naturalH = img.naturalHeight;
+    cropState.baseScale = Math.max(CROP_STAGE_SIZE / img.naturalWidth, CROP_STAGE_SIZE / img.naturalHeight);
+    document.getElementById('crop-zoom').value = 1;
+    applyCropTransform();
+  };
+  img.src = dataUrl;
+  document.getElementById('overlay-img-crop').classList.add('show');
+  document.getElementById('modal-img-crop').classList.add('show');
+}
+function closeCropModal(){
+  document.getElementById('overlay-img-crop').classList.remove('show');
+  document.getElementById('modal-img-crop').classList.remove('show');
+  cropState = null;
+}
+function applyCropTransform(){
+  if(!cropState) return;
+  const img = document.getElementById('crop-img');
+  const scale = cropState.baseScale * cropState.scale;
+  const w = cropState.naturalW * scale, h = cropState.naturalH * scale;
+  const maxOffsetX = Math.max(0, (w - CROP_STAGE_SIZE) / 2);
+  const maxOffsetY = Math.max(0, (h - CROP_STAGE_SIZE) / 2);
+  cropState.offsetX = Math.min(maxOffsetX, Math.max(-maxOffsetX, cropState.offsetX));
+  cropState.offsetY = Math.min(maxOffsetY, Math.max(-maxOffsetY, cropState.offsetY));
+  const left = (CROP_STAGE_SIZE - w) / 2 + cropState.offsetX;
+  const top = (CROP_STAGE_SIZE - h) / 2 + cropState.offsetY;
+  img.style.width = w + 'px';
+  img.style.height = h + 'px';
+  img.style.left = left + 'px';
+  img.style.top = top + 'px';
+}
+function onCropZoomChange(){
+  if(!cropState) return;
+  cropState.scale = parseFloat(document.getElementById('crop-zoom').value) || 1;
+  applyCropTransform();
+}
+function cropStagePointerDown(evt){
+  if(!cropState) return;
+  cropState.dragging = true;
+  cropState.startX = evt.clientX; cropState.startY = evt.clientY;
+  cropState.startOffsetX = cropState.offsetX; cropState.startOffsetY = cropState.offsetY;
+  evt.target.setPointerCapture && evt.target.setPointerCapture(evt.pointerId);
+}
+function cropStagePointerMove(evt){
+  if(!cropState || !cropState.dragging) return;
+  cropState.offsetX = cropState.startOffsetX + (evt.clientX - cropState.startX);
+  cropState.offsetY = cropState.startOffsetY + (evt.clientY - cropState.startY);
+  applyCropTransform();
+}
+function cropStagePointerUp(){
+  if(cropState) cropState.dragging = false;
+}
+function confirmCrop(){
+  if(!cropState) return;
+  const img = document.getElementById('crop-img');
+  const scale = cropState.baseScale * cropState.scale;
+  const w = cropState.naturalW * scale, h = cropState.naturalH * scale;
+  const left = (CROP_STAGE_SIZE - w) / 2 + cropState.offsetX;
+  const top = (CROP_STAGE_SIZE - h) / 2 + cropState.offsetY;
+  const factor = CROP_OUTPUT_SIZE / CROP_STAGE_SIZE;
+  const canvas = document.createElement('canvas');
+  canvas.width = CROP_OUTPUT_SIZE; canvas.height = CROP_OUTPUT_SIZE;
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(img, 0, 0, cropState.naturalW, cropState.naturalH, left * factor, top * factor, w * factor, h * factor);
+  moduleImageDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+  updateModuleImagePreview();
+  closeCropModal();
 }
 function askDeleteModule(){
   if(!editingModuleId) return;
