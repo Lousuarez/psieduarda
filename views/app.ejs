@@ -246,11 +246,20 @@ function toggleTheme(){
   :root[data-theme="dark"] .material-btn{ background:var(--verde); color:var(--verde-ink); }
   .material-btn svg{ width:15px; height:15px; }
   .no-material{ font-size:12px; color:var(--ink-faint); font-style:italic; margin-top:14px; }
-  .tema-modulo-card{ border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin-bottom:12px; background:var(--bg-sunken); }
-  .tema-modulo-head{ display:flex; align-items:center; gap:8px; margin-bottom:4px; }
   .tema-modulo-nome{ flex:1; min-width:0; font-weight:700; font-size:13.5px; color:var(--ink); }
-  .tema-modulo-meta{ font-size:11.5px; color:var(--ink-dim); margin-bottom:6px; }
-  .tema-modulo-desc{ margin:0 0 10px; }
+  .tema-modulo-meta{ font-size:11.5px; color:var(--ink-dim); margin-bottom:12px; }
+  .tema-modulo-resumo-list{ display:flex; flex-direction:column; gap:8px; }
+  .tema-modulo-resumo{ appearance:none; width:100%; text-align:left; font-family:var(--font); border:1px solid var(--line); border-radius:12px; padding:12px 34px 12px 14px; background:var(--bg-sunken); cursor:pointer; position:relative; display:block; }
+  .tema-modulo-resumo:hover{ border-color:var(--verde-ink); }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tema-modulo-resumo:hover{ border-color:var(--verde); } }
+  :root[data-theme="dark"] .tema-modulo-resumo:hover{ border-color:var(--verde); }
+  .tema-modulo-resumo-top{ display:flex; align-items:center; gap:8px; }
+  .tema-modulo-resumo-desc{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; margin-top:5px; font-size:12px; line-height:1.45; color:var(--ink-dim); }
+  .tema-modulo-chevron{ position:absolute; right:12px; top:50%; transform:translateY(-50%); width:16px; height:16px; color:var(--ink-faint); }
+  .tx-modal-back{ appearance:none; background:none; border:none; padding:0; margin:0 0 12px; display:flex; align-items:center; gap:4px; font-family:var(--font); font-weight:700; font-size:12px; color:var(--verde-ink); cursor:pointer; }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-modal-back{ color:var(--verde); } }
+  :root[data-theme="dark"] .tx-modal-back{ color:var(--verde); }
+  .tx-modal-back svg{ width:15px; height:15px; }
 
   /* Trilha - Extra: roadmap sequencial por ciclos, sem rolagem lateral (quebra em nova linha) */
   .tx-select-wrap{ display:flex; flex-direction:column; gap:4px; }
@@ -2523,16 +2532,30 @@ function temaStatus(te){
   if(mods.some(m=>m.status==='Concluído' || m.status==='Em andamento')) return 'Em andamento';
   return 'A iniciar';
 }
-function moduloDetailHtml(m){
-  const grp = groupParticipantesByStatus(m.id);
-  return `<div class="tema-modulo-card">
-    <div class="tema-modulo-head">
+// Card resumido (fechado) de um módulo dentro do modal do tema: só título +
+// início da descrição. Clicar troca o conteúdo do modal pro detalhe
+// completo (openTxModuloDetalhe), em vez de expandir tudo de uma vez.
+function temaModuloResumoHtml(m){
+  const shortDesc = stripHtml(m.descricao || '');
+  return `<button type="button" class="tema-modulo-resumo" onclick="openTxModuloDetalhe('${m.temaId}','${m.id}')">
+    <span class="tema-modulo-resumo-top">
       <span class="cat-dot ${catDotClass(m.categoria)}"></span>
       <span class="tema-modulo-nome">${esc(m.nome)}</span>
       <span class="status-pill ${statusPillClass(m.status)}" style="pointer-events:none;">${esc(m.status||'A iniciar')}</span>
-    </div>
-    ${[m.mentor?('Mentor: '+m.mentor):'', m.formato?('Formato: '+m.formato):'', (m.cargaHoraria!==null && m.cargaHoraria!==undefined)?(m.cargaHoraria+'h'):''].filter(Boolean).length ? `<div class="tema-modulo-meta">${[m.mentor?('Mentor: '+m.mentor):'', m.formato?('Formato: '+m.formato):'', (m.cargaHoraria!==null && m.cargaHoraria!==undefined)?(m.cargaHoraria+'h'):''].filter(Boolean).map(esc).join(' · ')}</div>` : ''}
-    ${m.descricao ? `<div class="d-desc tema-modulo-desc">${m.descricao}</div>` : ''}
+    </span>
+    ${shortDesc ? `<span class="tema-modulo-resumo-desc">${esc(shortDesc)}</span>` : ''}
+    <svg class="tema-modulo-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+  </button>`;
+}
+// Corpo com as informações gerais do módulo (mentor/formato/carga horária,
+// descrição completa, cronograma, inscritos, material) — usado quando o
+// usuário clica num módulo resumido e o modal troca pro detalhe dele.
+function moduloDetailBodyHtml(m){
+  const grp = groupParticipantesByStatus(m.id);
+  const metaParts = [m.mentor?('Mentor: '+m.mentor):'', m.formato?('Formato: '+m.formato):'', (m.cargaHoraria!==null && m.cargaHoraria!==undefined)?(m.cargaHoraria+'h'):''].filter(Boolean);
+  return `
+    ${metaParts.length ? `<div class="tema-modulo-meta">${metaParts.map(esc).join(' · ')}</div>` : ''}
+    ${m.descricao ? `<div class="d-desc">${m.descricao}</div>` : '<p class="d-desc" style="font-style:italic;color:var(--ink-faint);">Descrição ainda não cadastrada.</p>'}
     ${cronogramaBlockHtml(m)}
     <div class="people-block">
       <p class="people-label">Inscritos por status (${grp.total})</p>
@@ -2546,8 +2569,24 @@ function moduloDetailHtml(m){
     <a class="material-btn" href="${esc(m.linkMaterial)}" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
       Ver material do módulo
-    </a>` : `<p class="no-material">Material do módulo ainda não disponibilizado</p>`}
-  </div>`;
+    </a>` : `<p class="no-material">Material do módulo ainda não disponibilizado</p>`}`;
+}
+function openTxModuloDetalhe(temaId, moduloId){
+  const m = moduloById(moduloId);
+  if(!m) return;
+  document.getElementById('tx-modal-inner').innerHTML = `
+    <div class="tx-modal-accent lideranca"></div>
+    <button class="tx-modal-close" onclick="closeTxModuleModal()" aria-label="Fechar">×</button>
+    <div class="tx-modal-head">
+      <button type="button" class="tx-modal-back" onclick="openTxTemaModal('${temaId}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
+        Voltar ao tema
+      </button>
+      <p class="d-eyebrow"><span class="d-cat-label ${catDotClass(m.categoria)}">${esc(catLabel(m.categoria))}</span>${m.etapa?' · '+esc(m.etapa):''}</p>
+      <h2 class="d-title">${esc(m.nome)}</h2>
+      <span class="status-pill ${statusPillClass(m.status)}" style="pointer-events:none;">${esc(m.status||'A iniciar')}</span>
+    </div>
+    <div class="tx-modal-body">${moduloDetailBodyHtml(m)}</div>`;
 }
 function openTxTemaModal(id){
   const te = temaById(id);
@@ -2578,7 +2617,9 @@ function openTxTemaModal(id){
         <div><div class="meta-label">Inscritos</div><div class="meta-val">${inscritosUnicos}</div></div>
       </div>
       <div class="section-h" style="margin-top:8px;">Módulos deste tema</div>
-      ${mods.length ? mods.map(moduloDetailHtml).join('') : '<p class="no-material" style="margin-top:0;">Nenhum módulo cadastrado neste tema ainda.</p>'}
+      <div class="tema-modulo-resumo-list">
+        ${mods.length ? mods.map(temaModuloResumoHtml).join('') : '<p class="no-material" style="margin-top:0;">Nenhum módulo cadastrado neste tema ainda.</p>'}
+      </div>
     </div>`;
 
   document.getElementById('overlay-tx-detail').classList.add('show');
