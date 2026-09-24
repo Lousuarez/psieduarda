@@ -32,13 +32,33 @@ CREATE TABLE IF NOT EXISTS ciclos (
 
 -- Rodar de novo é seguro (idempotente) — cobre bancos que já tinham a
 -- tabela "ciclos" criada antes da coluna transversal existir. Um ciclo
--- transversal representa módulos que valem para a trilha inteira, fora da
+-- transversal representa temas que valem para a trilha inteira, fora da
 -- sequência numerada de ciclos (ver renderViewTrilhaExtra no front-end).
 ALTER TABLE ciclos ADD COLUMN IF NOT EXISTS transversal BOOLEAN NOT NULL DEFAULT FALSE;
 
-CREATE TABLE IF NOT EXISTS modulos (
+-- Tema: novo nível entre ciclo e módulo (Trilha > Ciclo > Tema > Módulo).
+-- É o Tema que aparece como "bolinha" na Trilha-Extra agora (não mais o
+-- módulo) — por isso carrega o ícone/imagem, mês, formato e descrição.
+-- "carga_horaria" do tema NÃO é gravada aqui: é sempre calculada como a
+-- soma de modulos.carga_horaria dos módulos do tema (ver GET /api/temas).
+CREATE TABLE IF NOT EXISTS temas (
     id CHAR(18) PRIMARY KEY,
     ciclo_id CHAR(18) NOT NULL,
+    titulo VARCHAR(191) NOT NULL,
+    descricao TEXT,
+    mes VARCHAR(191),
+    formato VARCHAR(191),
+    icon VARCHAR(32) NOT NULL DEFAULT 'layers',
+    imagem MEDIUMTEXT,
+    ordem INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (ciclo_id) REFERENCES ciclos(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS modulos (
+    id CHAR(18) PRIMARY KEY,
+    tema_id CHAR(18) NOT NULL,
     nome VARCHAR(191) NOT NULL,
     etapa VARCHAR(191),
     ordem INT NOT NULL DEFAULT 0,
@@ -48,35 +68,28 @@ CREATE TABLE IF NOT EXISTS modulos (
     mentor VARCHAR(191),
     formato VARCHAR(191),
     publico_alvo VARCHAR(191),
-    carga_horaria VARCHAR(64),
+    carga_horaria DECIMAL(6,2),
     inicio_previsto VARCHAR(64),
     link_material VARCHAR(500),
     tem_cronograma BOOLEAN NOT NULL DEFAULT FALSE,
-    icon VARCHAR(32) NOT NULL DEFAULT 'layers',
-    imagem MEDIUMTEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (ciclo_id) REFERENCES ciclos(id) ON DELETE RESTRICT
+    FOREIGN KEY (tema_id) REFERENCES temas(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Rodar de novo é seguro (idempotente) — cobre bancos que já tinham a
 -- tabela "modulos" criada antes da coluna tem_cronograma existir.
 ALTER TABLE modulos ADD COLUMN IF NOT EXISTS tem_cronograma BOOLEAN NOT NULL DEFAULT FALSE;
 
--- Rodar de novo é seguro (idempotente) — cobre bancos que já tinham a
--- tabela "modulos" criada antes de "icon"/"imagem" existirem. A "bolinha"
--- de um módulo na Trilha-Extra passou a ser parametrizada por módulo (era
--- por ciclo, via ciclos.icon) — "imagem" guarda um data URL (base64) da
--- imagem enviada e recortada pelo usuário; quando vazio, usa o ícone padrão
--- em "icon". Bancos que já tinham módulos antes dessa mudança precisam de
--- um UPDATE avulso (fora deste script) copiando ciclos.icon para
--- modulos.icon, pra não perder a seleção que já existia por ciclo.
-ALTER TABLE modulos ADD COLUMN IF NOT EXISTS icon VARCHAR(32) NOT NULL DEFAULT 'layers';
-ALTER TABLE modulos ADD COLUMN IF NOT EXISTS imagem MEDIUMTEXT;
-
 -- Rodar de novo é seguro — cobre bancos que já tinham "modulos" criada antes
 -- de "Autoconhecimento"/"Inovação" existirem como categoria.
 ALTER TABLE modulos MODIFY COLUMN categoria ENUM('Liderança','Método','Liderança e Método','Autoconhecimento','Inovação') NOT NULL DEFAULT 'Liderança';
+
+-- NOTA: a migração de "modulos.ciclo_id" (+ "icon"/"imagem", que voltaram a
+-- não existir em módulo) para "modulos.tema_id" é destrutiva e não cabe
+-- num ALTER idempotente — foi feita via script avulso (rebuild-trilhas),
+-- que também apaga toda a estrutura de trilhas/ciclos/temas/módulos antes
+-- de recriar (preserva colaboradores/unidades/usuários).
 
 -- Cronograma de etapas de um módulo (opcional — só usado quando
 -- modulos.tem_cronograma = TRUE). Cada etapa tem seu próprio período e
