@@ -736,8 +736,12 @@ function toggleTheme(){
     </div>
 
     <nav class="sidebar-nav" aria-label="Navegação principal">
-      <div class="nav-group">
-        <p class="nav-group-label">Visão geral</p>
+      <div class="nav-group open" id="navgroup-visao-geral">
+        <button class="nav-group-toggle" onclick="toggleNavGroup('visao-geral')" aria-expanded="true" aria-controls="navgroup-visao-geral-list">
+          <span class="nav-group-label">Visão geral</span>
+          <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+        </button>
+        <div class="nav-group-list" id="navgroup-visao-geral-list"><div>
         <button class="nav-item active" id="navv-colab" aria-current="page" onclick="navTo('view','colaborador')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a5 5 0 0 1 5-5h6a5 5 0 0 1 5 5v1"/></svg>
           Colaboradores
@@ -750,6 +754,7 @@ function toggleTheme(){
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5 11 13.5 15 9"/><rect x="3.5" y="4.5" width="17" height="16" rx="2.2"/><path d="M3.5 9.5h17"/></svg>
           Frequência
         </button>
+        </div></div>
       </div>
 
       <div class="nav-group" id="navgroup-cadastros">
