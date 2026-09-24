@@ -464,6 +464,11 @@ function toggleTheme(){
   .progress-cycle-head .progress-cycle-title{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .progress-cycle-count{ font-size:11px; font-weight:700; color:var(--ink-dim); white-space:nowrap; flex-shrink:0; }
   .progress-bar-outer-sm{ height:4px; margin-top:6px; }
+  .progress-tema-group{ margin-top:12px; padding-left:12px; border-left:2px solid var(--line); }
+  .progress-tema-group:first-of-type{ margin-top:14px; }
+  .progress-tema-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .progress-tema-title{ font-size:10.5px; font-weight:700; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.03em; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .progress-tema-count{ font-size:10px; font-weight:700; color:var(--ink-faint); white-space:nowrap; flex-shrink:0; }
   .prog-list{ margin-top:10px; }
   .prog-row-sm{ padding:6px 0; gap:8px; min-width:0; }
   .prog-row-sm .prog-name{ flex:1; min-width:0; font-size:12.5px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -890,7 +895,7 @@ function toggleTheme(){
           <div class="window-head">
             <div>
               <p class="window-title">Frequência</p>
-              <p class="window-sub">Filtre pela data da aula (ou navegue por trilha/ciclo/módulo) e faça a chamada da etapa.</p>
+              <p class="window-sub">Filtre pela data da aula (ou navegue por trilha/ciclo/tema/módulo) e faça a chamada da etapa.</p>
             </div>
           </div>
           <div class="window-body" style="padding-bottom:0;">
@@ -906,6 +911,10 @@ function toggleTheme(){
               <div class="tx-select-wrap">
                 <label for="freq-ciclo-select" class="tx-select-label">Ciclo</label>
                 <select id="freq-ciclo-select" onchange="selectFreqCiclo(this.value)"></select>
+              </div>
+              <div class="tx-select-wrap">
+                <label for="freq-tema-select" class="tx-select-label">Tema</label>
+                <select id="freq-tema-select" onchange="selectFreqTema(this.value)"></select>
               </div>
               <div class="tx-select-wrap">
                 <label for="freq-modulo-select" class="tx-select-label">Módulo</label>
@@ -950,6 +959,10 @@ function toggleTheme(){
                 <select id="relfreq-ciclo-select" onchange="selectRelfreqCiclo(this.value)"></select>
               </div>
               <div class="tx-select-wrap">
+                <label for="relfreq-tema-select" class="tx-select-label">Tema</label>
+                <select id="relfreq-tema-select" onchange="selectRelfreqTema(this.value)"></select>
+              </div>
+              <div class="tx-select-wrap">
                 <label for="relfreq-modulo-select" class="tx-select-label">Módulo</label>
                 <select id="relfreq-modulo-select" onchange="selectRelfreqModulo(this.value)"></select>
               </div>
@@ -961,7 +974,7 @@ function toggleTheme(){
           </div>
           <div class="window-body">
             <div class="reg-toolbar">
-              <input type="text" id="relfreq-search" class="reg-search" placeholder="Buscar por trilha, módulo ou etapa…" oninput="renderRelatorioFrequencia(this.value)">
+              <input type="text" id="relfreq-search" class="reg-search" placeholder="Buscar por trilha, tema, módulo ou etapa…" oninput="renderRelatorioFrequencia(this.value)">
             </div>
             <div id="relfreq-list"></div>
           </div>
@@ -973,7 +986,7 @@ function toggleTheme(){
           <div class="window-head">
             <div>
               <p class="window-title">Frequência por colaborador</p>
-              <p class="window-sub">Frequência de cada colaborador nas aulas já fechadas — geral e detalhada por trilha, ciclo e módulo.</p>
+              <p class="window-sub">Frequência de cada colaborador nas aulas já fechadas — geral e detalhada por trilha, ciclo, tema e módulo.</p>
             </div>
           </div>
           <div class="window-body">
@@ -1047,7 +1060,7 @@ function toggleTheme(){
               <p class="window-sub">Registro completo da equipe — consulte, filtre e edite cada colaborador.</p>
             </div>
             <div style="display:flex; gap:8px;">
-              <button class="btn-secondary" onclick="exportEstadoAtual()" title="Baixa uma planilha com trilha, ciclo, módulo e status de cada colaborador"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M12 3v12m0 0-4-4m4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>Exportar</button>
+              <button class="btn-secondary" onclick="exportEstadoAtual()" title="Baixa uma planilha com trilha, ciclo, tema, módulo e status de cada colaborador"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M12 3v12m0 0-4-4m4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>Exportar</button>
               <button class="reg-new-btn" onclick="openColabForm(null)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Novo colaborador</button>
             </div>
           </div>
@@ -1513,11 +1526,13 @@ let txSelectedTema = null;
 let freqData = new Date().toISOString().slice(0,10);
 let freqTrilhaId = '';
 let freqCicloId = '';
+let freqTemaId = '';
 let freqModuloId = null;
 let freqEtapaId = null;
 let relfreqData = '';
 let relfreqTrilhaId = '';
 let relfreqCicloId = '';
+let relfreqTemaId = '';
 let relfreqModuloId = '';
 let relfreqEtapaId = '';
 const relfreqVersoesCache = {};
@@ -1839,15 +1854,16 @@ function renderViewColabList(filter){
 function selectColabView(id){ colabSelected = id; renderViewColabDetail(); renderViewColabList(document.getElementById('vcolab-search').value); }
 
 function colabEnrolledTrilhas(c){
-  // Todos os módulos dos ciclos das trilhas em que a pessoa está matriculada —
-  // sem progresso registrado, o módulo aparece como "Não iniciado" (ver render abaixo).
+  // Todos os módulos (agrupados por tema) dos ciclos das trilhas em que a
+  // pessoa está matriculada — sem progresso registrado, o módulo aparece
+  // como "Não iniciado" (ver render abaixo).
   return (c.trilhaIds||[]).map(tid=>{
     const t = trilhaById(tid); if(!t) return null;
-    const ciclosComMods = sortedCiclosOf(tid).map(ci=>{
-      const mods = temasOf(ci.id).flatMap(te=>modulosOf(te.id));
-      return {ci, mods};
-    }).filter(x=>x.mods.length);
-    return ciclosComMods.length ? {t, ciclosComMods} : null;
+    const ciclosComTemas = sortedCiclosOf(tid).map(ci=>{
+      const temasCom = temasOf(ci.id).map(te=>({te, mods: modulosOf(te.id)})).filter(x=>x.mods.length);
+      return {ci, temasCom};
+    }).filter(x=>x.temasCom.length);
+    return ciclosComTemas.length ? {t, ciclosComTemas} : null;
   }).filter(Boolean);
 }
 
@@ -1858,7 +1874,7 @@ function renderViewColabDetail(){
   if(!c){ el.innerHTML = '<div class="empty-state">Selecione um colaborador na lista.</div>'; return; }
   const unidadeNome = unidadeById(c.unidadeId)?.nome || '—';
   const enrolled = colabEnrolledTrilhas(c);
-  const allMods = enrolled.flatMap(({ciclosComMods})=>ciclosComMods.flatMap(x=>x.mods));
+  const allMods = enrolled.flatMap(({ciclosComTemas})=>ciclosComTemas.flatMap(ci=>ci.temasCom.flatMap(x=>x.mods)));
   const done = allMods.filter(m=>progressoDoc(c.id,m.id)?.status==='Concluído').length;
   const pct = allMods.length ? Math.round(done/allMods.length*100) : 0;
 
@@ -1887,8 +1903,8 @@ function renderViewColabDetail(){
   if(!enrolled.length){
     html += `<p style="font-size:12.5px;color:var(--ink-dim);">Ainda não está inserido em nenhuma trilha.</p>`;
   } else {
-    enrolled.forEach(({t, ciclosComMods}) => {
-      const modsT = ciclosComMods.flatMap(x=>x.mods);
+    enrolled.forEach(({t, ciclosComTemas}) => {
+      const modsT = ciclosComTemas.flatMap(ci=>ci.temasCom.flatMap(x=>x.mods));
       const doneT = modsT.filter(m=>progressoDoc(c.id,m.id)?.status==='Concluído').length;
       const pctT = modsT.length ? Math.round(doneT/modsT.length*100) : 0;
       html += `<div class="progress-group">
@@ -1898,29 +1914,38 @@ function renderViewColabDetail(){
           <span class="progress-group-stat-label">${doneT}/${modsT.length} módulos concluídos</span>
         </div>
         <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:${pctT}%"></div></div>`;
-      ciclosComMods.forEach(({ci, mods}) => {
-        const withStatus = mods.map(m => ({m, st: progressoDoc(c.id, m.id)?.status || 'Não iniciado'}));
-        const emAndamento = withStatus.filter(x=>x.st==='Em andamento');
-        const concluidos = withStatus.filter(x=>x.st==='Concluído');
-        const naoIniciados = withStatus.filter(x=>x.st==='Não iniciado');
-        const doneCi = concluidos.length;
+      ciclosComTemas.forEach(({ci, temasCom}) => {
+        const mods = temasCom.flatMap(x=>x.mods);
+        const doneCi = mods.filter(m=>progressoDoc(c.id,m.id)?.status==='Concluído').length;
         const pctCi = mods.length ? Math.round(doneCi/mods.length*100) : 0;
-        const groupId = `pmore-${c.id}-${ci.id}`;
         html += `<div class="progress-cycle-card">
           <div class="progress-cycle-head">
             <span class="progress-cycle-title">${esc(ci.nome)}</span>
             <span class="progress-cycle-count">${doneCi}/${mods.length}</span>
           </div>
-          <div class="progress-bar-outer progress-bar-outer-sm"><div class="progress-bar-inner" style="width:${pctCi}%"></div></div>
-          <div class="prog-list">`;
-        [...emAndamento, ...concluidos].forEach(({m, st}) => { html += vcolabProgRow(m, st); });
-        if(naoIniciados.length){
-          html += `<button type="button" class="prog-toggle-more" onclick="toggleProgMore('${groupId}')" id="${groupId}-btn">+ mostrar ${naoIniciados.length} não iniciado${naoIniciados.length>1?'s':''}</button>
-          <div class="prog-more-list" id="${groupId}" style="display:none">`;
-          naoIniciados.forEach(({m, st}) => { html += vcolabProgRow(m, st); });
-          html += `</div>`;
-        }
-        html += `</div></div>`;
+          <div class="progress-bar-outer progress-bar-outer-sm"><div class="progress-bar-inner" style="width:${pctCi}%"></div></div>`;
+        temasCom.forEach(({te, mods: modsTe}) => {
+          const withStatus = modsTe.map(m => ({m, st: progressoDoc(c.id, m.id)?.status || 'Não iniciado'}));
+          const emAndamento = withStatus.filter(x=>x.st==='Em andamento');
+          const concluidos = withStatus.filter(x=>x.st==='Concluído');
+          const naoIniciados = withStatus.filter(x=>x.st==='Não iniciado');
+          const groupId = `pmore-${c.id}-${te.id}`;
+          html += `<div class="progress-tema-group">
+            <div class="progress-tema-head">
+              <span class="progress-tema-title">${esc(te.titulo)}</span>
+              <span class="progress-tema-count">${concluidos.length}/${modsTe.length}</span>
+            </div>
+            <div class="prog-list">`;
+          [...emAndamento, ...concluidos].forEach(({m, st}) => { html += vcolabProgRow(m, st); });
+          if(naoIniciados.length){
+            html += `<button type="button" class="prog-toggle-more" onclick="toggleProgMore('${groupId}')" id="${groupId}-btn">+ mostrar ${naoIniciados.length} não iniciado${naoIniciados.length>1?'s':''}</button>
+            <div class="prog-more-list" id="${groupId}" style="display:none">`;
+            naoIniciados.forEach(({m, st}) => { html += vcolabProgRow(m, st); });
+            html += `</div>`;
+          }
+          html += `</div></div>`;
+        });
+        html += `</div>`;
       });
       html += `</div>`;
     });
@@ -1962,8 +1987,9 @@ function formatDateHora(dt){
   return d.toLocaleDateString('pt-BR') + ' às ' + d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
 }
 function selectFreqData(v){ freqData = v; freqModuloId = null; freqEtapaId = null; renderFrequenciaView(); }
-function selectFreqTrilha(id){ freqTrilhaId = id; freqCicloId = ''; freqModuloId = null; freqEtapaId = null; renderFrequenciaView(); }
-function selectFreqCiclo(id){ freqCicloId = id; freqModuloId = null; freqEtapaId = null; renderFrequenciaView(); }
+function selectFreqTrilha(id){ freqTrilhaId = id; freqCicloId = ''; freqTemaId = ''; freqModuloId = null; freqEtapaId = null; renderFrequenciaView(); }
+function selectFreqCiclo(id){ freqCicloId = id; freqTemaId = ''; freqModuloId = null; freqEtapaId = null; renderFrequenciaView(); }
+function selectFreqTema(id){ freqTemaId = id; freqModuloId = null; freqEtapaId = null; renderFrequenciaView(); }
 function selectFreqModulo(id){ freqModuloId = id; freqEtapaId = null; renderFrequenciaView(); }
 function selectFreqEtapa(id){ freqEtapaId = id; renderFrequenciaView(); }
 
@@ -1971,10 +1997,11 @@ function renderFrequenciaView(){
   const dataInput = document.getElementById('freq-data-input');
   const trilhaSel = document.getElementById('freq-trilha-select');
   const cicloSel = document.getElementById('freq-ciclo-select');
+  const temaSel = document.getElementById('freq-tema-select');
   const modSel = document.getElementById('freq-modulo-select');
   const etSel = document.getElementById('freq-etapa-select');
   const content = document.getElementById('freq-content');
-  if(!dataInput || !trilhaSel || !cicloSel || !modSel || !etSel || !content) return;
+  if(!dataInput || !trilhaSel || !cicloSel || !temaSel || !modSel || !etSel || !content) return;
   if(!currentUserIsAdmin){ content.innerHTML = '<div class="empty-state">Somente administradores podem realizar a chamada.</div>'; return; }
   if(dbUnavailable){ content.innerHTML = '<div class="empty-state">Este visualizador não tem acesso ao banco de dados do artifact.</div>'; return; }
   if(!isLoaded('modulos') || !isLoaded('temas') || !isLoaded('ciclos') || !isLoaded('trilhas') || !isLoaded('modulo-etapas') || !isLoaded('progresso') || !isLoaded('colaboradores') || !isLoaded('modulo-frequencia') || !isLoaded('modulo-etapa-chamada')){
@@ -1997,7 +2024,14 @@ function renderFrequenciaView(){
   cicloSel.innerHTML = '<option value="">(todos os ciclos)</option>' + cicloOptions.map(c=>`<option value="${esc(c.id)}" ${c.id===freqCicloId?'selected':''}>${esc(c.nome)}</option>`).join('');
 
   const modsAfterCiclo = freqCicloId ? modsAfterTrilha.filter(m=>cicloOfModulo(m)?.id===freqCicloId) : modsAfterTrilha;
-  const moduloOptions = [...modsAfterCiclo].sort((a,b)=>{
+
+  const temaIdsElig = [...new Set(modsAfterCiclo.map(m=>m.temaId).filter(Boolean))];
+  const temaOptions = temaIdsElig.map(id=>temaById(id)).filter(Boolean).sort((a,b)=>a.titulo.localeCompare(b.titulo));
+  if(freqTemaId && !temaOptions.find(t=>t.id===freqTemaId)) freqTemaId = '';
+  temaSel.innerHTML = '<option value="">(todos os temas)</option>' + temaOptions.map(t=>`<option value="${esc(t.id)}" ${t.id===freqTemaId?'selected':''}>${esc(t.titulo)}</option>`).join('');
+
+  const modsAfterTema = freqTemaId ? modsAfterCiclo.filter(m=>m.temaId===freqTemaId) : modsAfterCiclo;
+  const moduloOptions = [...modsAfterTema].sort((a,b)=>{
     const ta = cicloOfModulo(a), tb = cicloOfModulo(b);
     return (trilhaById(ta?.trilhaId)?.nome||'').localeCompare(trilhaById(tb?.trilhaId)?.nome||'') || (a.ordem??0)-(b.ordem??0);
   });
@@ -2122,8 +2156,9 @@ async function marcarTodosFrequencia(presente){
 
 /* ================= RELATÓRIOS: Frequência ================= */
 function selectRelfreqData(v){ relfreqData = v; relfreqModuloId = ''; relfreqEtapaId = ''; renderRelatorioFrequencia(document.getElementById('relfreq-search')?.value); }
-function selectRelfreqTrilha(id){ relfreqTrilhaId = id; relfreqCicloId = ''; relfreqModuloId = ''; relfreqEtapaId = ''; renderRelatorioFrequencia(document.getElementById('relfreq-search')?.value); }
-function selectRelfreqCiclo(id){ relfreqCicloId = id; relfreqModuloId = ''; relfreqEtapaId = ''; renderRelatorioFrequencia(document.getElementById('relfreq-search')?.value); }
+function selectRelfreqTrilha(id){ relfreqTrilhaId = id; relfreqCicloId = ''; relfreqTemaId = ''; relfreqModuloId = ''; relfreqEtapaId = ''; renderRelatorioFrequencia(document.getElementById('relfreq-search')?.value); }
+function selectRelfreqCiclo(id){ relfreqCicloId = id; relfreqTemaId = ''; relfreqModuloId = ''; relfreqEtapaId = ''; renderRelatorioFrequencia(document.getElementById('relfreq-search')?.value); }
+function selectRelfreqTema(id){ relfreqTemaId = id; relfreqModuloId = ''; relfreqEtapaId = ''; renderRelatorioFrequencia(document.getElementById('relfreq-search')?.value); }
 function selectRelfreqModulo(id){ relfreqModuloId = id; relfreqEtapaId = ''; renderRelatorioFrequencia(document.getElementById('relfreq-search')?.value); }
 function selectRelfreqEtapa(id){ relfreqEtapaId = id; renderRelatorioFrequencia(document.getElementById('relfreq-search')?.value); }
 
@@ -2132,9 +2167,10 @@ function renderRelatorioFrequencia(filter){
   const dataInput = document.getElementById('relfreq-data-input');
   const trilhaSel = document.getElementById('relfreq-trilha-select');
   const cicloSel = document.getElementById('relfreq-ciclo-select');
+  const temaSel = document.getElementById('relfreq-tema-select');
   const modSel = document.getElementById('relfreq-modulo-select');
   const etSel = document.getElementById('relfreq-etapa-select');
-  if(!el || !dataInput || !trilhaSel || !cicloSel || !modSel || !etSel) return;
+  if(!el || !dataInput || !trilhaSel || !cicloSel || !temaSel || !modSel || !etSel) return;
   if(dbUnavailable){ el.innerHTML = '<div class="empty-state">Este visualizador não tem acesso ao banco de dados do artifact.</div>'; return; }
   if(!isLoaded('modulo-etapa-chamada') || !isLoaded('modulo-etapas') || !isLoaded('modulos') || !isLoaded('temas') || !isLoaded('ciclos') || !isLoaded('trilhas')){
     el.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando…</div>'; return;
@@ -2145,10 +2181,11 @@ function renderRelatorioFrequencia(filter){
   const base = moduloChamadas.filter(c => c.versoesCount > 0).map(c => {
     const e = moduloEtapas.find(x=>x.id===c.etapaId);
     const m = e ? moduloById(e.moduloId) : null;
-    const ci = m ? cicloOfModulo(m) : null;
+    const te = m ? temaById(m.temaId) : null;
+    const ci = te ? cicloById(te.cicloId) : null;
     const t = ci ? trilhaById(ci.trilhaId) : null;
-    return { chamada: c, etapa: e, modulo: m, ciclo: ci, trilha: t };
-  }).filter(r => r.etapa && r.modulo && r.ciclo && r.trilha);
+    return { chamada: c, etapa: e, modulo: m, tema: te, ciclo: ci, trilha: t };
+  }).filter(r => r.etapa && r.modulo && r.tema && r.ciclo && r.trilha);
 
   const afterData = base.filter(r => etapaMatchesDate(r.etapa, relfreqData));
 
@@ -2162,11 +2199,16 @@ function renderRelatorioFrequencia(filter){
   cicloSel.innerHTML = '<option value="">(todos os ciclos)</option>' + cicloOptions.map(c=>`<option value="${esc(c.id)}" ${c.id===relfreqCicloId?'selected':''}>${esc(c.nome)}</option>`).join('');
 
   const afterCiclo = relfreqCicloId ? afterTrilha.filter(r=>r.ciclo.id===relfreqCicloId) : afterTrilha;
-  const moduloOptions = [...new Map(afterCiclo.map(r=>[r.modulo.id, r.modulo])).values()].sort((a,b)=>a.nome.localeCompare(b.nome));
+  const temaOptions = [...new Map(afterCiclo.map(r=>[r.tema.id, r.tema])).values()].sort((a,b)=>a.titulo.localeCompare(b.titulo));
+  if(relfreqTemaId && !temaOptions.find(t=>t.id===relfreqTemaId)) relfreqTemaId = '';
+  temaSel.innerHTML = '<option value="">(todos os temas)</option>' + temaOptions.map(t=>`<option value="${esc(t.id)}" ${t.id===relfreqTemaId?'selected':''}>${esc(t.titulo)}</option>`).join('');
+
+  const afterTema = relfreqTemaId ? afterCiclo.filter(r=>r.tema.id===relfreqTemaId) : afterCiclo;
+  const moduloOptions = [...new Map(afterTema.map(r=>[r.modulo.id, r.modulo])).values()].sort((a,b)=>a.nome.localeCompare(b.nome));
   if(relfreqModuloId && !moduloOptions.find(m=>m.id===relfreqModuloId)) relfreqModuloId = '';
   modSel.innerHTML = '<option value="">(todos os módulos)</option>' + moduloOptions.map(m=>`<option value="${esc(m.id)}" ${m.id===relfreqModuloId?'selected':''}>${esc(m.nome)}</option>`).join('');
 
-  const afterModulo = relfreqModuloId ? afterCiclo.filter(r=>r.modulo.id===relfreqModuloId) : afterCiclo;
+  const afterModulo = relfreqModuloId ? afterTema.filter(r=>r.modulo.id===relfreqModuloId) : afterTema;
   const etapaOptions = [...new Map(afterModulo.map(r=>[r.etapa.id, r.etapa])).values()].sort((a,b)=>(a.ordem??0)-(b.ordem??0));
   if(relfreqEtapaId && !etapaOptions.find(e=>e.id===relfreqEtapaId)) relfreqEtapaId = '';
   etSel.innerHTML = '<option value="">(todas as etapas)</option>' + etapaOptions.map(e=>`<option value="${esc(e.id)}" ${e.id===relfreqEtapaId?'selected':''}>${esc(e.nome)}${e.dataInicio?' · '+formatDateBR(e.dataInicio):''}</option>`).join('');
@@ -2175,7 +2217,7 @@ function renderRelatorioFrequencia(filter){
 
   const f = norm(filter||'');
   if(f){
-    registros = registros.filter(r => norm(r.trilha.nome).includes(f) || norm(r.ciclo.nome).includes(f) || norm(r.modulo.nome).includes(f) || norm(r.etapa.nome).includes(f));
+    registros = registros.filter(r => norm(r.trilha.nome).includes(f) || norm(r.ciclo.nome).includes(f) || norm(r.tema.titulo).includes(f) || norm(r.modulo.nome).includes(f) || norm(r.etapa.nome).includes(f));
   }
   registros.sort((a,b) => new Date(b.chamada.fechadaEm||0) - new Date(a.chamada.fechadaEm||0));
 
@@ -2189,7 +2231,7 @@ function renderRelatorioFrequencia(filter){
     return `<div class="relfreq-row">
       <div class="relfreq-row-head" onclick="toggleRelfreqRow('${r.etapa.id}')">
         <div class="relfreq-row-main">
-          <div class="reg-row-title">${esc(r.trilha?.nome||'—')} / ${esc(r.modulo?.nome||'—')} — ${esc(r.etapa.nome)}</div>
+          <div class="reg-row-title">${esc(r.trilha?.nome||'—')} / ${esc(r.tema?.titulo||'—')} / ${esc(r.modulo?.nome||'—')} — ${esc(r.etapa.nome)}</div>
           <div class="reg-row-sub">${r.etapa.dataInicio?formatDateBR(r.etapa.dataInicio)+' · ':''}${r.chamada.status==='fechada'?'Fechada':'Reaberta (em edição)'} em ${formatDateHora(r.chamada.fechadaEm)}${r.chamada.fechadaPor?' por '+esc(r.chamada.fechadaPor):''}${r.chamada.versoesCount>1?' · '+r.chamada.versoesCount+' versões':''}</div>
         </div>
         <span class="btn-ghost-sm" style="pointer-events:none;">${isOpen?'▲':'▼'}</span>
@@ -2297,10 +2339,11 @@ function renderRelfreqColabDetail(){
   const registros = relfreqColabPresencas.filter(p=>p.colaboradorId===c.id).map(p=>{
     const e = moduloEtapas.find(x=>x.id===p.etapaId);
     const m = e ? moduloById(e.moduloId) : null;
-    const ci = m ? cicloOfModulo(m) : null;
+    const te = m ? temaById(m.temaId) : null;
+    const ci = te ? cicloById(te.cicloId) : null;
     const t = ci ? trilhaById(ci.trilhaId) : null;
-    return { etapa: e, modulo: m, ciclo: ci, trilha: t, presente: p.presente };
-  }).filter(r => r.etapa && r.modulo && r.ciclo && r.trilha);
+    return { etapa: e, modulo: m, tema: te, ciclo: ci, trilha: t, presente: p.presente };
+  }).filter(r => r.etapa && r.modulo && r.tema && r.ciclo && r.trilha);
 
   const total = registros.length;
   const presentes = registros.filter(r=>r.presente).length;
@@ -2350,19 +2393,33 @@ function renderRelfreqColabDetail(){
           <span class="progress-cycle-title">${esc(ciclo.nome)}</span>
           <span class="progress-cycle-count">${pCi}/${regsCi.length}</span>
         </div>
-        <div class="progress-bar-outer progress-bar-outer-sm"><div class="progress-bar-inner" style="width:${pctCi}%"></div></div>
-        <div class="prog-list">`;
+        <div class="progress-bar-outer progress-bar-outer-sm"><div class="progress-bar-inner" style="width:${pctCi}%"></div></div>`;
 
-      const modsMap = new Map();
-      regsCi.forEach(r => { if(!modsMap.has(r.modulo.id)) modsMap.set(r.modulo.id, { modulo:r.modulo, regs:[] }); modsMap.get(r.modulo.id).regs.push(r); });
-      [...modsMap.values()].sort((a,b)=>a.modulo.nome.localeCompare(b.modulo.nome)).forEach(({modulo, regs: regsMod}) => {
-        const pMod = regsMod.filter(r=>r.presente).length;
-        html += `<div class="prog-row"><span class="prog-name">${esc(modulo.nome)}</span><span class="status-pill ${pMod===regsMod.length?'done':(pMod===0?'off':'on')}" style="pointer-events:none;">${pMod}/${regsMod.length}</span></div>`;
-        [...regsMod].sort((a,b)=>(a.etapa.ordem??0)-(b.etapa.ordem??0)).forEach(r => {
-          html += `<div class="prog-row prog-row-sm"><span class="prog-name">${esc(r.etapa.nome)}${r.etapa.dataInicio?' · '+formatDateBR(r.etapa.dataInicio):''}</span><span class="status-pill ${r.presente?'done':'off'}" style="pointer-events:none;">${r.presente?'Presente':'Ausente'}</span></div>`;
+      const temasMap = new Map();
+      regsCi.forEach(r => { if(!temasMap.has(r.tema.id)) temasMap.set(r.tema.id, { tema:r.tema, regs:[] }); temasMap.get(r.tema.id).regs.push(r); });
+      [...temasMap.values()].sort((a,b)=>(a.tema.ordem??0)-(b.tema.ordem??0) || a.tema.titulo.localeCompare(b.tema.titulo)).forEach(({tema, regs: regsTe}) => {
+        const pTe = regsTe.filter(r=>r.presente).length;
+        const pctTe = regsTe.length ? Math.round(pTe/regsTe.length*100) : 0;
+        html += `<div class="progress-tema-group">
+          <div class="progress-tema-head">
+            <span class="progress-tema-title">${esc(tema.titulo)}${tema.mes?' · '+esc(tema.mes):''}</span>
+            <span class="progress-tema-count">${pTe}/${regsTe.length}</span>
+          </div>
+          <div class="progress-bar-outer progress-bar-outer-sm"><div class="progress-bar-inner" style="width:${pctTe}%"></div></div>
+          <div class="prog-list">`;
+
+        const modsMap = new Map();
+        regsTe.forEach(r => { if(!modsMap.has(r.modulo.id)) modsMap.set(r.modulo.id, { modulo:r.modulo, regs:[] }); modsMap.get(r.modulo.id).regs.push(r); });
+        [...modsMap.values()].sort((a,b)=>a.modulo.nome.localeCompare(b.modulo.nome)).forEach(({modulo, regs: regsMod}) => {
+          const pMod = regsMod.filter(r=>r.presente).length;
+          html += `<div class="prog-row"><span class="prog-name">${esc(modulo.nome)}</span><span class="status-pill ${pMod===regsMod.length?'done':(pMod===0?'off':'on')}" style="pointer-events:none;">${pMod}/${regsMod.length}</span></div>`;
+          [...regsMod].sort((a,b)=>(a.etapa.ordem??0)-(b.etapa.ordem??0)).forEach(r => {
+            html += `<div class="prog-row prog-row-sm"><span class="prog-name">${esc(r.etapa.nome)}${r.etapa.dataInicio?' · '+formatDateBR(r.etapa.dataInicio):''}</span><span class="status-pill ${r.presente?'done':'off'}" style="pointer-events:none;">${r.presente?'Presente':'Ausente'}</span></div>`;
+          });
         });
+        html += `</div></div>`;
       });
-      html += `</div></div>`;
+      html += `</div>`;
     });
     html += `</div>`;
   });
