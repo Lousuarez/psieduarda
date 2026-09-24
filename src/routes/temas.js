@@ -1,19 +1,10 @@
 const express = require('express');
-const sanitizeHtml = require('sanitize-html');
+const { sanitizeDescricao } = require('../sanitizeDescricao');
 const { pool, genId } = require('../db');
 const asyncHandler = require('../asyncHandler');
 const { logAudit } = require('../audit');
 
 const router = express.Router();
-
-function sanitizeDescricao(html) {
-  return sanitizeHtml(html || '', {
-    allowedTags: ['b', 'strong', 'i', 'em', 'u', 'ul', 'ol', 'li', 'p', 'br', 'a'],
-    allowedAttributes: { a: ['href', 'target', 'rel'] },
-    allowedSchemes: ['http', 'https', 'mailto'],
-    transformTags: { a: sanitizeHtml.simpleTransform('a', { target: '_blank', rel: 'noopener noreferrer' }) },
-  });
-}
 
 // "cargaHoraria" nunca é gravada em temas — é sempre a soma de
 // modulos.carga_horaria dos módulos deste tema (ver pedido do usuário:
