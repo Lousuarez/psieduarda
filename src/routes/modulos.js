@@ -1,9 +1,23 @@
 const express = require('express');
+const sanitizeHtml = require('sanitize-html');
 const { pool, genId } = require('../db');
 const asyncHandler = require('../asyncHandler');
 const { logAudit } = require('../audit');
 
 const router = express.Router();
+
+// A descrição do módulo é editada num rich text (negrito, itálico, listas)
+// no front-end e chega aqui como HTML — sempre sanitiza antes de gravar,
+// já que esse HTML depois é injetado sem escape nas telas que exibem o
+// módulo (inclusive a página pública "Minha Trilha").
+function sanitizeDescricao(html) {
+  return sanitizeHtml(html || '', {
+    allowedTags: ['b', 'strong', 'i', 'em', 'u', 'ul', 'ol', 'li', 'p', 'br', 'a'],
+    allowedAttributes: { a: ['href', 'target', 'rel'] },
+    allowedSchemes: ['http', 'https', 'mailto'],
+    transformTags: { a: sanitizeHtml.simpleTransform('a', { target: '_blank', rel: 'noopener noreferrer' }) },
+  });
+}
 
 function toApi(row) {
   return {
@@ -69,6 +83,8 @@ router.post('/', asyncHandler(async (req, res) => {
       vals.push(!!req.body[apiKey]);
     } else if (apiKey === 'icon') {
       vals.push(req.body[apiKey] || 'layers');
+    } else if (apiKey === 'descricao') {
+      vals.push(sanitizeDescricao(req.body[apiKey]));
     } else {
       vals.push(req.body[apiKey] !== undefined ? cast(req.body[apiKey]) : '');
     }
@@ -90,7 +106,9 @@ router.put('/:id', asyncHandler(async (req, res) => {
   for (const [apiKey, col, cast] of FIELDS) {
     if (req.body[apiKey] === undefined) continue;
     sets.push(`${col} = ?`);
-    vals.push(apiKey === 'ordem' ? Number(req.body[apiKey]) : cast(req.body[apiKey]));
+    if (apiKey === 'ordem') vals.push(Number(req.body[apiKey]));
+    else if (apiKey === 'descricao') vals.push(sanitizeDescricao(req.body[apiKey]));
+    else vals.push(cast(req.body[apiKey]));
   }
   if (sets.length) {
     vals.push(id);

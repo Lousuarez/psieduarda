@@ -629,6 +629,21 @@ function toggleTheme(){
   .crop-stage:active{ cursor:grabbing; }
   .crop-stage img{ position:absolute; left:0; top:0; max-width:none; user-select:none; pointer-events:none; }
   .crop-zoom{ display:block; width:100%; margin:4px 0 0; }
+  .rte-toolbar{ display:flex; align-items:center; gap:4px; margin-bottom:6px; }
+  .rte-btn{ appearance:none; border:1px solid var(--line); background:var(--bg); border-radius:6px; min-width:28px; height:26px; padding:0 6px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:12px; font-weight:700; color:var(--ink-dim); font-family:var(--font); }
+  .rte-btn:hover{ background:var(--bg-sunken); color:var(--ink); }
+  .rte-btn-italic{ font-style:italic; }
+  .rte-btn-underline{ text-decoration:underline; }
+  .rte-sep{ width:1px; height:18px; background:var(--line); margin:0 2px; }
+  .rte-editor{ min-height:90px; max-height:280px; overflow-y:auto; border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-family:var(--font); font-size:13px; line-height:1.55; background:var(--bg); color:var(--ink); }
+  .rte-editor:focus{ outline:2px solid var(--verde-ink); outline-offset:-1px; }
+  .rte-editor:empty::before{ content:attr(data-placeholder); color:var(--ink-faint); }
+  .rte-editor p{ margin:0 0 8px; }
+  .rte-editor p:last-child{ margin-bottom:0; }
+  .rte-editor ul, .rte-editor ol{ margin:4px 0; padding-left:22px; }
+  .d-desc ul, .d-desc ol, .modal-desc ul, .modal-desc ol{ margin:6px 0; padding-left:22px; }
+  .d-desc p, .modal-desc p{ margin:0 0 8px; }
+  .d-desc p:last-child, .modal-desc p:last-child{ margin-bottom:0; }
   .panel-actions{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
   .form-tabs{ display:flex; gap:18px; margin:0 0 20px; border-bottom:1px solid var(--line); }
   .form-tab{ appearance:none; background:none; border:none; cursor:pointer; font-family:var(--font); font-weight:700; font-size:12.5px; color:var(--ink-dim); padding:0 0 10px; border-bottom:2px solid transparent; }
@@ -1277,7 +1292,18 @@ function toggleTheme(){
             <div class="field"><label for="mf-categoria">Categoria</label><select id="mf-categoria"><option>Liderança</option><option>Método</option><option>Liderança e Método</option><option>Autoconhecimento</option><option>Inovação</option></select></div>
             <div class="field"><label for="mf-status">Status da turma</label><select id="mf-status"><option>A iniciar</option><option>Em andamento</option><option>Concluído</option></select></div>
           </div>
-          <div class="field"><label for="mf-desc">Descrição</label><textarea id="mf-desc"></textarea></div>
+          <div class="field">
+            <label for="mf-desc">Descrição</label>
+            <div class="rte-toolbar">
+              <button type="button" class="rte-btn" title="Negrito" onmousedown="event.preventDefault()" onclick="rteExec('bold')"><b>B</b></button>
+              <button type="button" class="rte-btn rte-btn-italic" title="Itálico" onmousedown="event.preventDefault()" onclick="rteExec('italic')"><i>I</i></button>
+              <button type="button" class="rte-btn rte-btn-underline" title="Sublinhado" onmousedown="event.preventDefault()" onclick="rteExec('underline')"><u>S</u></button>
+              <span class="rte-sep"></span>
+              <button type="button" class="rte-btn" title="Lista com tópicos" onmousedown="event.preventDefault()" onclick="rteExec('insertUnorderedList')">☰•</button>
+              <button type="button" class="rte-btn" title="Lista numerada" onmousedown="event.preventDefault()" onclick="rteExec('insertOrderedList')">☰1</button>
+            </div>
+            <div class="rte-editor" id="mf-desc" contenteditable="true" data-placeholder="Descreva o módulo…"></div>
+          </div>
           <div class="field-row">
             <div class="field"><label for="mf-mentor">Mentor(es)</label><input type="text" id="mf-mentor"></div>
             <div class="field"><label for="mf-formato">Formato</label><input type="text" id="mf-formato"></div>
@@ -1429,6 +1455,7 @@ const loadedCols = new Set();
 function isLoaded(name){ return dbUnavailable || loadedCols.has(name); }
 
 function esc(s){ return (s ?? '').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function stripHtml(html){ const d = document.createElement('div'); d.innerHTML = html ?? ''; return d.textContent || ''; }
 function norm(s){ return (s ?? '').toString().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase(); }
 function toast(msg){ const t = document.getElementById('save-toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove('show'), 2000); }
 
@@ -2433,7 +2460,7 @@ function openTxModuleModal(id){
       <span class="status-pill ${statusPillClass(m.status)}" style="pointer-events:none;">${esc(m.status||'A iniciar')}</span>
     </div>
     <div class="tx-modal-body">
-      ${m.descricao ? `<p class="d-desc">${esc(m.descricao)}</p>` : '<p class="d-desc" style="font-style:italic;color:var(--ink-faint);">Descrição ainda não cadastrada.</p>'}
+      ${m.descricao ? `<div class="d-desc">${m.descricao}</div>` : '<p class="d-desc" style="font-style:italic;color:var(--ink-faint);">Descrição ainda não cadastrada.</p>'}
       <div class="meta-grid">
         <div><div class="meta-label">Formato</div><div class="meta-val">${m.formato?esc(m.formato):'—'}</div></div>
         <div><div class="meta-label">Mentor</div><div class="meta-val">${m.mentor?esc(m.mentor):'—'}</div></div>
@@ -2488,7 +2515,7 @@ function txNodesHtml(mods){
     const st = m.status || 'A iniciar';
     const stClass = st==='Concluído' ? 'done' : (st==='Em andamento' ? 'on' : 'off');
     const label = m.etapa ? m.etapa : `Módulo ${mIdx+1}`;
-    const tip = esc([m.nome, m.descricao || ''].filter(Boolean).join(' — '));
+    const tip = esc([m.nome, stripHtml(m.descricao || '')].filter(Boolean).join(' — '));
     const isSel = m.id === txSelectedModulo;
     const nodeIconHtml = m.imagem ? `<img src="${esc(m.imagem)}" alt="">` : iconSvg(m.icon || 'layers');
     return `
@@ -3017,6 +3044,14 @@ function askDeleteCycle(){
   });
 }
 
+function rteExec(cmd){
+  document.getElementById('mf-desc').focus();
+  document.execCommand(cmd, false, null);
+}
+function getModuleDescHtml(){
+  const el = document.getElementById('mf-desc');
+  return (el.textContent || '').trim() ? el.innerHTML.trim() : '';
+}
 function openModuleForm(id, cicloIdForNew){
   editingModuleId = id;
   const m = id ? moduloById(id) : null;
@@ -3028,7 +3063,7 @@ function openModuleForm(id, cicloIdForNew){
   document.getElementById('mf-nome').value = m?.nome || '';
   document.getElementById('mf-categoria').value = m?.categoria || 'Liderança';
   document.getElementById('mf-status').value = m?.status || 'A iniciar';
-  document.getElementById('mf-desc').value = m?.descricao || '';
+  document.getElementById('mf-desc').innerHTML = m?.descricao || '';
   document.getElementById('mf-mentor').value = m?.mentor || '';
   document.getElementById('mf-formato').value = m?.formato || '';
   document.getElementById('mf-publico').value = m?.publicoAlvo || '';
@@ -3173,7 +3208,7 @@ async function saveModule(){
     ordem: parseInt(document.getElementById('mf-ordem').value)||0,
     categoria: document.getElementById('mf-categoria').value,
     status: document.getElementById('mf-status').value,
-    descricao: document.getElementById('mf-desc').value.trim(),
+    descricao: getModuleDescHtml(),
     mentor: document.getElementById('mf-mentor').value.trim(),
     formato: document.getElementById('mf-formato').value.trim(),
     publicoAlvo: document.getElementById('mf-publico').value.trim(),
