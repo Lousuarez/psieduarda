@@ -6,6 +6,7 @@ const ENTIDADE_LABELS = {
   unidade: 'Cadastros Gerais · Unidades',
   trilha: 'Cadastro de Trilhas',
   ciclo: 'Cadastro de Ciclos',
+  tema: 'Cadastro de Temas',
   modulo: 'Cadastro de Módulos',
   moduloEtapa: 'Cadastro de Módulos · Cronograma',
   moduloFrequencia: 'Frequência',

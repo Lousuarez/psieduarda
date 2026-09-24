@@ -12,6 +12,7 @@ router.get('/', asyncHandler(async (req, res) => {
   const [unidades] = await pool.query('SELECT * FROM unidades');
   const [trilhas] = await pool.query('SELECT * FROM trilhas ORDER BY ordem');
   const [ciclos] = await pool.query('SELECT * FROM ciclos ORDER BY ordem');
+  const [temas] = await pool.query('SELECT * FROM temas ORDER BY ordem');
   const [modulos] = await pool.query('SELECT * FROM modulos ORDER BY ordem');
   const [colaboradores] = await pool.query('SELECT * FROM colaboradores ORDER BY nome');
   const [matriculas] = await pool.query('SELECT * FROM colaborador_trilhas');
@@ -21,8 +22,10 @@ router.get('/', asyncHandler(async (req, res) => {
   const trilhaById = Object.fromEntries(trilhas.map((t) => [t.id, t]));
   const ciclosByTrilha = {};
   ciclos.forEach((ci) => { (ciclosByTrilha[ci.trilha_id] ||= []).push(ci); });
-  const modulosByCiclo = {};
-  modulos.forEach((m) => { (modulosByCiclo[m.ciclo_id] ||= []).push(m); });
+  const temasByCiclo = {};
+  temas.forEach((te) => { (temasByCiclo[te.ciclo_id] ||= []).push(te); });
+  const modulosByTema = {};
+  modulos.forEach((m) => { (modulosByTema[m.tema_id] ||= []).push(m); });
   const trilhaIdsByColab = {};
   matriculas.forEach((mt) => { (trilhaIdsByColab[mt.colaborador_id] ||= []).push(mt.trilha_id); });
   const statusByColabModulo = {};
@@ -35,25 +38,28 @@ router.get('/', asyncHandler(async (req, res) => {
       const t = trilhaById[tid];
       if (!t) continue;
       for (const ci of ciclosByTrilha[tid] || []) {
-        for (const m of modulosByCiclo[ci.id] || []) {
-          rows.push({
-            Colaborador: c.nome,
-            Unidade: unidadeById[c.unidade_id]?.nome || '',
-            Trilha: t.nome,
-            Ciclo: ci.nome,
-            'Status do colaborador': statusByColabModulo[`${c.id}|${m.id}`] || 'Não iniciado',
-            Módulo: m.nome,
-            Categoria: m.categoria,
-            Descrição: m.descricao || '',
-            Mentor: m.mentor || '',
-            Formato: m.formato || '',
-            'Público-alvo': m.publico_alvo || '',
-            'Carga horária': m.carga_horaria || '',
-            'Status do módulo': m.status,
-            Ordem: m.ordem,
-            'Link do material (PDF)': m.link_material || '',
-            'Início previsto': m.inicio_previsto || '',
-          });
+        for (const te of temasByCiclo[ci.id] || []) {
+          for (const m of modulosByTema[te.id] || []) {
+            rows.push({
+              Colaborador: c.nome,
+              Unidade: unidadeById[c.unidade_id]?.nome || '',
+              Trilha: t.nome,
+              Ciclo: ci.nome,
+              Tema: te.titulo,
+              'Status do colaborador': statusByColabModulo[`${c.id}|${m.id}`] || 'Não iniciado',
+              Módulo: m.nome,
+              Categoria: m.categoria,
+              Descrição: m.descricao || '',
+              Mentor: m.mentor || '',
+              Formato: m.formato || '',
+              'Público-alvo': m.publico_alvo || '',
+              'Carga horária': m.carga_horaria ?? '',
+              'Status do módulo': m.status,
+              Ordem: m.ordem,
+              'Link do material (PDF)': m.link_material || '',
+              'Início previsto': m.inicio_previsto || '',
+            });
+          }
         }
       }
     }
@@ -95,10 +101,12 @@ router.get('/frequencia', asyncHandler(async (req, res) => {
   presencas.forEach((p) => { (presencasByVersao[p.versao_id] ||= []).push(p); });
 
   const [modulos] = await pool.query('SELECT * FROM modulos');
+  const [temas] = await pool.query('SELECT * FROM temas');
   const [ciclos] = await pool.query('SELECT * FROM ciclos');
   const [trilhas] = await pool.query('SELECT * FROM trilhas');
   const [colaboradores] = await pool.query('SELECT * FROM colaboradores');
   const moduloById = Object.fromEntries(modulos.map((m) => [m.id, m]));
+  const temaById = Object.fromEntries(temas.map((te) => [te.id, te]));
   const cicloById = Object.fromEntries(ciclos.map((c) => [c.id, c]));
   const trilhaById = Object.fromEntries(trilhas.map((t) => [t.id, t]));
   const colabById = Object.fromEntries(colaboradores.map((c) => [c.id, c]));
@@ -106,7 +114,8 @@ router.get('/frequencia', asyncHandler(async (req, res) => {
   const rows = [];
   for (const v of versoes) {
     const m = moduloById[v.modulo_id];
-    const ci = m ? cicloById[m.ciclo_id] : null;
+    const te = m ? temaById[m.tema_id] : null;
+    const ci = te ? cicloById[te.ciclo_id] : null;
     const t = ci ? trilhaById[ci.trilha_id] : null;
     const lista = presencasByVersao[v.id] || [];
     for (const p of lista) {
@@ -114,6 +123,7 @@ router.get('/frequencia', asyncHandler(async (req, res) => {
       rows.push({
         Trilha: t?.nome || '',
         Ciclo: ci?.nome || '',
+        Tema: te?.titulo || '',
         Módulo: m?.nome || '',
         Etapa: v.etapa_nome,
         'Data da etapa': v.data_inicio ? new Date(v.data_inicio).toLocaleDateString('pt-BR') : '',

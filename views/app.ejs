@@ -246,6 +246,20 @@ function toggleTheme(){
   :root[data-theme="dark"] .material-btn{ background:var(--verde); color:var(--verde-ink); }
   .material-btn svg{ width:15px; height:15px; }
   .no-material{ font-size:12px; color:var(--ink-faint); font-style:italic; margin-top:14px; }
+  .tema-modulo-nome{ flex:1; min-width:0; font-weight:700; font-size:13.5px; color:var(--ink); }
+  .tema-modulo-meta{ font-size:11.5px; color:var(--ink-dim); margin-bottom:12px; }
+  .tema-modulo-resumo-list{ display:flex; flex-direction:column; gap:8px; }
+  .tema-modulo-resumo{ appearance:none; width:100%; text-align:left; font-family:var(--font); border:1px solid var(--line); border-radius:12px; padding:12px 34px 12px 14px; background:var(--bg-sunken); cursor:pointer; position:relative; display:block; }
+  .tema-modulo-resumo:hover{ border-color:var(--verde-ink); }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tema-modulo-resumo:hover{ border-color:var(--verde); } }
+  :root[data-theme="dark"] .tema-modulo-resumo:hover{ border-color:var(--verde); }
+  .tema-modulo-resumo-top{ display:flex; align-items:center; gap:8px; }
+  .tema-modulo-resumo-desc{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; margin-top:5px; font-size:12px; line-height:1.45; color:var(--ink-dim); }
+  .tema-modulo-chevron{ position:absolute; right:12px; top:50%; transform:translateY(-50%); width:16px; height:16px; color:var(--ink-faint); }
+  .tx-modal-back{ appearance:none; background:none; border:none; padding:0; margin:0 0 12px; display:flex; align-items:center; gap:4px; font-family:var(--font); font-weight:700; font-size:12px; color:var(--verde-ink); cursor:pointer; }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tx-modal-back{ color:var(--verde); } }
+  :root[data-theme="dark"] .tx-modal-back{ color:var(--verde); }
+  .tx-modal-back svg{ width:15px; height:15px; }
 
   /* Trilha - Extra: roadmap sequencial por ciclos, sem rolagem lateral (quebra em nova linha) */
   .tx-select-wrap{ display:flex; flex-direction:column; gap:4px; }
@@ -629,6 +643,21 @@ function toggleTheme(){
   .crop-stage:active{ cursor:grabbing; }
   .crop-stage img{ position:absolute; left:0; top:0; max-width:none; user-select:none; pointer-events:none; }
   .crop-zoom{ display:block; width:100%; margin:4px 0 0; }
+  .rte-toolbar{ display:flex; align-items:center; gap:4px; margin-bottom:6px; }
+  .rte-btn{ appearance:none; border:1px solid var(--line); background:var(--bg); border-radius:6px; min-width:28px; height:26px; padding:0 6px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:12px; font-weight:700; color:var(--ink-dim); font-family:var(--font); }
+  .rte-btn:hover{ background:var(--bg-sunken); color:var(--ink); }
+  .rte-btn-italic{ font-style:italic; }
+  .rte-btn-underline{ text-decoration:underline; }
+  .rte-sep{ width:1px; height:18px; background:var(--line); margin:0 2px; }
+  .rte-editor{ min-height:90px; max-height:280px; overflow-y:auto; border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-family:var(--font); font-size:13px; line-height:1.55; background:var(--bg); color:var(--ink); }
+  .rte-editor:focus{ outline:2px solid var(--verde-ink); outline-offset:-1px; }
+  .rte-editor:empty::before{ content:attr(data-placeholder); color:var(--ink-faint); }
+  .rte-editor p{ margin:0 0 8px; }
+  .rte-editor p:last-child{ margin-bottom:0; }
+  .rte-editor ul, .rte-editor ol{ margin:4px 0; padding-left:22px; }
+  .d-desc ul, .d-desc ol, .modal-desc ul, .modal-desc ol{ margin:6px 0; padding-left:22px; }
+  .d-desc p, .modal-desc p{ margin:0 0 8px; }
+  .d-desc p:last-child, .modal-desc p:last-child{ margin-bottom:0; }
   .panel-actions{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
   .form-tabs{ display:flex; gap:18px; margin:0 0 20px; border-bottom:1px solid var(--line); }
   .form-tab{ appearance:none; background:none; border:none; cursor:pointer; font-family:var(--font); font-weight:700; font-size:12.5px; color:var(--ink-dim); padding:0 0 10px; border-bottom:2px solid transparent; }
@@ -733,6 +762,7 @@ function toggleTheme(){
           <div class="nav-submenu-list" id="navsub-manage-trilhas-list"><div>
             <button class="nav-item nav-subitem" id="navm-trilhas" onclick="navTo('manage','trilhas')">Trilhas</button>
             <button class="nav-item nav-subitem" id="navm-ciclos" onclick="navTo('manage','ciclos')">Ciclos</button>
+            <button class="nav-item nav-subitem" id="navm-temas" onclick="navTo('manage','temas')">Temas</button>
             <button class="nav-item nav-subitem" id="navm-modulos" onclick="navTo('manage','modulos')">Módulos</button>
           </div></div>
         </div>
@@ -1088,6 +1118,24 @@ function toggleTheme(){
         </div>
       </div>
 
+      <div class="view" id="view-m-temas">
+        <div class="window">
+          <div class="window-head">
+            <div>
+              <p class="window-title">Cadastro de temas</p>
+              <p class="window-sub">Localize um tema para editar, ou cadastre um novo.</p>
+            </div>
+            <button class="reg-new-btn" onclick="openTemaForm(null)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Novo tema</button>
+          </div>
+          <div class="window-body">
+            <div class="reg-toolbar">
+              <input type="text" class="reg-search" id="temas-search" placeholder="Localizar tema…" oninput="renderCadastroTemas(this.value)">
+            </div>
+            <div class="reg-list" id="temas-reg-list"></div>
+          </div>
+        </div>
+      </div>
+
       <div class="view" id="view-m-modulos">
         <div class="window">
           <div class="window-head">
@@ -1250,6 +1298,57 @@ function toggleTheme(){
   </div>
 </div>
 
+<!-- Modal: tema -->
+<div class="overlay" id="overlay-tema" onclick="closeTemaForm()"></div>
+<div class="modal-center" id="modal-tema" onclick="if(event.target===this) closeTemaForm();">
+  <div class="modal-box">
+    <div class="panel-head"><h3 id="tema-form-title">Tema</h3><button class="panel-close" onclick="closeTemaForm()">×</button></div>
+    <div class="field"><label for="tf2-ciclo">Ciclo</label><select id="tf2-ciclo"></select></div>
+    <div class="field"><label for="tf2-titulo">Título</label><input type="text" id="tf2-titulo" placeholder="Ex.: Comunicação e feedback"></div>
+    <div class="field-row">
+      <div class="field"><label for="tf2-mes">Mês</label><input type="text" id="tf2-mes" placeholder="Ex.: Mês 1"></div>
+      <div class="field"><label for="tf2-formato">Formato</label><input type="text" id="tf2-formato" placeholder="Ex.: Live + material"></div>
+    </div>
+    <div class="field"><label for="tf2-ordem">Ordem</label><input type="number" id="tf2-ordem" step="1"></div>
+    <div class="field">
+      <label for="tf-desc">Descrição</label>
+      <div class="rte-toolbar">
+        <button type="button" class="rte-btn" title="Negrito" onmousedown="event.preventDefault()" onclick="rteExec('tf-desc','bold')"><b>B</b></button>
+        <button type="button" class="rte-btn rte-btn-italic" title="Itálico" onmousedown="event.preventDefault()" onclick="rteExec('tf-desc','italic')"><i>I</i></button>
+        <button type="button" class="rte-btn rte-btn-underline" title="Sublinhado" onmousedown="event.preventDefault()" onclick="rteExec('tf-desc','underline')"><u>S</u></button>
+        <span class="rte-sep"></span>
+        <button type="button" class="rte-btn" title="Lista com tópicos" onmousedown="event.preventDefault()" onclick="rteExec('tf-desc','insertUnorderedList')">☰•</button>
+        <button type="button" class="rte-btn" title="Lista numerada" onmousedown="event.preventDefault()" onclick="rteExec('tf-desc','insertOrderedList')">☰1</button>
+      </div>
+      <div class="rte-editor" id="tf-desc" contenteditable="true" data-placeholder="Descreva o tema…"></div>
+    </div>
+    <div class="field">
+      <label>Imagem da bolinha (Trilha)</label>
+      <div class="icon-pick" id="tf-icon-pick"></div>
+      <div class="mf-img-row">
+        <div class="mf-img-preview" id="tf-img-preview"><span class="mf-img-preview-empty">Sem imagem</span></div>
+        <div class="mf-img-actions">
+          <label class="btn-secondary mf-img-upload-btn">Enviar imagem<input type="file" accept="image/*" id="tf-img-input" style="display:none;" onchange="onTemaImageSelected(event)"></label>
+          <button type="button" class="btn-ghost-sm" id="tf-img-remove-btn" style="display:none;" onclick="removeTemaImage()">Remover imagem</button>
+        </div>
+      </div>
+      <p class="field-hint">Escolha um ícone padrão ou envie uma imagem própria para substituir a bolinha deste tema na Trilha.</p>
+    </div>
+    <div class="field" id="tema-carga-row" style="display:none;">
+      <label>Carga horária / módulos</label>
+      <p class="field-hint" id="tf-carga-val" style="margin:0;">—</p>
+      <p class="field-hint" style="margin:2px 0 0;">Calculada automaticamente somando a carga horária dos módulos deste tema — edite pelo cadastro de Módulos.</p>
+    </div>
+    <div class="panel-actions">
+      <button type="button" class="btn-danger" id="tema-delete-btn" onclick="askDeleteTema()">Excluir tema</button>
+      <div style="display:flex;gap:8px;">
+        <button type="button" class="btn-secondary" onclick="closeTemaForm()">Cancelar</button>
+        <button type="button" class="btn-save" onclick="saveTema()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Drawer: módulo -->
 <div class="overlay" id="overlay-module" onclick="closeModuleDrawer()"></div>
 <div class="modal-center" id="modal-module" onclick="if(event.target===this) closeModuleDrawer();">
@@ -1267,7 +1366,7 @@ function toggleTheme(){
     <div class="colab-modal-body">
       <div class="form-tab-panel active" id="mftab-panel-dados">
         <form onsubmit="return false;">
-          <div class="field"><label for="mf-ciclo">Ciclo</label><select id="mf-ciclo"></select></div>
+          <div class="field"><label for="mf-tema">Tema</label><select id="mf-tema"></select></div>
           <div class="field-row">
             <div class="field"><label for="mf-etapa">Etapa (ex.: Mês 1)</label><input type="text" id="mf-etapa"></div>
             <div class="field"><label for="mf-ordem">Ordem</label><input type="number" id="mf-ordem" step="1"></div>
@@ -1277,29 +1376,28 @@ function toggleTheme(){
             <div class="field"><label for="mf-categoria">Categoria</label><select id="mf-categoria"><option>Liderança</option><option>Método</option><option>Liderança e Método</option><option>Autoconhecimento</option><option>Inovação</option></select></div>
             <div class="field"><label for="mf-status">Status da turma</label><select id="mf-status"><option>A iniciar</option><option>Em andamento</option><option>Concluído</option></select></div>
           </div>
-          <div class="field"><label for="mf-desc">Descrição</label><textarea id="mf-desc"></textarea></div>
+          <div class="field">
+            <label for="mf-desc">Descrição</label>
+            <div class="rte-toolbar">
+              <button type="button" class="rte-btn" title="Negrito" onmousedown="event.preventDefault()" onclick="rteExec('mf-desc','bold')"><b>B</b></button>
+              <button type="button" class="rte-btn rte-btn-italic" title="Itálico" onmousedown="event.preventDefault()" onclick="rteExec('mf-desc','italic')"><i>I</i></button>
+              <button type="button" class="rte-btn rte-btn-underline" title="Sublinhado" onmousedown="event.preventDefault()" onclick="rteExec('mf-desc','underline')"><u>S</u></button>
+              <span class="rte-sep"></span>
+              <button type="button" class="rte-btn" title="Lista com tópicos" onmousedown="event.preventDefault()" onclick="rteExec('mf-desc','insertUnorderedList')">☰•</button>
+              <button type="button" class="rte-btn" title="Lista numerada" onmousedown="event.preventDefault()" onclick="rteExec('mf-desc','insertOrderedList')">☰1</button>
+            </div>
+            <div class="rte-editor" id="mf-desc" contenteditable="true" data-placeholder="Descreva o módulo…"></div>
+          </div>
           <div class="field-row">
             <div class="field"><label for="mf-mentor">Mentor(es)</label><input type="text" id="mf-mentor"></div>
             <div class="field"><label for="mf-formato">Formato</label><input type="text" id="mf-formato"></div>
           </div>
           <div class="field-row">
             <div class="field"><label for="mf-publico">Público-alvo</label><input type="text" id="mf-publico"></div>
-            <div class="field"><label for="mf-carga">Carga horária</label><input type="text" id="mf-carga"></div>
+            <div class="field"><label for="mf-carga">Carga horária (h)</label><input type="number" id="mf-carga" step="0.5" min="0" placeholder="Ex.: 4"></div>
           </div>
           <div class="field"><label for="mf-inicio">Início previsto</label><input type="text" id="mf-inicio"></div>
           <div class="field"><label for="mf-material">Link do material</label><input type="text" id="mf-material" placeholder="https://…"></div>
-          <div class="field">
-            <label>Imagem da bolinha (Trilha)</label>
-            <div class="icon-pick" id="mf-icon-pick"></div>
-            <div class="mf-img-row">
-              <div class="mf-img-preview" id="mf-img-preview"><span class="mf-img-preview-empty">Sem imagem</span></div>
-              <div class="mf-img-actions">
-                <label class="btn-secondary mf-img-upload-btn">Enviar imagem<input type="file" accept="image/*" id="mf-img-input" style="display:none;" onchange="onModuleImageSelected(event)"></label>
-                <button type="button" class="btn-ghost-sm" id="mf-img-remove-btn" style="display:none;" onclick="removeModuleImage()">Remover imagem</button>
-              </div>
-            </div>
-            <p class="field-hint">Escolha um ícone padrão ou envie uma imagem própria para substituir a bolinha deste módulo na Trilha.</p>
-          </div>
           <label class="field-check"><input type="checkbox" id="mf-tem-cronograma" onchange="toggleCronogramaTab()"> Informar cronograma?</label>
         </form>
       </div>
@@ -1385,7 +1483,7 @@ function warnSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="current
 
 /* ---------- State ---------- */
 let db = null;
-let unidades = [], trilhas = [], ciclos = [], modulos = [], colaboradores = [], progresso = [], usuarios = [], moduloEtapas = [], moduloFrequencia = [], moduloChamadas = [];
+let unidades = [], trilhas = [], ciclos = [], temas = [], modulos = [], colaboradores = [], progresso = [], usuarios = [], moduloEtapas = [], moduloFrequencia = [], moduloChamadas = [];
 let dbUnavailable = false;
 let currentMode = 'view';
 let currentTab = 'colaborador';
@@ -1393,9 +1491,10 @@ let colabSelected = null;
 let editingColabId = null;
 let editingTrilhaId = null;
 let editingCycleId = null;
+let editingTemaId = null;
 let editingModuleId = null;
 let moduleEtapasDraft = [];
-let moduleImageDataUrl = null;
+let temaImageDataUrl = null;
 let cropState = null;
 let confirmActionFn = null;
 let unidadeEditingId = null;
@@ -1410,7 +1509,7 @@ function applyAdminVisibility(){
   if(!currentUserIsAdmin && currentMode==='reports' && currentTab==='auditoria') navTo('reports','frequencia');
 }
 let trilhaExtraSelected = null;
-let txSelectedModulo = null;
+let txSelectedTema = null;
 let freqData = new Date().toISOString().slice(0,10);
 let freqTrilhaId = '';
 let freqCicloId = '';
@@ -1429,6 +1528,7 @@ const loadedCols = new Set();
 function isLoaded(name){ return dbUnavailable || loadedCols.has(name); }
 
 function esc(s){ return (s ?? '').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function stripHtml(html){ const d = document.createElement('div'); d.innerHTML = html ?? ''; return d.textContent || ''; }
 function norm(s){ return (s ?? '').toString().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase(); }
 function toast(msg){ const t = document.getElementById('save-toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove('show'), 2000); }
 
@@ -1497,6 +1597,7 @@ async function boot(){
   db.collection('unidades').onSnapshot(s => { unidades = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('unidades'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
   db.collection('trilhas').onSnapshot(s => { trilhas = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('trilhas'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
   db.collection('ciclos').onSnapshot(s => { ciclos = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('ciclos'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
+  db.collection('temas').onSnapshot(s => { temas = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('temas'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
   db.collection('modulos').onSnapshot(s => { modulos = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('modulos'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
   db.collection('modulo-etapas').onSnapshot(s => { moduloEtapas = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('modulo-etapas'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
   db.collection('modulo-frequencia').onSnapshot(s => { moduloFrequencia = s.docs.map(d=>({id:d.id, ...d.data()})); loadedCols.add('modulo-frequencia'); renderAll(); }, ()=>{ dbUnavailable = true; renderAll(); });
@@ -1514,13 +1615,21 @@ async function boot(){
 /* ---------- Derived helpers ---------- */
 function sortedTrilhas(){ return [...trilhas].sort((a,b)=>(a.ordem??0)-(b.ordem??0) || (a.nome||'').localeCompare(b.nome||'')); }
 function sortedCiclosOf(trilhaId){ return ciclos.filter(c=>c.trilhaId===trilhaId).sort((a,b)=>(a.ordem??0)-(b.ordem??0)); }
-function modulosOf(cicloId){ return modulos.filter(m=>m.cicloId===cicloId).sort((a,b)=>(a.ordem??0)-(b.ordem??0)); }
+function temasOf(cicloId){ return temas.filter(t=>t.cicloId===cicloId).sort((a,b)=>(a.ordem??0)-(b.ordem??0)); }
+function modulosOf(temaId){ return modulos.filter(m=>m.temaId===temaId).sort((a,b)=>(a.ordem??0)-(b.ordem??0)); }
 function cicloById(id){ return ciclos.find(c=>c.id===id); }
+function temaById(id){ return temas.find(t=>t.id===id); }
 function trilhaById(id){ return trilhas.find(t=>t.id===id); }
 function unidadeById(id){ return unidades.find(u=>u.id===id); }
 function moduloById(id){ return modulos.find(m=>m.id===id); }
+function cicloOfTema(tema){ return tema ? cicloById(tema.cicloId) : undefined; }
+function cicloOfModulo(m){ return cicloOfTema(temaById(m?.temaId)); }
 function progressoDoc(colabId, modId){ return progresso.find(p=>p.colaboradorId===colabId && p.moduloId===modId); }
-function modulosDaTrilha(trilhaId){ const cids = ciclos.filter(c=>c.trilhaId===trilhaId).map(c=>c.id); return modulos.filter(m=>cids.includes(m.cicloId)); }
+function modulosDaTrilha(trilhaId){
+  const cids = ciclos.filter(c=>c.trilhaId===trilhaId).map(c=>c.id);
+  const teids = temas.filter(t=>cids.includes(t.cicloId)).map(t=>t.id);
+  return modulos.filter(m=>teids.includes(m.temaId));
+}
 function catDotClass(cat){ if(cat==='Liderança') return 'lideranca'; if(cat==='Método') return 'metodo'; if(cat==='Autoconhecimento') return 'autoconhecimento'; if(cat==='Inovação') return 'inovacao'; return 'ambos'; }
 function statusPillClass(status){ if(status==='Concluído') return 'done'; if(status==='Em andamento') return 'on'; return 'off'; }
 function nextStatus(status){ if(status==='Não iniciado' || !status) return 'Em andamento'; if(status==='Em andamento') return 'Concluído'; return 'Não iniciado'; }
@@ -1544,6 +1653,7 @@ function renderAll(){
     if(currentTab==='colaborador') renderManageColabTable();
     if(currentTab==='trilhas') renderTrilhas(document.getElementById('trilhas-search')?.value);
     if(currentTab==='ciclos') renderCadastroCiclos(document.getElementById('ciclos-search')?.value);
+    if(currentTab==='temas') renderCadastroTemas(document.getElementById('temas-search')?.value);
     if(currentTab==='modulos') renderCadastroModulos(document.getElementById('modulos-search')?.value);
     if(currentTab==='unidades') renderUnidades();
     if(currentTab==='usuarios') renderUsuarios();
@@ -1561,7 +1671,7 @@ function renderDashboard(){
   const el = document.getElementById('dash-grid');
   if(!el) return;
   if(dbUnavailable){ el.innerHTML = '<p class="dash-empty">Banco de dados indisponível.</p>'; return; }
-  if(!isLoaded('colaboradores') || !isLoaded('progresso') || !isLoaded('modulos')){
+  if(!isLoaded('colaboradores') || !isLoaded('progresso') || !isLoaded('modulos') || !isLoaded('temas') || !isLoaded('ciclos')){
     el.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando…</div>'; return;
   }
 
@@ -1581,7 +1691,7 @@ function renderDashboard(){
     if(!mods.length) return '';
     let slots = 0, done = 0;
     mods.forEach(m => {
-      const ci = ciclos.find(x=>x.id===m.cicloId);
+      const ci = cicloOfModulo(m);
       const enrolled = ci ? colaboradores.filter(c => (c.trilhaIds||[]).includes(ci.trilhaId)) : [];
       slots += enrolled.length;
       done += enrolled.filter(c => progresso.some(p=>p.colaboradorId===c.id && p.moduloId===m.id && p.status==='Concluído')).length;
@@ -1644,12 +1754,12 @@ function renderFoot(){
 
 const NAV_IDS = {
   view: {colaborador:'navv-colab', trilhaExtra:'navv-trilhaExtra', frequencia:'navv-frequencia'},
-  manage: {colaborador:'navm-colab', trilhas:'navm-trilhas', ciclos:'navm-ciclos', modulos:'navm-modulos', unidades:'navm-unidades', usuarios:'navm-usuarios'},
+  manage: {colaborador:'navm-colab', trilhas:'navm-trilhas', ciclos:'navm-ciclos', temas:'navm-temas', modulos:'navm-modulos', unidades:'navm-unidades', usuarios:'navm-usuarios'},
   reports: {frequencia:'navr-frequencia', frequenciaColab:'navr-frequencia-colab', auditoria:'navr-auditoria'}
 };
 const PANE_IDS = {
   view: {colaborador:'view-v-colaborador', trilhaExtra:'view-v-trilhaExtra', frequencia:'view-v-frequencia'},
-  manage: {colaborador:'view-m-colaborador', trilhas:'view-m-trilhas', ciclos:'view-m-ciclos', modulos:'view-m-modulos', unidades:'view-m-unidades', usuarios:'view-m-usuarios'},
+  manage: {colaborador:'view-m-colaborador', trilhas:'view-m-trilhas', ciclos:'view-m-ciclos', temas:'view-m-temas', modulos:'view-m-modulos', unidades:'view-m-unidades', usuarios:'view-m-usuarios'},
   reports: {frequencia:'view-r-frequencia', frequenciaColab:'view-r-frequencia-colab', auditoria:'view-r-auditoria'}
 };
 
@@ -1697,8 +1807,10 @@ function populateSelects(){
   if(uSel) uSel.innerHTML = unidades.map(u=>`<option value="${esc(u.id)}">${esc(u.nome)}</option>`).join('') || '<option value="">(nenhuma unidade cadastrada)</option>';
   const tSel = document.getElementById('cf2-trilha');
   if(tSel) tSel.innerHTML = sortedTrilhas().map(t=>`<option value="${esc(t.id)}">${esc(t.nome)}</option>`).join('');
-  const cSel = document.getElementById('mf-ciclo');
-  if(cSel) cSel.innerHTML = sortedTrilhas().flatMap(t => sortedCiclosOf(t.id).map(c=>`<option value="${esc(c.id)}">${esc(t.nome)} / ${esc(c.nome)}</option>`)).join('');
+  const tfcSel = document.getElementById('tf2-ciclo');
+  if(tfcSel) tfcSel.innerHTML = sortedTrilhas().flatMap(t => sortedCiclosOf(t.id).map(c=>`<option value="${esc(c.id)}">${esc(t.nome)} / ${esc(c.nome)}</option>`)).join('');
+  const mfSel = document.getElementById('mf-tema');
+  if(mfSel) mfSel.innerHTML = sortedTrilhas().flatMap(t => sortedCiclosOf(t.id).flatMap(c => temasOf(c.id).map(te=>`<option value="${esc(te.id)}">${esc(t.nome)} / ${esc(c.nome)} / ${esc(te.titulo)}</option>`))).join('');
   const txSel = document.getElementById('tx-trilha-select');
   if(txSel) txSel.innerHTML = sortedTrilhas().map(t=>`<option value="${esc(t.id)}" ${t.id===trilhaExtraSelected?'selected':''}>${esc(t.nome)}</option>`).join('') || '<option value="">(nenhuma trilha cadastrada)</option>';
   const mcuSel = document.getElementById('mc-filter-unidade');
@@ -1732,7 +1844,7 @@ function colabEnrolledTrilhas(c){
   return (c.trilhaIds||[]).map(tid=>{
     const t = trilhaById(tid); if(!t) return null;
     const ciclosComMods = sortedCiclosOf(tid).map(ci=>{
-      const mods = modulosOf(ci.id);
+      const mods = temasOf(ci.id).flatMap(te=>modulosOf(te.id));
       return {ci, mods};
     }).filter(x=>x.mods.length);
     return ciclosComMods.length ? {t, ciclosComMods} : null;
@@ -1831,7 +1943,7 @@ function catLabel(cat){ return ['Método','Liderança e Método','Autoconhecimen
 
 /* ================= Trilha - Extra: roadmap sequencial por trilha ================= */
 function selectTrilhaExtra(id){
-  if(id !== trilhaExtraSelected){ txSelectedModulo = null; closeTxModuleModal(); }
+  if(id !== trilhaExtraSelected){ txSelectedTema = null; closeTxModuleModal(); }
   trilhaExtraSelected = id; renderViewTrilhaExtra();
 }
 
@@ -1865,7 +1977,7 @@ function renderFrequenciaView(){
   if(!dataInput || !trilhaSel || !cicloSel || !modSel || !etSel || !content) return;
   if(!currentUserIsAdmin){ content.innerHTML = '<div class="empty-state">Somente administradores podem realizar a chamada.</div>'; return; }
   if(dbUnavailable){ content.innerHTML = '<div class="empty-state">Este visualizador não tem acesso ao banco de dados do artifact.</div>'; return; }
-  if(!isLoaded('modulos') || !isLoaded('ciclos') || !isLoaded('trilhas') || !isLoaded('modulo-etapas') || !isLoaded('progresso') || !isLoaded('colaboradores') || !isLoaded('modulo-frequencia') || !isLoaded('modulo-etapa-chamada')){
+  if(!isLoaded('modulos') || !isLoaded('temas') || !isLoaded('ciclos') || !isLoaded('trilhas') || !isLoaded('modulo-etapas') || !isLoaded('progresso') || !isLoaded('colaboradores') || !isLoaded('modulo-frequencia') || !isLoaded('modulo-etapa-chamada')){
     content.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando…</div>'; return;
   }
 
@@ -1873,20 +1985,20 @@ function renderFrequenciaView(){
 
   const eligibleMods = modulos.filter(m => m.temCronograma && moduloEtapas.some(e=>e.moduloId===m.id && etapaMatchesDate(e, freqData)));
 
-  const trilhaIdsElig = [...new Set(eligibleMods.map(m => cicloById(m.cicloId)?.trilhaId).filter(Boolean))];
+  const trilhaIdsElig = [...new Set(eligibleMods.map(m => cicloOfModulo(m)?.trilhaId).filter(Boolean))];
   const trilhaOptions = trilhaIdsElig.map(id=>trilhaById(id)).filter(Boolean).sort((a,b)=>a.nome.localeCompare(b.nome));
   if(freqTrilhaId && !trilhaOptions.find(t=>t.id===freqTrilhaId)) freqTrilhaId = '';
   trilhaSel.innerHTML = '<option value="">(todas as trilhas)</option>' + trilhaOptions.map(t=>`<option value="${esc(t.id)}" ${t.id===freqTrilhaId?'selected':''}>${esc(t.nome)}</option>`).join('');
 
-  const modsAfterTrilha = freqTrilhaId ? eligibleMods.filter(m => cicloById(m.cicloId)?.trilhaId === freqTrilhaId) : eligibleMods;
-  const cicloIdsElig = [...new Set(modsAfterTrilha.map(m=>m.cicloId))];
+  const modsAfterTrilha = freqTrilhaId ? eligibleMods.filter(m => cicloOfModulo(m)?.trilhaId === freqTrilhaId) : eligibleMods;
+  const cicloIdsElig = [...new Set(modsAfterTrilha.map(m=>cicloOfModulo(m)?.id).filter(Boolean))];
   const cicloOptions = cicloIdsElig.map(id=>cicloById(id)).filter(Boolean).sort((a,b)=>a.nome.localeCompare(b.nome));
   if(freqCicloId && !cicloOptions.find(c=>c.id===freqCicloId)) freqCicloId = '';
   cicloSel.innerHTML = '<option value="">(todos os ciclos)</option>' + cicloOptions.map(c=>`<option value="${esc(c.id)}" ${c.id===freqCicloId?'selected':''}>${esc(c.nome)}</option>`).join('');
 
-  const modsAfterCiclo = freqCicloId ? modsAfterTrilha.filter(m=>m.cicloId===freqCicloId) : modsAfterTrilha;
+  const modsAfterCiclo = freqCicloId ? modsAfterTrilha.filter(m=>cicloOfModulo(m)?.id===freqCicloId) : modsAfterTrilha;
   const moduloOptions = [...modsAfterCiclo].sort((a,b)=>{
-    const ta = cicloById(a.cicloId), tb = cicloById(b.cicloId);
+    const ta = cicloOfModulo(a), tb = cicloOfModulo(b);
     return (trilhaById(ta?.trilhaId)?.nome||'').localeCompare(trilhaById(tb?.trilhaId)?.nome||'') || (a.ordem??0)-(b.ordem??0);
   });
 
@@ -2024,7 +2136,7 @@ function renderRelatorioFrequencia(filter){
   const etSel = document.getElementById('relfreq-etapa-select');
   if(!el || !dataInput || !trilhaSel || !cicloSel || !modSel || !etSel) return;
   if(dbUnavailable){ el.innerHTML = '<div class="empty-state">Este visualizador não tem acesso ao banco de dados do artifact.</div>'; return; }
-  if(!isLoaded('modulo-etapa-chamada') || !isLoaded('modulo-etapas') || !isLoaded('modulos') || !isLoaded('ciclos') || !isLoaded('trilhas')){
+  if(!isLoaded('modulo-etapa-chamada') || !isLoaded('modulo-etapas') || !isLoaded('modulos') || !isLoaded('temas') || !isLoaded('ciclos') || !isLoaded('trilhas')){
     el.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando…</div>'; return;
   }
 
@@ -2033,7 +2145,7 @@ function renderRelatorioFrequencia(filter){
   const base = moduloChamadas.filter(c => c.versoesCount > 0).map(c => {
     const e = moduloEtapas.find(x=>x.id===c.etapaId);
     const m = e ? moduloById(e.moduloId) : null;
-    const ci = m ? cicloById(m.cicloId) : null;
+    const ci = m ? cicloOfModulo(m) : null;
     const t = ci ? trilhaById(ci.trilhaId) : null;
     return { chamada: c, etapa: e, modulo: m, ciclo: ci, trilha: t };
   }).filter(r => r.etapa && r.modulo && r.ciclo && r.trilha);
@@ -2176,7 +2288,7 @@ function renderRelfreqColabDetail(){
   const el = document.getElementById('relfreqcolab-detail');
   if(!el) return;
   if(dbUnavailable){ el.innerHTML = '<div class="empty-state">Este visualizador não tem acesso ao banco de dados do artifact.</div>'; return; }
-  if(!isLoaded('modulo-etapas') || !isLoaded('modulos') || !isLoaded('ciclos') || !isLoaded('trilhas') || relfreqColabPresencas===null){
+  if(!isLoaded('modulo-etapas') || !isLoaded('modulos') || !isLoaded('temas') || !isLoaded('ciclos') || !isLoaded('trilhas') || relfreqColabPresencas===null){
     el.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando…</div>'; return;
   }
   const c = colaboradores.find(x=>x.id===relfreqColabSelected);
@@ -2185,7 +2297,7 @@ function renderRelfreqColabDetail(){
   const registros = relfreqColabPresencas.filter(p=>p.colaboradorId===c.id).map(p=>{
     const e = moduloEtapas.find(x=>x.id===p.etapaId);
     const m = e ? moduloById(e.moduloId) : null;
-    const ci = m ? cicloById(m.cicloId) : null;
+    const ci = m ? cicloOfModulo(m) : null;
     const t = ci ? trilhaById(ci.trilhaId) : null;
     return { etapa: e, modulo: m, ciclo: ci, trilha: t, presente: p.presente };
   }).filter(r => r.etapa && r.modulo && r.ciclo && r.trilha);
@@ -2413,46 +2525,101 @@ function cronogramaBlockHtml(m){
       </div>`).join('') : '<p class="no-material" style="margin-top:0;">Nenhuma etapa cadastrada ainda.</p>'}
   </div>`;
 }
-function openTxModuleModal(id){
-  const m = moduloById(id);
-  const ci = m ? cicloById(m.cicloId) : null;
-  if(!m || !ci) return;
-  txSelectedModulo = id;
-  document.querySelectorAll('#tx-roadmap-row .tx-node.selected').forEach(n => { n.classList.remove('selected'); n.setAttribute('aria-pressed','false'); });
-  const node = document.querySelector(`#tx-roadmap-row .tx-node[data-mod-id="${id}"]`);
-  if(node){ node.classList.add('selected'); node.setAttribute('aria-pressed','true'); }
-
-  const cat = catDotClass(m.categoria);
+function temaStatus(te){
+  const mods = modulosOf(te.id);
+  if(!mods.length) return 'A iniciar';
+  if(mods.every(m=>m.status==='Concluído')) return 'Concluído';
+  if(mods.some(m=>m.status==='Concluído' || m.status==='Em andamento')) return 'Em andamento';
+  return 'A iniciar';
+}
+// Card resumido (fechado) de um módulo dentro do modal do tema: só título +
+// início da descrição. Clicar troca o conteúdo do modal pro detalhe
+// completo (openTxModuloDetalhe), em vez de expandir tudo de uma vez.
+function temaModuloResumoHtml(m){
+  const shortDesc = stripHtml(m.descricao || '');
+  return `<button type="button" class="tema-modulo-resumo" onclick="openTxModuloDetalhe('${m.temaId}','${m.id}')">
+    <span class="tema-modulo-resumo-top">
+      <span class="cat-dot ${catDotClass(m.categoria)}"></span>
+      <span class="tema-modulo-nome">${esc(m.nome)}</span>
+      <span class="status-pill ${statusPillClass(m.status)}" style="pointer-events:none;">${esc(m.status||'A iniciar')}</span>
+    </span>
+    ${shortDesc ? `<span class="tema-modulo-resumo-desc">${esc(shortDesc)}</span>` : ''}
+    <svg class="tema-modulo-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+  </button>`;
+}
+// Corpo com as informações gerais do módulo (mentor/formato/carga horária,
+// descrição completa, cronograma, inscritos, material) — usado quando o
+// usuário clica num módulo resumido e o modal troca pro detalhe dele.
+function moduloDetailBodyHtml(m){
   const grp = groupParticipantesByStatus(m.id);
+  const metaParts = [m.mentor?('Mentor: '+m.mentor):'', m.formato?('Formato: '+m.formato):'', (m.cargaHoraria!==null && m.cargaHoraria!==undefined)?(m.cargaHoraria+'h'):''].filter(Boolean);
+  return `
+    ${metaParts.length ? `<div class="tema-modulo-meta">${metaParts.map(esc).join(' · ')}</div>` : ''}
+    ${m.descricao ? `<div class="d-desc">${m.descricao}</div>` : '<p class="d-desc" style="font-style:italic;color:var(--ink-faint);">Descrição ainda não cadastrada.</p>'}
+    ${cronogramaBlockHtml(m)}
+    <div class="people-block">
+      <p class="people-label">Inscritos por status (${grp.total})</p>
+      ${grp.total===0 ? '<p class="no-material" style="margin-top:0;">Nenhum colaborador inscrito ainda.</p>' : `
+        ${grp.concluido.length?`<p class="status-group-label"><span class="status-pill done" style="pointer-events:none;">Concluído</span>${grp.concluido.length}</p><div class="chip-list">${grp.concluido.map(p=>`<span class="chip concluido">${esc(p.colab.nome)}</span>`).join('')}</div>`:''}
+        ${grp.andamento.length?`<p class="status-group-label"><span class="status-pill on" style="pointer-events:none;">Em andamento</span>${grp.andamento.length}</p><div class="chip-list">${grp.andamento.map(p=>`<span class="chip">${esc(p.colab.nome)}</span>`).join('')}</div>`:''}
+        ${grp.naoIniciado.length?`<p class="status-group-label"><span class="status-pill off" style="pointer-events:none;">Não iniciado</span>${grp.naoIniciado.length}</p><div class="chip-list">${grp.naoIniciado.map(p=>`<span class="chip">${esc(p.colab.nome)}</span>`).join('')}</div>`:''}
+      `}
+    </div>
+    ${m.linkMaterial ? `
+    <a class="material-btn" href="${esc(m.linkMaterial)}" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+      Ver material do módulo
+    </a>` : `<p class="no-material">Material do módulo ainda não disponibilizado</p>`}`;
+}
+function openTxModuloDetalhe(temaId, moduloId){
+  const m = moduloById(moduloId);
+  if(!m) return;
   document.getElementById('tx-modal-inner').innerHTML = `
-    <div class="tx-modal-accent ${cat}"></div>
+    <div class="tx-modal-accent lideranca"></div>
     <button class="tx-modal-close" onclick="closeTxModuleModal()" aria-label="Fechar">×</button>
     <div class="tx-modal-head">
-      <p class="d-eyebrow">${esc(ci.nome)}${m.etapa?' · '+esc(m.etapa):''} · <span class="d-cat-label ${cat}">${esc(catLabel(m.categoria))}</span></p>
+      <button type="button" class="tx-modal-back" onclick="openTxTemaModal('${temaId}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
+        Voltar ao tema
+      </button>
+      <p class="d-eyebrow"><span class="d-cat-label ${catDotClass(m.categoria)}">${esc(catLabel(m.categoria))}</span>${m.etapa?' · '+esc(m.etapa):''}</p>
       <h2 class="d-title">${esc(m.nome)}</h2>
       <span class="status-pill ${statusPillClass(m.status)}" style="pointer-events:none;">${esc(m.status||'A iniciar')}</span>
     </div>
+    <div class="tx-modal-body">${moduloDetailBodyHtml(m)}</div>`;
+}
+function openTxTemaModal(id){
+  const te = temaById(id);
+  const ci = te ? cicloOfTema(te) : null;
+  if(!te || !ci) return;
+  txSelectedTema = id;
+  document.querySelectorAll('#tx-roadmap-row .tx-node.selected').forEach(n => { n.classList.remove('selected'); n.setAttribute('aria-pressed','false'); });
+  const node = document.querySelector(`#tx-roadmap-row .tx-node[data-tema-id="${id}"]`);
+  if(node){ node.classList.add('selected'); node.setAttribute('aria-pressed','true'); }
+
+  const mods = modulosOf(te.id);
+  const st = temaStatus(te);
+  const inscritosUnicos = new Set(mods.flatMap(m=>progresso.filter(p=>p.moduloId===m.id).map(p=>p.colaboradorId))).size;
+
+  document.getElementById('tx-modal-inner').innerHTML = `
+    <div class="tx-modal-accent lideranca"></div>
+    <button class="tx-modal-close" onclick="closeTxModuleModal()" aria-label="Fechar">×</button>
+    <div class="tx-modal-head">
+      <p class="d-eyebrow">${esc(ci.nome)}${te.mes?' · '+esc(te.mes):''}${te.formato?' · '+esc(te.formato):''}</p>
+      <h2 class="d-title">${esc(te.titulo)}</h2>
+      <span class="status-pill ${statusPillClass(st)}" style="pointer-events:none;">${esc(st)}</span>
+    </div>
     <div class="tx-modal-body">
-      ${m.descricao ? `<p class="d-desc">${esc(m.descricao)}</p>` : '<p class="d-desc" style="font-style:italic;color:var(--ink-faint);">Descrição ainda não cadastrada.</p>'}
+      ${te.descricao ? `<div class="d-desc">${te.descricao}</div>` : '<p class="d-desc" style="font-style:italic;color:var(--ink-faint);">Descrição ainda não cadastrada.</p>'}
       <div class="meta-grid">
-        <div><div class="meta-label">Formato</div><div class="meta-val">${m.formato?esc(m.formato):'—'}</div></div>
-        <div><div class="meta-label">Mentor</div><div class="meta-val">${m.mentor?esc(m.mentor):'—'}</div></div>
-        <div><div class="meta-label">Carga horária</div><div class="meta-val">${m.cargaHoraria?esc(m.cargaHoraria):'—'}</div></div>
+        <div><div class="meta-label">Carga horária total</div><div class="meta-val">${te.cargaHoraria?esc(te.cargaHoraria)+'h':'—'}</div></div>
+        <div><div class="meta-label">Módulos</div><div class="meta-val">${mods.length}</div></div>
+        <div><div class="meta-label">Inscritos</div><div class="meta-val">${inscritosUnicos}</div></div>
       </div>
-      ${cronogramaBlockHtml(m)}
-      <div class="people-block">
-        <p class="people-label">Inscritos por status (${grp.total})</p>
-        ${grp.total===0 ? '<p class="no-material" style="margin-top:0;">Nenhum colaborador inscrito ainda.</p>' : `
-          ${grp.concluido.length?`<p class="status-group-label"><span class="status-pill done" style="pointer-events:none;">Concluído</span>${grp.concluido.length}</p><div class="chip-list">${grp.concluido.map(p=>`<span class="chip concluido">${esc(p.colab.nome)}</span>`).join('')}</div>`:''}
-          ${grp.andamento.length?`<p class="status-group-label"><span class="status-pill on" style="pointer-events:none;">Em andamento</span>${grp.andamento.length}</p><div class="chip-list">${grp.andamento.map(p=>`<span class="chip">${esc(p.colab.nome)}</span>`).join('')}</div>`:''}
-          ${grp.naoIniciado.length?`<p class="status-group-label"><span class="status-pill off" style="pointer-events:none;">Não iniciado</span>${grp.naoIniciado.length}</p><div class="chip-list">${grp.naoIniciado.map(p=>`<span class="chip">${esc(p.colab.nome)}</span>`).join('')}</div>`:''}
-        `}
+      <div class="section-h" style="margin-top:8px;">Módulos deste tema</div>
+      <div class="tema-modulo-resumo-list">
+        ${mods.length ? mods.map(temaModuloResumoHtml).join('') : '<p class="no-material" style="margin-top:0;">Nenhum módulo cadastrado neste tema ainda.</p>'}
       </div>
-      ${m.linkMaterial ? `
-      <a class="material-btn" href="${esc(m.linkMaterial)}" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
-        Ver material do módulo
-      </a>` : `<p class="no-material">Material do módulo ainda não disponibilizado</p>`}
     </div>`;
 
   document.getElementById('overlay-tx-detail').classList.add('show');
@@ -2462,7 +2629,7 @@ function closeTxModuleModal(){
   document.getElementById('overlay-tx-detail').classList.remove('show');
   document.getElementById('modal-tx-detail').classList.remove('show');
   document.querySelectorAll('#tx-roadmap-row .tx-node.selected').forEach(n => { n.classList.remove('selected'); n.setAttribute('aria-pressed','false'); });
-  txSelectedModulo = null;
+  txSelectedTema = null;
 }
 
 function groupParticipantesByStatus(modId){
@@ -2483,66 +2650,66 @@ function txCicloHeadHtml(badgeLabel, nome){
     <span class="tx-ciclo-chevron-btn"><svg class="tx-ciclo-chevron" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
   </div>`;
 }
-function txNodesHtml(mods){
-  return mods.map((m, mIdx) => {
-    const st = m.status || 'A iniciar';
+function txNodesHtml(temasList){
+  return temasList.map((te, teIdx) => {
+    const st = temaStatus(te);
     const stClass = st==='Concluído' ? 'done' : (st==='Em andamento' ? 'on' : 'off');
-    const label = m.etapa ? m.etapa : `Módulo ${mIdx+1}`;
-    const tip = esc([m.nome, m.descricao || ''].filter(Boolean).join(' — '));
-    const isSel = m.id === txSelectedModulo;
-    const nodeIconHtml = m.imagem ? `<img src="${esc(m.imagem)}" alt="">` : iconSvg(m.icon || 'layers');
+    const label = te.mes ? te.mes : `Tema ${teIdx+1}`;
+    const tip = esc([te.titulo, stripHtml(te.descricao || '')].filter(Boolean).join(' — '));
+    const isSel = te.id === txSelectedTema;
+    const nodeIconHtml = te.imagem ? `<img src="${esc(te.imagem)}" alt="">` : iconSvg(te.icon || 'layers');
     return `
-      <div class="tx-node ${isSel?'selected':''}" data-mod-id="${m.id}" title="${tip}" role="button" tabindex="0" aria-pressed="${isSel}"
-        onclick="openTxModuleModal('${m.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTxModuleModal('${m.id}');}">
+      <div class="tx-node ${isSel?'selected':''}" data-tema-id="${te.id}" title="${tip}" role="button" tabindex="0" aria-pressed="${isSel}"
+        onclick="openTxTemaModal('${te.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTxTemaModal('${te.id}');}">
         <div class="tx-node-icon">${nodeIconHtml}<span class="tx-node-status ${stClass}"></span></div>
         <span class="tx-node-dot"></span>
         <div class="tx-node-label">${esc(label)}</div>
-        <div class="tx-node-name">${esc(m.nome)}</div>
+        <div class="tx-node-name">${esc(te.titulo)}</div>
       </div>`;
   }).join('');
 }
 function renderViewTrilhaExtra(){
   const el = document.getElementById('vtrilhaextra-roadmap');
   if(dbUnavailable){ el.innerHTML = '<div class="empty-state">Este visualizador não tem acesso ao banco de dados do artifact.</div>'; return; }
-  if(!isLoaded('trilhas') || !isLoaded('ciclos') || !isLoaded('modulos')){ el.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando trilha…</div>'; return; }
+  if(!isLoaded('trilhas') || !isLoaded('ciclos') || !isLoaded('temas') || !isLoaded('modulos')){ el.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando trilha…</div>'; return; }
   const list = sortedTrilhas();
   if(!list.length){ el.innerHTML = '<div class="empty-cta"><p class="empty-title">Nenhuma trilha cadastrada ainda</p><p>Crie a primeira trilha em Cadastros → Trilhas.</p></div>'; return; }
   if(!trilhaExtraSelected || !list.find(t=>t.id===trilhaExtraSelected)){ trilhaExtraSelected = list[0].id; }
   const t = list.find(x=>x.id===trilhaExtraSelected);
-  const ciclosComMods = sortedCiclosOf(t.id).filter(ci => modulosOf(ci.id).length);
-  const transversais = ciclosComMods.filter(ci => ci.transversal);
-  const ciclosT = ciclosComMods.filter(ci => !ci.transversal);
+  const ciclosComTemas = sortedCiclosOf(t.id).filter(ci => temasOf(ci.id).length);
+  const transversais = ciclosComTemas.filter(ci => ci.transversal);
+  const ciclosT = ciclosComTemas.filter(ci => !ci.transversal);
 
-  if(!ciclosComMods.length){
-    el.innerHTML = `<p class="tx-roadmap-stat">${esc(t.nome)}</p><div class="empty-cta"><p class="empty-title">Esta trilha ainda não tem ciclos com módulos</p><p>Cadastre ciclos e módulos em Cadastros para ver a sequência aqui.</p></div>`;
+  if(!ciclosComTemas.length){
+    el.innerHTML = `<p class="tx-roadmap-stat">${esc(t.nome)}</p><div class="empty-cta"><p class="empty-title">Esta trilha ainda não tem ciclos com temas</p><p>Cadastre ciclos e temas em Cadastros para ver a sequência aqui.</p></div>`;
     return;
   }
 
-  let totalMods = 0;
+  let totalTemas = 0;
 
   const transversalHtml = transversais.map(ci => {
-    const mods = modulosOf(ci.id);
-    totalMods += mods.length;
+    const temasCiclo = temasOf(ci.id);
+    totalTemas += temasCiclo.length;
     return `<div class="tx-ciclo tx-ciclo-transversal">
       <div class="tx-transversal-row">
         <p class="tx-ciclo-heading"><span class="tx-ciclo-eyebrow">Transversal</span><span class="tx-ciclo-sep">|</span><span class="tx-ciclo-name">${esc(ci.nome)}</span></p>
-        <div class="tx-nodes">${txNodesHtml(mods)}</div>
+        <div class="tx-nodes">${txNodesHtml(temasCiclo)}</div>
         <span class="tx-ciclo-chevron-btn"><svg class="tx-ciclo-chevron" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
       </div>
     </div>`;
   }).join('');
 
   const rowHtml = ciclosT.map((ci, ciIdx) => {
-    const mods = modulosOf(ci.id);
-    totalMods += mods.length;
+    const temasCiclo = temasOf(ci.id);
+    totalTemas += temasCiclo.length;
     return `<div class="tx-ciclo">
       ${txCicloHeadHtml('Ciclo '+(ciIdx+1), ci.nome)}
-      <div class="tx-nodes">${txNodesHtml(mods)}</div>
+      <div class="tx-nodes">${txNodesHtml(temasCiclo)}</div>
     </div>`;
   }).join('');
 
   el.innerHTML = `
-    <p class="tx-roadmap-stat">${esc(t.nome)} · ${ciclosComMods.length} ciclo${ciclosComMods.length===1?'':'s'} · ${totalMods} módulo${totalMods===1?'':'s'}</p>
+    <p class="tx-roadmap-stat">${esc(t.nome)} · ${ciclosComTemas.length} ciclo${ciclosComTemas.length===1?'':'s'} · ${totalTemas} tema${totalTemas===1?'':'s'}</p>
     ${transversalHtml ? `<div class="tx-transversal-group">${transversalHtml}</div>` : ''}
     <div class="tx-row" id="tx-roadmap-row">${rowHtml}</div>`;
 
@@ -2733,7 +2900,7 @@ function renderColabFormTrilhas(){
       const t = trilhaById(tid); if(!t) return;
       html += `<div class="progress-group"><div class="progress-group-title">${esc(t.nome)}</div>`;
       sortedCiclosOf(tid).forEach(ci => {
-        const mods = modulosOf(ci.id);
+        const mods = temasOf(ci.id).flatMap(te=>modulosOf(te.id));
         if(!mods.length) return;
         html += `<div class="progress-cycle-title">${esc(ci.nome)}</div>`;
         mods.forEach(m => {
@@ -2873,7 +3040,7 @@ function askDeleteColab(){
 function renderTrilhas(filter){
   const el = document.getElementById('trilhas-list');
   if(dbUnavailable){ el.innerHTML = '<div class="empty-state">Este visualizador não tem acesso ao banco de dados do artifact.</div>'; return; }
-  if(!isLoaded('trilhas')){ el.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando trilhas…</div>'; return; }
+  if(!isLoaded('trilhas') || !isLoaded('ciclos') || !isLoaded('temas') || !isLoaded('modulos')){ el.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando trilhas…</div>'; return; }
   const f = norm(filter||'');
   const list = sortedTrilhas().filter(t=>norm(t.nome).includes(f));
   if(!list.length){
@@ -2889,16 +3056,20 @@ function renderTrilhas(filter){
           <div class="cycle-icon">${iconSvg(ci.icon)}</div>
           <div class="cycle-titles"><p class="cycle-eyebrow">${esc(ci.tema||'')}</p><p class="cycle-name">${esc(ci.nome)}</p></div>
         </div>
-        ${modulosOf(ci.id).map(m => `
-          <div class="module-node cat-${catDotClass(m.categoria)}" onclick="openModuleForm('${m.id}')">
-            ${m.etapa ? `<p class="module-etapa">${esc(m.etapa)}</p>` : ''}
-            <p class="module-name">${esc(m.nome)}</p>
+        ${temasOf(ci.id).map(te => {
+          const st = temaStatus(te);
+          const nMod = modulosOf(te.id).length;
+          return `
+          <div class="module-node" onclick="openTemaForm('${te.id}')">
+            ${te.mes ? `<p class="module-etapa">${esc(te.mes)}</p>` : ''}
+            <p class="module-name">${esc(te.titulo)}</p>
             <div class="module-meta">
-              <span class="module-cat-label"><span class="cat-dot ${catDotClass(m.categoria)}"></span>${esc(catLabel(m.categoria))}</span>
-              <span class="status-pill ${statusPillClass(m.status)}" style="pointer-events:none;">${esc(m.status||'A iniciar')}</span>
+              <span class="module-cat-label">${nMod} módulo${nMod===1?'':'s'}${te.cargaHoraria?' · '+esc(te.cargaHoraria)+'h':''}</span>
+              <span class="status-pill ${statusPillClass(st)}" style="pointer-events:none;">${esc(st)}</span>
             </div>
-          </div>`).join('')}
-        <button class="add-tile" onclick="openModuleForm(null,'${ci.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Módulo</button>
+          </div>`;
+        }).join('')}
+        <button class="add-tile" onclick="openTemaForm(null,'${ci.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Tema</button>
       </div>`).join('');
     return `
       <div class="trilha-card card">
@@ -2964,19 +3135,90 @@ function askDeleteTrilha(){
 }
 
 function renderIconPick(){
-  document.getElementById('mf-icon-pick').innerHTML = ICON_KEYS.map(k=>`<button type="button" class="icon-opt" data-icon="${k}" onclick="pickIcon('${k}')">${iconSvg(k)}</button>`).join('');
+  document.getElementById('tf-icon-pick').innerHTML = ICON_KEYS.map(k=>`<button type="button" class="icon-opt" data-icon="${k}" onclick="pickIcon('${k}')">${iconSvg(k)}</button>`).join('');
 }
 // silent=true só atualiza a seleção visual (usado ao abrir o form pra refletir
 // o valor salvo); um clique do usuário troca pra ícone padrão e descarta a
 // imagem enviada, já que a bolinha só mostra uma coisa por vez.
 function pickIcon(key, silent){
-  const el = document.getElementById('mf-icon-pick');
+  const el = document.getElementById('tf-icon-pick');
   el.querySelectorAll('.icon-opt').forEach(b=>b.classList.toggle('selected', b.dataset.icon===key));
   el.dataset.value = key;
   if(!silent){
-    moduleImageDataUrl = null;
-    updateModuleImagePreview();
+    temaImageDataUrl = null;
+    updateTemaImagePreview();
   }
+}
+function openTemaForm(id, cicloIdForNew){
+  editingTemaId = id;
+  const te = id ? temaById(id) : null;
+  document.getElementById('tema-form-title').textContent = te ? 'Editar tema' : 'Novo tema';
+  populateSelects();
+  document.getElementById('tf2-ciclo').value = te?.cicloId || cicloIdForNew || '';
+  document.getElementById('tf2-titulo').value = te?.titulo || '';
+  document.getElementById('tf2-mes').value = te?.mes || '';
+  document.getElementById('tf2-formato').value = te?.formato || '';
+  document.getElementById('tf2-ordem').value = te?.ordem ?? (temasOf(te?.cicloId||cicloIdForNew).length+1);
+  document.getElementById('tf-desc').innerHTML = te?.descricao || '';
+  renderIconPick();
+  pickIcon(te?.icon || 'layers', true);
+  temaImageDataUrl = te?.imagem || null;
+  updateTemaImagePreview();
+  document.getElementById('tema-delete-btn').style.display = te ? '' : 'none';
+  document.getElementById('tema-carga-row').style.display = te ? '' : 'none';
+  if(te) document.getElementById('tf-carga-val').textContent = (te.cargaHoraria || 0) + 'h · ' + modulosOf(te.id).length + ' módulo' + (modulosOf(te.id).length===1?'':'s');
+  document.getElementById('overlay-tema').classList.add('show');
+  document.getElementById('modal-tema').classList.add('show');
+}
+function closeTemaForm(){ document.getElementById('overlay-tema').classList.remove('show'); document.getElementById('modal-tema').classList.remove('show'); }
+async function saveTema(){
+  const titulo = document.getElementById('tf2-titulo').value.trim();
+  const cicloId = document.getElementById('tf2-ciclo').value;
+  if(!titulo || !cicloId){ toast('Informe ciclo e título do tema'); return; }
+  const data = {
+    cicloId, titulo,
+    mes: document.getElementById('tf2-mes').value.trim(),
+    formato: document.getElementById('tf2-formato').value.trim(),
+    ordem: parseInt(document.getElementById('tf2-ordem').value)||0,
+    descricao: getRichTextHtml('tf-desc'),
+    icon: document.getElementById('tf-icon-pick').dataset.value || 'layers',
+    imagem: temaImageDataUrl || '',
+  };
+  if(!db){ toast('Banco indisponível'); return; }
+  if(editingTemaId){ await db.doc('temas/'+editingTemaId).update(data); }
+  else { await db.collection('temas').add(data); }
+  closeTemaForm(); toast('Tema salvo');
+}
+function askDeleteTema(){
+  if(!editingTemaId) return;
+  if(modulosOf(editingTemaId).length){ toast('Mova ou exclua os módulos deste tema antes de excluí-lo'); return; }
+  const te = temaById(editingTemaId);
+  openConfirm(`Excluir ${te?.titulo||'tema'}?`, 'Esta ação não pode ser desfeita.', async () => {
+    await db.doc('temas/'+editingTemaId).delete();
+    closeTemaForm(); toast('Tema excluído');
+  });
+}
+function renderCadastroTemas(filter){
+  const el = document.getElementById('temas-reg-list');
+  if(dbUnavailable){ el.innerHTML = '<div class="empty-state">Este visualizador não tem acesso ao banco de dados do artifact.</div>'; return; }
+  if(!isLoaded('temas') || !isLoaded('ciclos')){ el.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando temas…</div>'; return; }
+  const f = norm(filter||'');
+  const list = [...temas].filter(te => norm(te.titulo).includes(f) || norm(cicloOfTema(te)?.nome).includes(f))
+    .sort((a,b)=> (a.ordem??0)-(b.ordem??0));
+  if(!list.length){ el.innerHTML = temas.length===0 ? '<p class="colab-empty">Nenhum tema cadastrado ainda.</p>' : `<p class="colab-empty">Nenhum resultado para "${esc(filter||'')}".</p>`; return; }
+  el.innerHTML = list.map(te => {
+    const ci = cicloOfTema(te); const t = ci ? trilhaById(ci.trilhaId) : null;
+    const nMod = modulosOf(te.id).length;
+    return `
+    <div class="reg-row" onclick="openTemaForm('${te.id}')">
+      <div class="cycle-icon" style="width:26px;height:26px;flex-shrink:0;">${te.imagem ? `<img src="${esc(te.imagem)}" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : iconSvg(te.icon)}</div>
+      <div class="reg-row-main">
+        <div class="reg-row-title">${esc(te.titulo)}</div>
+        <div class="reg-row-sub">${esc(t?.nome || '—')} / ${esc(ci?.nome || '—')}${te.mes?' · '+esc(te.mes):''} · ${nMod} módulo${nMod===1?'':'s'}</div>
+      </div>
+      <span class="btn-ghost-sm" style="pointer-events:none;">${editSvg()}</span>
+    </div>`;
+  }).join('');
 }
 function openCycleModal(id, trilhaIdForNew){
   editingCycleId = id;
@@ -3009,7 +3251,7 @@ async function saveCycle(){
 }
 function askDeleteCycle(){
   if(!editingCycleId) return;
-  if(modulosOf(editingCycleId).length){ toast('Mova ou exclua os módulos deste ciclo antes de excluí-lo'); return; }
+  if(temasOf(editingCycleId).length){ toast('Mova ou exclua os temas deste ciclo antes de excluí-lo'); return; }
   const ci = cicloById(editingCycleId);
   openConfirm(`Excluir ${ci?.nome||'ciclo'}?`, 'Esta ação não pode ser desfeita.', async () => {
     await db.doc('ciclos/'+editingCycleId).delete();
@@ -3017,29 +3259,33 @@ function askDeleteCycle(){
   });
 }
 
-function openModuleForm(id, cicloIdForNew){
+function rteExec(fieldId, cmd){
+  document.getElementById(fieldId).focus();
+  document.execCommand(cmd, false, null);
+}
+function getRichTextHtml(fieldId){
+  const el = document.getElementById(fieldId);
+  return (el.textContent || '').trim() ? el.innerHTML.trim() : '';
+}
+function openModuleForm(id, temaIdForNew){
   editingModuleId = id;
   const m = id ? moduloById(id) : null;
   document.getElementById('module-drawer-title').textContent = m ? 'Editar módulo' : 'Novo módulo';
   populateSelects();
-  document.getElementById('mf-ciclo').value = m?.cicloId || cicloIdForNew || '';
+  document.getElementById('mf-tema').value = m?.temaId || temaIdForNew || '';
   document.getElementById('mf-etapa').value = m?.etapa || '';
-  document.getElementById('mf-ordem').value = m?.ordem ?? (modulosOf(m?.cicloId||cicloIdForNew).length+1);
+  document.getElementById('mf-ordem').value = m?.ordem ?? (modulosOf(m?.temaId||temaIdForNew).length+1);
   document.getElementById('mf-nome').value = m?.nome || '';
   document.getElementById('mf-categoria').value = m?.categoria || 'Liderança';
   document.getElementById('mf-status').value = m?.status || 'A iniciar';
-  document.getElementById('mf-desc').value = m?.descricao || '';
+  document.getElementById('mf-desc').innerHTML = m?.descricao || '';
   document.getElementById('mf-mentor').value = m?.mentor || '';
   document.getElementById('mf-formato').value = m?.formato || '';
   document.getElementById('mf-publico').value = m?.publicoAlvo || '';
-  document.getElementById('mf-carga').value = m?.cargaHoraria || '';
+  document.getElementById('mf-carga').value = m?.cargaHoraria ?? '';
   document.getElementById('mf-inicio').value = m?.inicioPrevisto || '';
   document.getElementById('mf-material').value = m?.linkMaterial || '';
   document.getElementById('mf-tem-cronograma').checked = !!m?.temCronograma;
-  renderIconPick();
-  pickIcon(m?.icon || 'layers', true);
-  moduleImageDataUrl = m?.imagem || null;
-  updateModuleImagePreview();
   document.getElementById('module-delete-btn').style.display = m ? '' : 'none';
   moduleEtapasDraft = m ? moduloEtapas.filter(e=>e.moduloId===id).sort((a,b)=>(a.ordem??0)-(b.ordem??0)).map(e=>({...e})) : [];
   switchModuleFormTab('dados');
@@ -3070,7 +3316,7 @@ function renderModuleTurma(){
     return;
   }
   const m = moduloById(editingModuleId);
-  const ci = m ? cicloById(m.cicloId) : null;
+  const ci = m ? cicloOfModulo(m) : null;
   const trilha = ci ? trilhaById(ci.trilhaId) : null;
   const matriculados = progresso.filter(p=>p.moduloId===editingModuleId)
     .map(p=>({...p, colab: colaboradores.find(c=>c.id===p.colaboradorId)}))
@@ -3102,7 +3348,7 @@ function renderModuleTurma(){
 async function matricularNoModulo(colabId){
   if(!db || !editingModuleId) return;
   const m = moduloById(editingModuleId);
-  const ci = m ? cicloById(m.cicloId) : null;
+  const ci = m ? cicloOfModulo(m) : null;
   const c = colaboradores.find(x=>x.id===colabId);
   if(ci && c && !(c.trilhaIds||[]).includes(ci.trilhaId)){
     await fetch('api/colaboradores/'+encodeURIComponent(colabId)+'/trilhas/'+encodeURIComponent(ci.trilhaId), { method:'POST', headers: authHeaders() });
@@ -3165,24 +3411,23 @@ function updateEtapaDraft(i, field, value){
 }
 async function saveModule(){
   const nome = document.getElementById('mf-nome').value.trim();
-  const cicloId = document.getElementById('mf-ciclo').value;
-  if(!nome || !cicloId){ toast('Informe ciclo e nome do módulo'); return; }
+  const temaId = document.getElementById('mf-tema').value;
+  if(!nome || !temaId){ toast('Informe tema e nome do módulo'); return; }
   const temCronograma = document.getElementById('mf-tem-cronograma').checked;
+  const cargaRaw = document.getElementById('mf-carga').value.trim();
   const data = {
-    cicloId, nome, etapa: document.getElementById('mf-etapa').value.trim(),
+    temaId, nome, etapa: document.getElementById('mf-etapa').value.trim(),
     ordem: parseInt(document.getElementById('mf-ordem').value)||0,
     categoria: document.getElementById('mf-categoria').value,
     status: document.getElementById('mf-status').value,
-    descricao: document.getElementById('mf-desc').value.trim(),
+    descricao: getRichTextHtml('mf-desc'),
     mentor: document.getElementById('mf-mentor').value.trim(),
     formato: document.getElementById('mf-formato').value.trim(),
     publicoAlvo: document.getElementById('mf-publico').value.trim(),
-    cargaHoraria: document.getElementById('mf-carga').value.trim(),
+    cargaHoraria: cargaRaw === '' ? null : parseFloat(cargaRaw),
     inicioPrevisto: document.getElementById('mf-inicio').value.trim(),
     linkMaterial: document.getElementById('mf-material').value.trim(),
     temCronograma,
-    icon: document.getElementById('mf-icon-pick').dataset.value || 'layers',
-    imagem: moduleImageDataUrl || '',
   };
   if(!db){ toast('Banco indisponível'); return; }
   let moduleId = editingModuleId;
@@ -3204,28 +3449,29 @@ async function saveModule(){
     await db.reload('modulo-frequencia'); // exclusão em cascata de etapas removidas acontece no banco
   }
 
+  await db.reload('temas'); // carga horária do tema é a soma dos módulos — recalculada no servidor a cada leitura
   closeModuleDrawer(); toast('Módulo salvo');
 }
 
-/* ---------- Imagem da bolinha do módulo (upload + recorte) ---------- */
+/* ---------- Imagem da bolinha do tema (upload + recorte) ---------- */
 const CROP_STAGE_SIZE = 220;
 const CROP_OUTPUT_SIZE = 256;
-function updateModuleImagePreview(){
-  const prev = document.getElementById('mf-img-preview');
-  const removeBtn = document.getElementById('mf-img-remove-btn');
-  if(moduleImageDataUrl){
-    prev.innerHTML = `<img src="${moduleImageDataUrl}" alt="">`;
+function updateTemaImagePreview(){
+  const prev = document.getElementById('tf-img-preview');
+  const removeBtn = document.getElementById('tf-img-remove-btn');
+  if(temaImageDataUrl){
+    prev.innerHTML = `<img src="${temaImageDataUrl}" alt="">`;
     removeBtn.style.display = '';
   } else {
     prev.innerHTML = '<span class="mf-img-preview-empty">Sem imagem</span>';
     removeBtn.style.display = 'none';
   }
 }
-function removeModuleImage(){
-  moduleImageDataUrl = null;
-  updateModuleImagePreview();
+function removeTemaImage(){
+  temaImageDataUrl = null;
+  updateTemaImagePreview();
 }
-function onModuleImageSelected(evt){
+function onTemaImageSelected(evt){
   const file = evt.target.files && evt.target.files[0];
   evt.target.value = '';
   if(!file) return;
@@ -3302,8 +3548,8 @@ function confirmCrop(){
   const ctx = canvas.getContext('2d');
   ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(img, 0, 0, cropState.naturalW, cropState.naturalH, left * factor, top * factor, w * factor, h * factor);
-  moduleImageDataUrl = canvas.toDataURL('image/jpeg', 0.92);
-  updateModuleImagePreview();
+  temaImageDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+  updateTemaImagePreview();
   closeCropModal();
 }
 function askDeleteModule(){
@@ -3314,6 +3560,7 @@ function askDeleteModule(){
     await db.reload('progresso'); // exclusão em cascata acontece no banco
     await db.reload('modulo-etapas');
     await db.reload('modulo-frequencia');
+    await db.reload('temas'); // carga horária do tema é a soma dos módulos
     closeModuleDrawer(); toast('Módulo excluído');
   });
 }
@@ -3322,19 +3569,19 @@ function askDeleteModule(){
 function renderCadastroCiclos(filter){
   const el = document.getElementById('ciclos-reg-list');
   if(dbUnavailable){ el.innerHTML = '<div class="empty-state">Este visualizador não tem acesso ao banco de dados do artifact.</div>'; return; }
-  if(!isLoaded('ciclos')){ el.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando ciclos…</div>'; return; }
+  if(!isLoaded('ciclos') || !isLoaded('temas')){ el.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando ciclos…</div>'; return; }
   const f = norm(filter||'');
   const list = [...ciclos].filter(ci => norm(ci.nome).includes(f) || norm(trilhaById(ci.trilhaId)?.nome).includes(f))
     .sort((a,b)=> (trilhaById(a.trilhaId)?.nome||'').localeCompare(trilhaById(b.trilhaId)?.nome||'') || (a.ordem??0)-(b.ordem??0));
   if(!list.length){ el.innerHTML = ciclos.length===0 ? '<p class="colab-empty">Nenhum ciclo cadastrado ainda.</p>' : `<p class="colab-empty">Nenhum resultado para "${esc(filter||'')}".</p>`; return; }
   el.innerHTML = list.map(ci => {
-    const nMod = modulosOf(ci.id).length;
+    const nTemas = temasOf(ci.id).length;
     return `
     <div class="reg-row" onclick="openCycleModal('${ci.id}')">
       <div class="cycle-icon" style="width:26px;height:26px;flex-shrink:0;">${iconSvg(ci.icon)}</div>
       <div class="reg-row-main">
         <div class="reg-row-title">${esc(ci.nome)}${ci.transversal?' <span class="badge" style="vertical-align:middle;">Transversal</span>':''}</div>
-        <div class="reg-row-sub">${esc(trilhaById(ci.trilhaId)?.nome || '—')}${ci.tema?' · '+esc(ci.tema):''} · ${nMod} módulo${nMod===1?'':'s'}</div>
+        <div class="reg-row-sub">${esc(trilhaById(ci.trilhaId)?.nome || '—')}${ci.tema?' · '+esc(ci.tema):''} · ${nTemas} tema${nTemas===1?'':'s'}</div>
       </div>
       <span class="btn-ghost-sm" style="pointer-events:none;">${editSvg()}</span>
     </div>`;
@@ -3345,19 +3592,19 @@ function renderCadastroCiclos(filter){
 function renderCadastroModulos(filter){
   const el = document.getElementById('modulos-reg-list');
   if(dbUnavailable){ el.innerHTML = '<div class="empty-state">Este visualizador não tem acesso ao banco de dados do artifact.</div>'; return; }
-  if(!isLoaded('modulos')){ el.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando módulos…</div>'; return; }
+  if(!isLoaded('modulos') || !isLoaded('temas') || !isLoaded('ciclos')){ el.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando módulos…</div>'; return; }
   const f = norm(filter||'');
-  const list = [...modulos].filter(m => norm(m.nome).includes(f) || norm(cicloById(m.cicloId)?.nome).includes(f))
+  const list = [...modulos].filter(m => norm(m.nome).includes(f) || norm(cicloOfModulo(m)?.nome).includes(f) || norm(temaById(m.temaId)?.titulo).includes(f))
     .sort((a,b)=> (a.ordem??0)-(b.ordem??0));
   if(!list.length){ el.innerHTML = modulos.length===0 ? '<p class="colab-empty">Nenhum módulo cadastrado ainda.</p>' : `<p class="colab-empty">Nenhum resultado para "${esc(filter||'')}".</p>`; return; }
   el.innerHTML = list.map(m => {
-    const ci = cicloById(m.cicloId); const t = ci ? trilhaById(ci.trilhaId) : null;
+    const te = temaById(m.temaId); const ci = cicloOfModulo(m); const t = ci ? trilhaById(ci.trilhaId) : null;
     return `
     <div class="reg-row" onclick="openModuleForm('${m.id}')">
       <span class="cat-dot ${catDotClass(m.categoria)}" style="flex-shrink:0;"></span>
       <div class="reg-row-main">
         <div class="reg-row-title">${esc(m.nome)}</div>
-        <div class="reg-row-sub">${esc(t?.nome||'—')} / ${esc(ci?.nome||'—')} · ${esc(m.status||'A iniciar')}</div>
+        <div class="reg-row-sub">${esc(t?.nome||'—')} / ${esc(ci?.nome||'—')} / ${esc(te?.titulo||'—')} · ${esc(m.status||'A iniciar')}</div>
       </div>
       <span class="btn-ghost-sm" style="pointer-events:none;">${editSvg()}</span>
     </div>`;

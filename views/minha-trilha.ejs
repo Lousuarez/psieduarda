@@ -91,6 +91,8 @@ function toggleTheme(){
   .progress-bar-outer{ height:5px; border-radius:4px; background:var(--status-todo-bg); overflow:hidden; margin-bottom:22px; }
   .progress-bar-inner{ height:100%; background:var(--verde); border-radius:4px; }
 
+  .progress-ciclo-label{ font-size:10.5px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-faint); margin:14px 0 6px; }
+  .progress-ciclo-label:first-of-type{ margin-top:0; }
   .progress-cycle-card{ border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:10px; background:var(--bg-sunken); }
   .progress-cycle-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
   .progress-cycle-title{ font-size:11px; font-weight:700; color:var(--verde-ink); text-transform:uppercase; letter-spacing:.04em; }
@@ -130,6 +132,9 @@ function toggleTheme(){
   .modal-title{ font-size:18px; font-weight:800; margin:0 42px 12px 0; }
   .modal-body{ padding:20px 24px 24px; }
   .modal-desc{ font-size:13px; line-height:1.55; color:var(--ink-dim); margin:0 0 18px; }
+  .modal-desc ul, .modal-desc ol{ margin:6px 0; padding-left:22px; }
+  .modal-desc p{ margin:0 0 8px; }
+  .modal-desc p:last-child{ margin-bottom:0; }
   .meta-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:14px; margin-bottom:18px; }
   .meta-label{ font-size:10px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:3px; }
   .meta-val{ font-size:12.5px; font-weight:600; color:var(--ink); }
@@ -200,7 +205,7 @@ function render(data){
 
   html += '<div class="section-h">Minhas trilhas</div>';
   data.trilhas.forEach(t => {
-    const mods = t.ciclos.flatMap(ci => ci.modulos);
+    const mods = t.ciclos.flatMap(ci => ci.temas.flatMap(te => te.modulos));
     const done = mods.filter(m => m.status === 'Concluído').length;
     const pct = mods.length ? Math.round(done / mods.length * 100) : 0;
     html += `<div class="progress-group">
@@ -211,21 +216,26 @@ function render(data){
       </div>
       <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:${pct}%"></div></div>`;
     t.ciclos.forEach(ci => {
-      if(!ci.modulos.length) return;
-      const doneCi = ci.modulos.filter(m => m.status === 'Concluído').length;
-      html += `<div class="progress-cycle-card">
-        <div class="progress-cycle-head">
-          <span class="progress-cycle-title">${esc(ci.nome)}</span>
-          <span class="progress-cycle-count">${doneCi}/${ci.modulos.length}</span>
-        </div>
-        <div class="prog-list">`;
-      ci.modulos.forEach(m => {
-        const cls = statusClass(m.status);
-        html += `<div class="prog-row" role="button" tabindex="0" onclick="openModuloModal('${m.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openModuloModal('${m.id}');}">
-          <span class="status-dot ${cls}"></span><span class="prog-name">${esc(m.nome)}</span>
-          <span class="status-pill ${cls}">${esc(m.status)}</span></div>`;
+      const ciMods = ci.temas.flatMap(te => te.modulos);
+      if(!ciMods.length) return;
+      html += `<div class="progress-ciclo-label">${esc(ci.nome)}</div>`;
+      ci.temas.forEach(te => {
+        if(!te.modulos.length) return;
+        const doneTe = te.modulos.filter(m => m.status === 'Concluído').length;
+        html += `<div class="progress-cycle-card">
+          <div class="progress-cycle-head">
+            <span class="progress-cycle-title">${esc(te.titulo)}</span>
+            <span class="progress-cycle-count">${doneTe}/${te.modulos.length}</span>
+          </div>
+          <div class="prog-list">`;
+        te.modulos.forEach(m => {
+          const cls = statusClass(m.status);
+          html += `<div class="prog-row" role="button" tabindex="0" onclick="openModuloModal('${m.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openModuloModal('${m.id}');}">
+            <span class="status-dot ${cls}"></span><span class="prog-name">${esc(m.nome)}</span>
+            <span class="status-pill ${cls}">${esc(m.status)}</span></div>`;
+        });
+        html += `</div></div>`;
       });
-      html += `</div></div>`;
     });
     html += `</div>`;
   });
@@ -239,27 +249,30 @@ function openModuloModal(moduloId){
   let found = null;
   for(const t of currentData.trilhas){
     for(const ci of t.ciclos){
-      const m = ci.modulos.find(x => x.id === moduloId);
-      if(m){ found = { m, ci }; break; }
+      for(const te of ci.temas){
+        const m = te.modulos.find(x => x.id === moduloId);
+        if(m){ found = { m, ci, te }; break; }
+      }
+      if(found) break;
     }
     if(found) break;
   }
   if(!found) return;
-  const { m, ci } = found;
+  const { m, ci, te } = found;
   const cls = statusClass(m.status);
   document.getElementById('modulo-modal-box').innerHTML = `
     <button type="button" class="modal-close" onclick="closeModuloModal()" aria-label="Fechar">×</button>
     <div class="modal-head">
-      <p class="modal-eyebrow">${esc(ci.nome)} · ${esc(catLabel(m.categoria))}</p>
+      <p class="modal-eyebrow">${esc(ci.nome)} · ${esc(te.titulo)} · ${esc(catLabel(m.categoria))}</p>
       <h2 class="modal-title">${esc(m.nome)}</h2>
       <span class="status-pill ${cls}">${esc(m.status)}</span>
     </div>
     <div class="modal-body">
-      ${m.descricao ? `<p class="modal-desc">${esc(m.descricao)}</p>` : '<p class="modal-desc" style="font-style:italic;">Descrição ainda não cadastrada.</p>'}
+      ${m.descricao ? `<div class="modal-desc">${m.descricao}</div>` : '<p class="modal-desc" style="font-style:italic;">Descrição ainda não cadastrada.</p>'}
       <div class="meta-grid">
         <div><div class="meta-label">Formato</div><div class="meta-val">${m.formato?esc(m.formato):'—'}</div></div>
         <div><div class="meta-label">Mentor</div><div class="meta-val">${m.mentor?esc(m.mentor):'—'}</div></div>
-        <div><div class="meta-label">Carga horária</div><div class="meta-val">${m.cargaHoraria?esc(m.cargaHoraria):'—'}</div></div>
+        <div><div class="meta-label">Carga horária</div><div class="meta-val">${m.cargaHoraria?esc(m.cargaHoraria)+'h':'—'}</div></div>
       </div>
       ${m.linkMaterial ? `
       <a class="material-btn" href="${esc(m.linkMaterial)}" target="_blank" rel="noopener">

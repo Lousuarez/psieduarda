@@ -1,14 +1,28 @@
 const express = require('express');
+const sanitizeHtml = require('sanitize-html');
 const { pool, genId } = require('../db');
 const asyncHandler = require('../asyncHandler');
 const { logAudit } = require('../audit');
 
 const router = express.Router();
 
+// A descrição do módulo é editada num rich text (negrito, itálico, listas)
+// no front-end e chega aqui como HTML — sempre sanitiza antes de gravar,
+// já que esse HTML depois é injetado sem escape nas telas que exibem o
+// módulo (inclusive a página pública "Minha Trilha").
+function sanitizeDescricao(html) {
+  return sanitizeHtml(html || '', {
+    allowedTags: ['b', 'strong', 'i', 'em', 'u', 'ul', 'ol', 'li', 'p', 'br', 'a'],
+    allowedAttributes: { a: ['href', 'target', 'rel'] },
+    allowedSchemes: ['http', 'https', 'mailto'],
+    transformTags: { a: sanitizeHtml.simpleTransform('a', { target: '_blank', rel: 'noopener noreferrer' }) },
+  });
+}
+
 function toApi(row) {
   return {
     id: row.id,
-    cicloId: row.ciclo_id,
+    temaId: row.tema_id,
     nome: row.nome,
     etapa: row.etapa || '',
     ordem: row.ordem,
@@ -18,17 +32,15 @@ function toApi(row) {
     mentor: row.mentor || '',
     formato: row.formato || '',
     publicoAlvo: row.publico_alvo || '',
-    cargaHoraria: row.carga_horaria || '',
+    cargaHoraria: row.carga_horaria !== null && row.carga_horaria !== undefined ? Number(row.carga_horaria) : null,
     inicioPrevisto: row.inicio_previsto || '',
     linkMaterial: row.link_material || '',
     temCronograma: !!row.tem_cronograma,
-    icon: row.icon || 'layers',
-    imagem: row.imagem || '',
   };
 }
 
 const FIELDS = [
-  ['cicloId', 'ciclo_id', String],
+  ['temaId', 'tema_id', String],
   ['nome', 'nome', String],
   ['etapa', 'etapa', String],
   ['ordem', 'ordem', Number],
@@ -38,13 +50,17 @@ const FIELDS = [
   ['mentor', 'mentor', String],
   ['formato', 'formato', String],
   ['publicoAlvo', 'publico_alvo', String],
-  ['cargaHoraria', 'carga_horaria', String],
+  ['cargaHoraria', 'carga_horaria', Number],
   ['inicioPrevisto', 'inicio_previsto', String],
   ['linkMaterial', 'link_material', String],
   ['temCronograma', 'tem_cronograma', Boolean],
-  ['icon', 'icon', String],
-  ['imagem', 'imagem', String],
 ];
+
+function cargaHorariaVal(raw) {
+  if (raw === undefined || raw === null || raw === '') return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
+}
 
 router.get('/', asyncHandler(async (req, res) => {
   const [rows] = await pool.query('SELECT * FROM modulos ORDER BY updated_at ASC');
@@ -56,7 +72,7 @@ router.post('/', asyncHandler(async (req, res) => {
   const cols = ['id'];
   const vals = [id];
   const placeholders = ['?'];
-  for (const [apiKey, col, cast] of FIELDS) {
+  for (const [apiKey, col] of FIELDS) {
     cols.push(col);
     placeholders.push('?');
     if (apiKey === 'ordem') {
@@ -67,10 +83,12 @@ router.post('/', asyncHandler(async (req, res) => {
       vals.push(req.body[apiKey] || 'A iniciar');
     } else if (apiKey === 'temCronograma') {
       vals.push(!!req.body[apiKey]);
-    } else if (apiKey === 'icon') {
-      vals.push(req.body[apiKey] || 'layers');
+    } else if (apiKey === 'descricao') {
+      vals.push(sanitizeDescricao(req.body[apiKey]));
+    } else if (apiKey === 'cargaHoraria') {
+      vals.push(cargaHorariaVal(req.body[apiKey]));
     } else {
-      vals.push(req.body[apiKey] !== undefined ? cast(req.body[apiKey]) : '');
+      vals.push(req.body[apiKey] !== undefined ? String(req.body[apiKey]) : '');
     }
   }
   await pool.query(`INSERT INTO modulos (${cols.join(', ')}) VALUES (${placeholders.join(', ')})`, vals);
@@ -87,10 +105,14 @@ router.put('/:id', asyncHandler(async (req, res) => {
   const antes = toApi(rows[0]);
   const sets = [];
   const vals = [];
-  for (const [apiKey, col, cast] of FIELDS) {
+  for (const [apiKey, col] of FIELDS) {
     if (req.body[apiKey] === undefined) continue;
     sets.push(`${col} = ?`);
-    vals.push(apiKey === 'ordem' ? Number(req.body[apiKey]) : cast(req.body[apiKey]));
+    if (apiKey === 'ordem') vals.push(Number(req.body[apiKey]));
+    else if (apiKey === 'descricao') vals.push(sanitizeDescricao(req.body[apiKey]));
+    else if (apiKey === 'cargaHoraria') vals.push(cargaHorariaVal(req.body[apiKey]));
+    else if (apiKey === 'temCronograma') vals.push(!!req.body[apiKey]);
+    else vals.push(String(req.body[apiKey]));
   }
   if (sets.length) {
     vals.push(id);

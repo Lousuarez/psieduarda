@@ -29,10 +29,17 @@ router.get('/:token', asyncHandler(async (req, res) => {
     const [cicloRows] = await pool.query(`SELECT * FROM ciclos WHERE trilha_id IN (${tPlaceholders}) ORDER BY ordem`, trilhaIds);
     const cicloIds = cicloRows.map((r) => r.id);
 
-    let moduloRows = [];
+    let temaRows = [];
     if (cicloIds.length) {
-      const cPlaceholders = cicloIds.map(() => '?').join(',');
-      [moduloRows] = await pool.query(`SELECT * FROM modulos WHERE ciclo_id IN (${cPlaceholders}) ORDER BY ordem`, cicloIds);
+      const ciPlaceholders = cicloIds.map(() => '?').join(',');
+      [temaRows] = await pool.query(`SELECT * FROM temas WHERE ciclo_id IN (${ciPlaceholders}) ORDER BY ordem`, cicloIds);
+    }
+    const temaIds = temaRows.map((r) => r.id);
+
+    let moduloRows = [];
+    if (temaIds.length) {
+      const tePlaceholders = temaIds.map(() => '?').join(',');
+      [moduloRows] = await pool.query(`SELECT * FROM modulos WHERE tema_id IN (${tePlaceholders}) ORDER BY ordem`, temaIds);
     }
     const moduloIds = moduloRows.map((r) => r.id);
 
@@ -54,19 +61,30 @@ router.get('/:token', asyncHandler(async (req, res) => {
         .map((ci) => ({
           id: ci.id,
           nome: ci.nome,
-          modulos: moduloRows
-            .filter((m) => m.ciclo_id === ci.id)
-            .map((m) => ({
-              id: m.id,
-              nome: m.nome,
-              categoria: m.categoria,
-              descricao: m.descricao || '',
-              mentor: m.mentor || '',
-              formato: m.formato || '',
-              publicoAlvo: m.publico_alvo || '',
-              cargaHoraria: m.carga_horaria || '',
-              linkMaterial: m.link_material || '',
-              status: statusByModulo[m.id] || 'Não iniciado',
+          temas: temaRows
+            .filter((te) => te.ciclo_id === ci.id)
+            .map((te) => ({
+              id: te.id,
+              titulo: te.titulo,
+              descricao: te.descricao || '',
+              mes: te.mes || '',
+              formato: te.formato || '',
+              icon: te.icon || 'layers',
+              imagem: te.imagem || '',
+              modulos: moduloRows
+                .filter((m) => m.tema_id === te.id)
+                .map((m) => ({
+                  id: m.id,
+                  nome: m.nome,
+                  categoria: m.categoria,
+                  descricao: m.descricao || '',
+                  mentor: m.mentor || '',
+                  formato: m.formato || '',
+                  publicoAlvo: m.publico_alvo || '',
+                  cargaHoraria: m.carga_horaria ?? '',
+                  linkMaterial: m.link_material || '',
+                  status: statusByModulo[m.id] || 'Não iniciado',
+                })),
             })),
         })),
     }));
