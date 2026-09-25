@@ -20,9 +20,14 @@ const usuariosRoutes = require('./src/routes/usuarios');
 const minhaTrilhaRoutes = require('./src/routes/minhaTrilha');
 const exportRoutes = require('./src/routes/export');
 const auditLogRoutes = require('./src/routes/auditLog');
+const loginLogRoutes = require('./src/routes/loginLog');
 const { version } = require('./src/version');
 
 const app = express();
+
+// Atrás do proxy da Hostinger — sem isso, req.ip mostra o IP interno do
+// proxy em vez do IP real de quem acessou (usado no histórico de acesso).
+app.set('trust proxy', true);
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -58,6 +63,7 @@ app.use('/api/progresso', asyncHandler(requireAuth), progressoRoutes);
 app.use('/api/usuarios', asyncHandler(requireAuth), requireAdmin, usuariosRoutes);
 app.use('/api/export', asyncHandler(requireAuth), exportRoutes);
 app.use('/api/auditoria', asyncHandler(requireAuth), requireAdmin, auditLogRoutes);
+app.use('/api/login-log', asyncHandler(requireAuth), requireAdmin, loginLogRoutes);
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {

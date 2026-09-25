@@ -262,6 +262,22 @@ CREATE TABLE IF NOT EXISTS audit_log (
     KEY idx_audit_criado (criado_em)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Histórico de acesso — uma linha por login bem-sucedido. "ip_address" e
+-- "user_agent" vêm da requisição (não tem como o navegador informar o nome
+-- do computador, só o servidor de arquivos locais teria isso). Sem FK em
+-- usuario_id pelo mesmo motivo do audit_log: o histórico sobrevive à
+-- exclusão do usuário.
+CREATE TABLE IF NOT EXISTS login_log (
+    id CHAR(18) PRIMARY KEY,
+    usuario_id CHAR(18),
+    usuario_nome VARCHAR(191) NOT NULL,
+    ip_address VARCHAR(64),
+    user_agent VARCHAR(255),
+    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_login_usuario (usuario_id, criado_em),
+    KEY idx_login_criado (criado_em)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- Usuário administrador padrão (senha: Prestes@admin2026 — troque depois
 -- gerando um novo hash com:
 -- node -e "console.log(require('bcryptjs').hashSync('nova_senha', 10))"
