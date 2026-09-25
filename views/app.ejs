@@ -818,6 +818,10 @@ function toggleTheme(){
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20.5 20.5-4-4"/><path d="M8.5 11h5M11 8.5v5"/></svg>
           Auditoria
         </button>
+        <button class="nav-item" id="navr-login-log" onclick="navTo('reports','loginLog')" style="display:none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.2"/><path d="M3.5 9.5h17"/><path d="M8 14h3M8 17h6"/></svg>
+          Histórico de acesso
+        </button>
         </div></div>
       </div>
     </nav>
@@ -1052,6 +1056,41 @@ function toggleTheme(){
             <p class="field-hint" id="audit-count" style="margin:0 0 12px;"></p>
             <div id="audit-list"></div>
             <button type="button" class="btn-secondary" id="audit-load-more" style="margin-top:14px;display:none;" onclick="loadMoreAudit()">Carregar mais</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="view" id="view-r-login-log">
+        <div class="window">
+          <div class="window-head">
+            <div>
+              <p class="window-title">Histórico de acesso</p>
+              <p class="window-sub">Todo login realizado na plataforma — quem, quando, de qual IP e navegador/sistema.</p>
+            </div>
+          </div>
+          <div class="window-body" style="padding-bottom:0;">
+            <div class="freq-filters">
+              <div class="tx-select-wrap">
+                <label for="loginlog-de-input" class="tx-select-label">De</label>
+                <input type="date" id="loginlog-de-input" onchange="onLoginLogFilterChange()">
+              </div>
+              <div class="tx-select-wrap">
+                <label for="loginlog-ate-input" class="tx-select-label">Até</label>
+                <input type="date" id="loginlog-ate-input" onchange="onLoginLogFilterChange()">
+              </div>
+              <div class="tx-select-wrap">
+                <label for="loginlog-usuario-select" class="tx-select-label">Usuário</label>
+                <select id="loginlog-usuario-select" onchange="onLoginLogFilterChange()"><option value="">(todos os usuários)</option></select>
+              </div>
+            </div>
+          </div>
+          <div class="window-body">
+            <div class="reg-toolbar">
+              <input type="text" id="loginlog-search" class="reg-search" placeholder="Buscar por usuário ou IP…" oninput="onLoginLogSearchInput()">
+            </div>
+            <p class="field-hint" id="loginlog-count" style="margin:0 0 12px;"></p>
+            <div id="loginlog-list"></div>
+            <button type="button" class="btn-secondary" id="loginlog-load-more" style="margin-top:14px;display:none;" onclick="loadMoreLoginLog()">Carregar mais</button>
           </div>
         </div>
       </div>
@@ -1523,8 +1562,9 @@ function applyAdminVisibility(){
   document.getElementById('navsub-manage-admin').style.display = currentUserIsAdmin ? '' : 'none';
   document.getElementById('navv-frequencia').style.display = currentUserIsAdmin ? '' : 'none';
   document.getElementById('navr-auditoria').style.display = currentUserIsAdmin ? '' : 'none';
+  document.getElementById('navr-login-log').style.display = currentUserIsAdmin ? '' : 'none';
   if(!currentUserIsAdmin && currentMode==='view' && currentTab==='frequencia') navTo('view','colaborador');
-  if(!currentUserIsAdmin && currentMode==='reports' && currentTab==='auditoria') navTo('reports','frequencia');
+  if(!currentUserIsAdmin && currentMode==='reports' && (currentTab==='auditoria' || currentTab==='loginLog')) navTo('reports','frequencia');
 }
 let trilhaExtraSelected = null;
 let txSelectedTema = null;
@@ -1681,6 +1721,7 @@ function renderAll(){
     if(currentTab==='frequencia') renderRelatorioFrequencia(document.getElementById('relfreq-search')?.value);
     if(currentTab==='frequenciaColab') renderRelfreqColabView(document.getElementById('relfreqcolab-search')?.value);
     if(currentTab==='auditoria') renderAuditoriaView();
+    if(currentTab==='loginLog') renderLoginLogView();
   }
   if(document.getElementById('modal-colab').classList.contains('show')) renderColabFormTrilhas();
   if(document.getElementById('modal-module').classList.contains('show')){ renderModuleTurma(); renderModuleCronograma(); }
@@ -1775,12 +1816,12 @@ function renderFoot(){
 const NAV_IDS = {
   view: {colaborador:'navv-colab', trilhaExtra:'navv-trilhaExtra', frequencia:'navv-frequencia'},
   manage: {colaborador:'navm-colab', trilhas:'navm-trilhas', ciclos:'navm-ciclos', temas:'navm-temas', modulos:'navm-modulos', unidades:'navm-unidades', usuarios:'navm-usuarios'},
-  reports: {frequencia:'navr-frequencia', frequenciaColab:'navr-frequencia-colab', auditoria:'navr-auditoria'}
+  reports: {frequencia:'navr-frequencia', frequenciaColab:'navr-frequencia-colab', auditoria:'navr-auditoria', loginLog:'navr-login-log'}
 };
 const PANE_IDS = {
   view: {colaborador:'view-v-colaborador', trilhaExtra:'view-v-trilhaExtra', frequencia:'view-v-frequencia'},
   manage: {colaborador:'view-m-colaborador', trilhas:'view-m-trilhas', ciclos:'view-m-ciclos', temas:'view-m-temas', modulos:'view-m-modulos', unidades:'view-m-unidades', usuarios:'view-m-usuarios'},
-  reports: {frequencia:'view-r-frequencia', frequenciaColab:'view-r-frequencia-colab', auditoria:'view-r-auditoria'}
+  reports: {frequencia:'view-r-frequencia', frequenciaColab:'view-r-frequencia-colab', auditoria:'view-r-auditoria', loginLog:'view-r-login-log'}
 };
 
 function navTo(mode, name){
@@ -2557,6 +2598,85 @@ function auditDiffHtml(a){
     <span class="audit-diff-arrow">→</span>
     <span class="audit-diff-after">${esc(formatAuditValue(depois[k]))}</span>
   </div>`).join('');
+}
+
+/* ================= RELATÓRIOS: Histórico de acesso ================= */
+let loginLogFiltrosLoaded = false;
+let loginLogDocs = [];
+let loginLogTotal = 0;
+let loginLogOffset = 0;
+const LOGINLOG_LIMIT = 100;
+let loginLogSearchTimer = null;
+
+async function renderLoginLogView(){
+  if(!currentUserIsAdmin) return;
+  if(!loginLogFiltrosLoaded){
+    await loadLoginLogFiltros();
+    loginLogFiltrosLoaded = true;
+  }
+  await fetchLoginLog(true);
+}
+async function loadLoginLogFiltros(){
+  try{
+    const res = await fetch('api/login-log/filtros', { headers: authHeaders() });
+    const data = await res.json();
+    const userSel = document.getElementById('loginlog-usuario-select');
+    if(userSel) userSel.innerHTML = '<option value="">(todos os usuários)</option>' + data.usuarios.map(u=>`<option value="${esc(u)}">${esc(u)}</option>`).join('');
+  }catch(e){}
+}
+function onLoginLogFilterChange(){ fetchLoginLog(true); }
+function onLoginLogSearchInput(){
+  clearTimeout(loginLogSearchTimer);
+  loginLogSearchTimer = setTimeout(()=>fetchLoginLog(true), 300);
+}
+function loginLogQueryParams(offset){
+  const params = new URLSearchParams();
+  const usuarioNome = document.getElementById('loginlog-usuario-select')?.value;
+  const de = document.getElementById('loginlog-de-input')?.value;
+  const ate = document.getElementById('loginlog-ate-input')?.value;
+  const q = document.getElementById('loginlog-search')?.value;
+  if(usuarioNome) params.set('usuarioNome', usuarioNome);
+  if(de) params.set('de', de);
+  if(ate) params.set('ate', ate);
+  if(q) params.set('q', q);
+  params.set('limit', LOGINLOG_LIMIT);
+  params.set('offset', offset);
+  return params;
+}
+async function fetchLoginLog(reset){
+  const list = document.getElementById('loginlog-list');
+  if(!list) return;
+  if(reset){ loginLogOffset = 0; loginLogDocs = []; list.innerHTML = '<div class="loading-row"><span class="spinner"></span>Carregando…</div>'; }
+  try{
+    const params = loginLogQueryParams(loginLogOffset);
+    const res = await fetch('api/login-log?'+params.toString(), { headers: authHeaders() });
+    if(!res.ok){ list.innerHTML = '<p class="colab-empty">Não foi possível carregar o histórico de acesso.</p>'; return; }
+    const data = await res.json();
+    loginLogDocs = reset ? data.docs : [...loginLogDocs, ...data.docs];
+    loginLogTotal = data.total;
+    renderLoginLogList();
+  }catch(e){ list.innerHTML = '<p class="colab-empty">Não foi possível carregar o histórico de acesso.</p>'; }
+}
+function loadMoreLoginLog(){
+  loginLogOffset += LOGINLOG_LIMIT;
+  fetchLoginLog(false);
+}
+function renderLoginLogList(){
+  const list = document.getElementById('loginlog-list');
+  const countEl = document.getElementById('loginlog-count');
+  const moreBtn = document.getElementById('loginlog-load-more');
+  if(!list) return;
+  if(countEl) countEl.textContent = loginLogTotal ? `${loginLogDocs.length} de ${loginLogTotal} acesso${loginLogTotal===1?'':'s'}` : '';
+  if(!loginLogDocs.length){ list.innerHTML = '<p class="colab-empty">Nenhum acesso registrado para os filtros aplicados.</p>'; if(moreBtn) moreBtn.style.display='none'; return; }
+  list.innerHTML = loginLogDocs.map(a => `<div class="relfreq-row">
+    <div class="relfreq-row-head" style="cursor:default;">
+      <div class="relfreq-row-main">
+        <div class="reg-row-title">${esc(a.usuarioNome||'—')}</div>
+        <div class="reg-row-sub">${formatDateHora(a.criadoEm)} · ${esc(a.ipAddress||'IP desconhecido')} · ${esc([a.os, a.browser].filter(Boolean).join(' · ') || 'Navegador desconhecido')}</div>
+      </div>
+    </div>
+  </div>`).join('');
+  if(moreBtn) moreBtn.style.display = loginLogDocs.length < loginLogTotal ? '' : 'none';
 }
 
 function formatDateBR(iso){
